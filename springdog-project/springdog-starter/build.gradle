@@ -1,0 +1,47 @@
+plugins {
+    id "com.vanniktech.maven.publish" version "${mavenPublishVersion}"
+    id "io.github.goooler.shadow" version "${shadowVersion}"
+}
+
+dependencies {
+    api project(":springdog-project:springdog-autoconfigure")
+    api project(":springdog-project:springdog-manager")
+}
+
+mavenPublishing {
+    coordinates(rootPackageName, "springdog-stater", springDogVersion)
+
+    pom {
+        name = "SpringDog Starter"
+        description = "All in one!"
+        inceptionYear = "2024"
+        url = ""
+
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+
+        developers {
+            developer {
+                id = "PENEKhun"
+                name = "MoonSeonghun"
+                email = "penekhun@gmail.com"
+                url = "https://github.com/PENEKhun"
+                group = "Owner"
+                organization {
+                    name = "easypeel-security"
+                    url = "https://github.com/easypeel-security"
+                }
+            }
+        }
+
+        scm {
+            connection = "scm:git:git://github.com/PENEKhun/springdog.git"
+            developerConnection = "scm:git:ssh://github.com/PENEKhun/springdog.git"
+            url = "https://github.com/PENEKhun/springdog"
+        }
+    }
+}

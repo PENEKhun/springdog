@@ -1,0 +1,56 @@
+plugins {
+    id "com.vanniktech.maven.publish" version "${mavenPublishVersion}"
+    id "io.github.goooler.shadow" version "${shadowVersion}"
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+//    TODO: enable spring security
+//    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "com.squareup:javapoet:1.13.0"
+    implementation "org.springframework.boot:spring-boot-starter-thymeleaf:${springbootVersion}"
+    implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0"
+    implementation "org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.2.RELEASE"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
+    testImplementation "org.springframework.security:spring-security-test:${springVersion}"
+
+    api project(":springdog-project:springdog-datastore")
+}
+
+mavenPublishing {
+    coordinates(rootPackageName, "springdog-agent", springDogVersion)
+
+    pom {
+        name = "SpringDog Agent"
+        description = "Bark bark!"
+        inceptionYear = "2024"
+        url = ""
+
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+
+        developers {
+            developer {
+                id = "PENEKhun"
+                name = "MoonSeonghun"
+                email = "penekhun@gmail.com"
+                url = "https://github.com/PENEKhun"
+                group = "Owner"
+                organization {
+                    name = "easypeel-security"
+                    url = "https://github.com/easypeel-security"
+                }
+            }
+        }
+
+        scm {
+            connection = "scm:git:git://github.com/PENEKhun/springdog.git"
+            developerConnection = "scm:git:ssh://github.com/PENEKhun/springdog.git"
+            url = "https://github.com/PENEKhun/springdog"
+        }
+    }
+}
