@@ -13,7 +13,7 @@ dependencies {
 }
 
 mavenPublishing {
-    coordinates(rootPackageName, "springdog-stater", springDogVersion)
+    coordinates(rootPackageName, "springdog-starter", springDogVersion)
 
     pom {
         name = "SpringDog Starter"
