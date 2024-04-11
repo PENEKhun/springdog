@@ -4,13 +4,12 @@ plugins {
 }
 
 dependencies {
-    implementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
 //    TODO: enable spring security
 //    implementation "org.springframework.boot:spring-boot-starter-security"
-    implementation "com.squareup:javapoet:1.13.0"
+//    implementation "org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.2.RELEASE"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf:${springbootVersion}"
-    implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0"
-    implementation "org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.2.RELEASE"
+    implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}"
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
     testImplementation "org.springframework.security:spring-security-test:${springVersion}"
 

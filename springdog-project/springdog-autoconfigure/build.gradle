@@ -4,6 +4,13 @@ plugins {
 }
 
 dependencies {
+    implementation "com.squareup:javapoet:1.13.0"
+    implementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+
+    compileOnly "org.springframework.boot:spring-boot-starter-thymeleaf:${springbootVersion}"
+    compileOnly "org.springframework.boot:spring-boot-autoconfigure-processor:${springbootVersion}"
+    compileOnly "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}"
+
     api project(":springdog-project:springdog-agent")
     api project(":springdog-project:springdog-datastore")
 }
