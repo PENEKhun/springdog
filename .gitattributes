@@ -1,3 +1,2 @@
-/springdog-project/springdog-agent/src/main/resources/static/*.css linguist-detectable=false
-/springdog-project/springdog-agent/src/main/resources/static/*.html linguist-detectable=false
-/springdog-project/springdog-agent/src/main/resources/static/*.js linguist-detectable=false
+*.css linguist-detectable=false
+*.html linguist-detectable=false
