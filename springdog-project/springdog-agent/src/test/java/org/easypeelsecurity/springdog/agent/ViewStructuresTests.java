@@ -32,7 +32,7 @@ class ViewStructuresTests {
   @EnumSource(ViewStructures.class)
   void allStaticResourcesAreExist(ViewStructures item) {
     // given
-    String filePath = item.getFilePath();
+    String filePath = item.getResourcePath();
 
     // when & then
     File file = new File("src/main/resources" + filePath);
@@ -45,7 +45,7 @@ class ViewStructuresTests {
     // given
     HashSet<String> uris = new HashSet<>();
     for (ViewStructures item : ViewStructures.values()) {
-      uris.add(item.getUri());
+      uris.add(item.getUrlPath());
     }
 
     // when & then
@@ -57,7 +57,7 @@ class ViewStructuresTests {
     // given
     HashSet<String> filePaths = new HashSet<>();
     for (ViewStructures item : ViewStructures.values()) {
-      filePaths.add(item.getFilePath());
+      filePaths.add(item.getResourcePath());
     }
 
     // when & then

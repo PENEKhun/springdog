@@ -125,11 +125,11 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
       MethodSpec method = MethodSpec.methodBuilder(value.name())
           .addAnnotation(
               AnnotationSpec.builder(GetMapping.class)
-                  .addMember("value", "$S", value.getUri())
+                  .addMember("value", "$S", value.getUrlPath())
                   .build())
           .addModifiers(PUBLIC)
           .returns(String.class)
-          .addStatement("return $S", value.getFilePath())
+          .addStatement("return $S", value.getResourcePath())
           .build();
 
       controllerClass.addMethod(method);

@@ -26,20 +26,27 @@ public enum ViewStructures {
   MAIN("/", "/templates/content/main.html"),
   LOGIN("/login", "/templates/content/login.html");
 
-  private final String uri;
-  private final String filePath;
+  /**
+   * The relative URL path that maps to the resource.
+   */
+  private final String urlPath;
 
-  ViewStructures(String uri, String filePath) {
-    this.uri = uri;
-    this.filePath = filePath;
+  /**
+   * The path to the resource.
+   */
+  private final String resourcePath;
+
+  ViewStructures(String urlPath, String resourcePath) {
+    this.urlPath = urlPath;
+    this.resourcePath = resourcePath;
   }
 
-  public String getUri() {
-    return uri;
+  public String getUrlPath() {
+    return urlPath;
   }
 
-  public String getFilePath() {
-    return filePath;
+  public String getResourcePath() {
+    return resourcePath;
   }
 
 }
