@@ -4,8 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation 'ch.vorburger.mariaDB4j:mariaDB4j:3.1.0'
-    testImplementation 'ch.vorburger.mariaDB4j:mariaDB4j:3.1.0'
+
 }
 
 mavenPublishing {

@@ -20,9 +20,10 @@ import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.tools.Diagnostic.Kind.ERROR;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
 import java.util.Set;
 
-import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
@@ -30,11 +31,17 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.sql.DataSource;
 import javax.tools.Diagnostic.Kind;
 
 import org.easypeelsecurity.springdog.agent.ViewStructures;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.jpa.JpaVendorAdapter;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -46,6 +53,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
 import jakarta.annotation.Generated;
+import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 
 
 /**
@@ -56,6 +64,17 @@ import jakarta.annotation.Generated;
 public class SpringDogEnableProcessor extends AbstractProcessor {
 
   private boolean isAlreadyProcessed = false;
+  private static final String AGENT_PACKAGE_NAME = "org.easypeelsecurity.springdog.agent";
+  private static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
+  private static final String CONNECTION_URL =
+      "jdbc:derby:%s;%s".formatted("springdog-embedded-database", "create=true");
+  private static final HashMap<String, String> HIBERNATE_PROPERTIES = new HashMap<>() {
+    {
+      put("hibernate.hbm2ddl.auto", "create");
+      put("hibernate.dialect", "org.hibernate.dialect.DerbyDialect");
+    }
+  };
+
 
   @Override
   public Set<String> getSupportedAnnotationTypes() {
@@ -83,21 +102,72 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
 
       Builder thymeleafResolver = generateThymeleafResolver();
       Builder accessibleControllerCode = generateControllerCode();
+      Builder configureDatastore = generatedJpaConfig();
+
       String fullPackageName = elements.iterator().next().toString();
       super.processingEnv.getMessager()
-              .printMessage(Kind.NOTE, fullPackageName);
+          .printMessage(Kind.NOTE, fullPackageName);
 
       saveJavaFile(fullPackageName, thymeleafResolver);
       saveJavaFile(fullPackageName, accessibleControllerCode);
+      saveJavaFile(fullPackageName, configureDatastore);
       super.processingEnv.getMessager()
           .printMessage(Kind.NOTE, "Processed @SpringDogEnable annotation successfully.");
 
-      // TODO: 추가 필요한 구성들 동작 (DATABASE 설정, 등등...)이 런타임에 이뤄질 수 있도록
       isAlreadyProcessed = true;
     }
 
     return true;
   }
+
+  private Builder generatedJpaConfig() {
+
+    MethodSpec springdogEntityManagerFactory = MethodSpec.methodBuilder("springdogEntityManagerFactory")
+        .addAnnotation(Bean.class)
+        .returns(LocalContainerEntityManagerFactoryBean.class)
+        .addModifiers(Modifier.PUBLIC)
+        .addStatement("$T em = new $T()", LocalContainerEntityManagerFactoryBean.class,
+            LocalContainerEntityManagerFactoryBean.class)
+        .addStatement("em.setDataSource(dataSource())")
+        .addStatement("em.setPackagesToScan($S)", AGENT_PACKAGE_NAME)
+        .addStatement("$T vendorAdapter = new $T()", JpaVendorAdapter.class, HibernateJpaVendorAdapter.class)
+        .addStatement("em.setJpaVendorAdapter(vendorAdapter)")
+        .addStatement("em.setJpaProperties(additionalProperties())")
+        .addStatement("return em")
+        .build();
+
+    MethodSpec dataSource = MethodSpec.methodBuilder("dataSource")
+        .addAnnotation(Bean.class)
+        .returns(DataSource.class)
+        .addModifiers(Modifier.PUBLIC)
+        .addStatement("$T dataSource = new $T()", DriverManagerDataSource.class, DriverManagerDataSource.class)
+        .addStatement("dataSource.setDriverClassName($S)", DRIVER)
+        .addStatement("dataSource.setUrl($S)", CONNECTION_URL)
+        .addStatement("return dataSource")
+        .build();
+
+    MethodSpec additionalProperties = MethodSpec.methodBuilder("additionalProperties")
+        .addModifiers(Modifier.PUBLIC)
+        .returns(Properties.class)
+        .addStatement("$T properties = new $T()", Properties.class, Properties.class)
+        .addStatement("properties.setProperty(\"hibernate.hbm2ddl.auto\", \"create\")")
+        .addStatement("properties.setProperty(\"hibernate.dialect\", \"org.hibernate.dialect.DerbyDialect\")")
+        .addStatement("return properties")
+        .build();
+
+    return TypeSpec.classBuilder("JpaConfig")
+        .addAnnotation(Configuration.class)
+        .addAnnotation(AnnotationSpec.builder(EnableJpaRepositories.class)
+            .addMember("basePackages", "$S", AGENT_PACKAGE_NAME)
+            .addMember("entityManagerFactoryRef", "$S", "springdogEntityManagerFactory")
+            .addMember("transactionManagerRef", "$S", "springdogTransactionManager")
+            .build())
+        .addModifiers(Modifier.PUBLIC)
+        .addMethod(springdogEntityManagerFactory)
+        .addMethod(dataSource)
+        .addMethod(additionalProperties);
+  }
+
 
   private void saveJavaFile(String fullPackageName, Builder classSpec) {
     assert fullPackageName != null && !fullPackageName.isEmpty() : "package name is null or empty";
@@ -112,7 +182,7 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
           .build()
           .writeTo(filer);
     } catch (IOException e) {
-      processingEnv.getMessager().printMessage(ERROR, "Fatal error, Can't save java file. "  + e.getMessage());
+      processingEnv.getMessager().printMessage(ERROR, "Fatal error, Can't save java file. " + e.getMessage());
     }
   }
 

@@ -11,6 +11,10 @@ dependencies {
     compileOnly "org.springframework.boot:spring-boot-autoconfigure-processor:${springbootVersion}"
     compileOnly "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}"
 
+    implementation "org.apache.derby:derby:${derbyVersion}"
+    implementation "org.apache.derby:derbyclient:${derbyVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
+
     api project(":springdog-project:springdog-agent")
     api project(":springdog-project:springdog-datastore")
 }
