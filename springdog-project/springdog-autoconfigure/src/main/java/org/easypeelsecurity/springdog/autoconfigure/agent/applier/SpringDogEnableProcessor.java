@@ -16,19 +16,14 @@
 
 package org.easypeelsecurity.springdog.autoconfigure.agent.applier;
 
-import static javax.lang.model.element.Modifier.PUBLIC;
-import static javax.tools.Diagnostic.Kind.ERROR;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.sql.DataSource;
@@ -52,30 +47,18 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
-import jakarta.annotation.Generated;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 
-
 /**
- * &#064;SpringDogEnable  Annotation Processor.
- *
- * @author PENEKhun
+ * Processes the SpringDogEnable annotation to enable configurations necessary for SpringDog functionalities.
  */
 public class SpringDogEnableProcessor extends AbstractProcessor {
 
-  private boolean isAlreadyProcessed = false;
-  private static final String AGENT_PACKAGE_NAME = "org.easypeelsecurity.springdog.agent";
-  private static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
-  private static final String CONNECTION_URL =
-      "jdbc:derby:%s;%s".formatted("springdog-embedded-database", "create=true");
-  private static final HashMap<String, String> HIBERNATE_PROPERTIES = new HashMap<>() {
-    {
-      put("hibernate.hbm2ddl.auto", "create");
-      put("hibernate.dialect", "org.hibernate.dialect.DerbyDialect");
-    }
-  };
+  private static final String DATABASE_URL = "jdbc:derby:springdog-embedded-database;create=true";
 
-
+  /**
+   * Registers support for the SpringDogEnable annotation.
+   */
   @Override
   public Set<String> getSupportedAnnotationTypes() {
     return Set.of(SpringDogEnable.class.getName());
@@ -83,45 +66,28 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
 
   @Override
   public SourceVersion getSupportedSourceVersion() {
-    if (processingEnv.getSourceVersion().compareTo(SourceVersion.RELEASE_17) < 0) {
-      processingEnv.getMessager().printMessage(ERROR, "Springdog is only supported in Java 17 or higher.");
-    }
-
     return SourceVersion.latestSupported();
   }
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(SpringDogEnable.class);
-    for (Element ignored : elements) {
-      if (isAlreadyProcessed) {
-        super.processingEnv.getMessager()
-            .printMessage(Kind.MANDATORY_WARNING, "@SpringDogEnable annotation is already processed.");
-        return false;
-      }
-
-      Builder thymeleafResolver = generateThymeleafResolver();
-      Builder accessibleControllerCode = generateControllerCode();
-      Builder configureDatastore = generatedJpaConfig();
-
-      String fullPackageName = elements.iterator().next().toString();
-      super.processingEnv.getMessager()
-          .printMessage(Kind.NOTE, fullPackageName);
-
-      saveJavaFile(fullPackageName, thymeleafResolver);
-      saveJavaFile(fullPackageName, accessibleControllerCode);
-      saveJavaFile(fullPackageName, configureDatastore);
-      super.processingEnv.getMessager()
-          .printMessage(Kind.NOTE, "Processed @SpringDogEnable annotation successfully.");
-
-      isAlreadyProcessed = true;
+    if (!roundEnv.processingOver() && !annotations.isEmpty()) {
+      generateConfigurations(roundEnv);
+      return true;
     }
-
-    return true;
+    return false;
   }
 
-  private Builder generatedJpaConfig() {
+  private void generateConfigurations(RoundEnvironment roundEnv) {
+    roundEnv.getElementsAnnotatedWith(SpringDogEnable.class).forEach(element -> {
+      String fullPackageName = element.getEnclosingElement().toString();
+      generateThymeleafConfig(fullPackageName);
+      generateJPAConfig(fullPackageName);
+      generateController(fullPackageName);
+    });
+  }
 
+  private void generateJPAConfig(String fullPackageName) {
     MethodSpec springdogEntityManagerFactory = MethodSpec.methodBuilder("springdogEntityManagerFactory")
         .addAnnotation(Bean.class)
         .returns(LocalContainerEntityManagerFactoryBean.class)
@@ -129,7 +95,7 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
         .addStatement("$T em = new $T()", LocalContainerEntityManagerFactoryBean.class,
             LocalContainerEntityManagerFactoryBean.class)
         .addStatement("em.setDataSource(dataSource())")
-        .addStatement("em.setPackagesToScan($S)", AGENT_PACKAGE_NAME)
+        .addStatement("em.setPackagesToScan($S)", "org.easypeelsecurity.springdog.agent")
         .addStatement("$T vendorAdapter = new $T()", JpaVendorAdapter.class, HibernateJpaVendorAdapter.class)
         .addStatement("em.setJpaVendorAdapter(vendorAdapter)")
         .addStatement("em.setJpaProperties(additionalProperties())")
@@ -141,74 +107,43 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
         .returns(DataSource.class)
         .addModifiers(Modifier.PUBLIC)
         .addStatement("$T dataSource = new $T()", DriverManagerDataSource.class, DriverManagerDataSource.class)
-        .addStatement("dataSource.setDriverClassName($S)", DRIVER)
-        .addStatement("dataSource.setUrl($S)", CONNECTION_URL)
+        .addStatement("dataSource.setDriverClassName($S)", "org.apache.derby.jdbc.EmbeddedDriver")
+        .addStatement("dataSource.setUrl($S)", DATABASE_URL)
         .addStatement("return dataSource")
         .build();
 
-    MethodSpec additionalProperties = MethodSpec.methodBuilder("additionalProperties")
+    MethodSpec.Builder tempAdditionalProperties = MethodSpec.methodBuilder("additionalProperties")
         .addModifiers(Modifier.PUBLIC)
         .returns(Properties.class)
-        .addStatement("$T properties = new $T()", Properties.class, Properties.class)
-        .addStatement("properties.setProperty(\"hibernate.hbm2ddl.auto\", \"create\")")
-        .addStatement("properties.setProperty(\"hibernate.dialect\", \"org.hibernate.dialect.DerbyDialect\")")
-        .addStatement("return properties")
-        .build();
+        .addStatement("$T properties = new $T()", Properties.class, Properties.class);
+    hibernateProperties().forEach(
+        (key, value) -> tempAdditionalProperties.addStatement("properties.setProperty($S, $S)", key, value));
+    MethodSpec additionalProperties = tempAdditionalProperties.addStatement("return properties").build();
 
-    return TypeSpec.classBuilder("JpaConfig")
+    TypeSpec jpaConfig = TypeSpec.classBuilder("JPAConfiguration")
         .addAnnotation(Configuration.class)
         .addAnnotation(AnnotationSpec.builder(EnableJpaRepositories.class)
-            .addMember("basePackages", "$S", AGENT_PACKAGE_NAME)
+            .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.agent")
             .addMember("entityManagerFactoryRef", "$S", "springdogEntityManagerFactory")
             .addMember("transactionManagerRef", "$S", "springdogTransactionManager")
             .build())
         .addModifiers(Modifier.PUBLIC)
         .addMethod(springdogEntityManagerFactory)
         .addMethod(dataSource)
-        .addMethod(additionalProperties);
-  }
+        .addMethod(additionalProperties)
+        .build();
 
-
-  private void saveJavaFile(String fullPackageName, Builder classSpec) {
-    assert fullPackageName != null && !fullPackageName.isEmpty() : "package name is null or empty";
-    assert classSpec != null : "classSpec is null";
-
-    Filer filer = processingEnv.getFiler();
-    String originalPackageName = fullPackageName.substring(0, fullPackageName.lastIndexOf("."));
-    AnnotationSpec generatedAnnotation = AnnotationSpec.builder(Generated.class)
-        .addMember("value", "$S", SpringDogEnable.class.getName()).build();
     try {
-      JavaFile.builder(originalPackageName, classSpec.addAnnotation(generatedAnnotation).build())
+      JavaFile.builder(fullPackageName, jpaConfig)
           .build()
-          .writeTo(filer);
+          .writeTo(processingEnv.getFiler());
     } catch (IOException e) {
-      processingEnv.getMessager().printMessage(ERROR, "Fatal error, Can't save java file. " + e.getMessage());
+      processingEnv.getMessager()
+          .printMessage(Kind.ERROR, "Error writing datasource init codes : " + e.getMessage());
     }
   }
 
-  private Builder generateControllerCode() {
-    Builder controllerClass = TypeSpec.classBuilder("View")
-        .addAnnotation(Controller.class)
-        .addModifiers(PUBLIC);
-
-    for (ViewStructures value : ViewStructures.values()) {
-      MethodSpec method = MethodSpec.methodBuilder(value.name())
-          .addAnnotation(
-              AnnotationSpec.builder(GetMapping.class)
-                  .addMember("value", "$S", value.getUrlPath())
-                  .build())
-          .addModifiers(PUBLIC)
-          .returns(String.class)
-          .addStatement("return $S", value.getResourcePath())
-          .build();
-
-      controllerClass.addMethod(method);
-    }
-    assert !controllerClass.methodSpecs.isEmpty() : "view method wasn't generated";
-    return controllerClass;
-  }
-
-  private Builder generateThymeleafResolver() {
+  private void generateThymeleafConfig(String fullPackageName) {
     MethodSpec templateEngineMethod = MethodSpec.methodBuilder("templateEngine")
         .addAnnotation(Bean.class)
         .returns(SpringTemplateEngine.class)
@@ -231,11 +166,60 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
         .addStatement("return templateResolver")
         .build();
 
-    return TypeSpec.classBuilder("SpringDogDashboardEnabler")
+    TypeSpec agentEnabler = TypeSpec.classBuilder("SpringDogAgentEnabler")
         .addAnnotation(Configuration.class)
         .addModifiers(Modifier.PUBLIC)
         .addMethod(templateEngineMethod)
-        .addMethod(templateResolverMethod);
+        .addMethod(templateResolverMethod)
+        .build();
+
+    try {
+      JavaFile.builder(fullPackageName, agentEnabler)
+          .build()
+          .writeTo(processingEnv.getFiler());
+    } catch (IOException e) {
+      processingEnv.getMessager()
+          .printMessage(Kind.ERROR, "Error writing Thymeleaf configuration: " + e.getMessage());
+    }
   }
 
+  private void generateController(String fullPackageName) {
+    Builder controllerClass = TypeSpec.classBuilder("View")
+        .addAnnotation(Controller.class)
+        .addModifiers(Modifier.PUBLIC);
+
+    for (ViewStructures value : ViewStructures.values()) {
+      MethodSpec method = MethodSpec.methodBuilder(value.name())
+          .addAnnotation(
+              AnnotationSpec.builder(GetMapping.class)
+                  .addMember("value", "$S", value.getUrlPath())
+                  .build())
+          .addModifiers(Modifier.PUBLIC)
+          .returns(String.class)
+          .addStatement("return $S", value.getResourcePath())
+          .build();
+
+      controllerClass.addMethod(method);
+    }
+
+    assert !controllerClass.methodSpecs.isEmpty() : "view method wasn't generated";
+    TypeSpec controllerSpec = controllerClass.build();
+    try {
+      JavaFile.builder(fullPackageName, controllerSpec)
+          .build()
+          .writeTo(processingEnv.getFiler());
+    } catch (IOException e) {
+      processingEnv.getMessager().printMessage(Kind.ERROR, "Error writing controller class: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Defines Hibernate properties.
+   */
+  private HashMap<String, String> hibernateProperties() {
+    HashMap<String, String> properties = new HashMap<>();
+    properties.put("hibernate.hbm2ddl.auto", "create");
+    properties.put("hibernate.dialect", "org.hibernate.dialect.DerbyDialect");
+    return properties;
+  }
 }
