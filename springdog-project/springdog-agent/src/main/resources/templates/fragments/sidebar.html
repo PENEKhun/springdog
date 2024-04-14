@@ -1,36 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <div id="layoutSidenav_nav" th:fragment="sidebarFragment">
+
   <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
     <div class="sb-sidenav-menu">
       <div class="nav">
-        <div class="sb-sidenav-menu-heading">Core</div>
-        <a aria-controls="collapseLayouts" aria-expanded="false" class="nav-link collapsed"
-           data-bs-target="#collapseLayouts" data-bs-toggle="collapse">
-          <div class="sb-nav-link-icon">
-            <svg aria-hidden="true" class="svg-inline--fa fa-table-columns" data-fa-i2svg=""
-                 data-icon="table-columns" data-prefix="fas" focusable="false"
-                 role="img" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-              <path d="M384,80h16V32H232V0h-64v32H0v48h16v224H0v48h62.024l-32,144h48.392l32.008-144H176v144h48V352h65.584l32.008,144h48.392
-				l-32-144H400v-48h-16V80z M184,16h32v16h-32V16z M16,48h368v16H16V48z M368,80v224H32V80H368z M65.584,480H49.976l28.44-128
-				h15.608L65.584,480z M208,480h-16V352h16V480z M350.024,480h-15.608l-28.44-128h15.608L350.024,480z M384,336H16v-16h368V336z"
-                    fill="currentColor"></path>
-              <polygon fill="currentColor"
-                       points="304,272 64,272 64,112 336,112 336,272 320,272 320,288 352,288 352,96 48,96 48,288 304,288 			"/>
-              <path d="M268.32,208l45.608,53.2l12.144-10.408L275.68,192h-12.376c0.392-2.656,0.696-5.32,0.696-8c0-30.872-25.128-56-56-56
-				c-25.096,0-46.616,16.472-53.576,40H140.16l-66.408,83l12.504,10l61.584-77h55.992l53.608,76.584l13.112-9.168l-29.096-41.56
-				l1.856-1.856H268.32z M236.688,192l-4.544,4.544L212.168,168H171.52c6.216-14.296,20.248-24,36.48-24c22.056,0,40,17.944,40,40
-				c0,2.672-0.368,5.344-0.928,8H236.688z" fill="currentColor"></path>
-              <path d="M487.936,81.488L460.28,40h-24.56l-27.656,41.488C402.792,89.392,400,98.6,400,108.112V112
-				c0,14.168,6.208,26.88,16,35.68V464c0,17.648,14.352,32,32,32s32-14.352,32-32V147.68c9.792-8.792,16-21.504,16-35.68v-3.888
-				C496,98.6,493.208,89.392,487.936,81.488z M464,464c0,8.824-7.176,16-16,16c-8.824,0-16-7.176-16-16v-16h32V464z M464,432h-32
-				V192h32V432z M464,176h-32v-18.8c5.016,1.784,10.384,2.8,16,2.8c5.616,0,10.984-1.024,16-2.8V176z M480,112
-				c0,17.648-14.352,32-32,32s-32-14.352-32-32v-3.888c0-6.344,1.856-12.48,5.376-17.752L440,62.424V104h16V62.424l18.624,27.936
-				c3.52,5.272,5.376,11.408,5.376,17.752V112z" fill="currentColor"></path>
+        <div class="sb-sidenav-menu-heading">Service</div>
 
-            </svg>
+        <a class="nav-link" th:href="@{/}">
+          <div class="sb-nav-link-icon">
           </div>
           Dashboard
+        </a>
+
+        <a aria-controls="rate-limits" aria-expanded="false" class="nav-link collapsed"
+           data-bs-target="#rate-limits" data-bs-toggle="collapse">
+          <div class="sb-nav-link-icon">
+          </div>
+          Rate Limit
           <div class="sb-sidenav-collapse-arrow">
             <svg aria-hidden="true" class="svg-inline--fa fa-angle-down" data-fa-i2svg=""
                  data-icon="angle-down" data-prefix="fas" focusable="false"
@@ -42,34 +29,18 @@
           </div>
         </a>
         <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
-             id="collapseLayouts">
+             id="rate-limits">
           <nav class="sb-sidenav-menu-nested nav">
-            <a class="nav-link" th:href="@{/}">dashboard</a>
+            <a class="nav-link" th:href="@{/rate-limit/manage}">Manage</a>
+            <a class="nav-link" th:href="@{/rate-limit/monitor}">Monitor</a>
           </nav>
         </div>
 
-        <a aria-controls="collapsePages" aria-expanded="false" class="nav-link collapsed"
-           data-bs-target="#collapsePages" data-bs-toggle="collapse">
+        <a aria-controls="errorTraces" aria-expanded="false" class="nav-link collapsed"
+           data-bs-target="#errorTraces" data-bs-toggle="collapse">
           <div class="sb-nav-link-icon">
-            <svg aria-hidden="true" class="svg-inline--fa fa-book-open" data-fa-i2svg=""
-                 data-icon="book-open" data-prefix="fas" focusable="false"
-                 role="img" viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg">
-              <path d="M143.891,239.576c53.747,0,97.473-43.725,97.473-97.472s-43.725-97.472-97.473-97.472
-                  c-53.747,0-97.472,43.725-97.472,97.472C46.419,195.849,90.144,239.576,143.891,239.576z"
-                    fill="currentColor"></path>
-              <path d="M143.893,256.635C64.55,256.635,0,321.18,0,400.516v48.799c0,9.974,8.086,18.06,18.06,18.06h251.654
-				c9.974,0,18.06-8.086,18.06-18.06v-48.799C287.774,321.553,223.913,256.635,143.893,256.635z"
-                    fill="currentColor"></path>
-              <path d="M277.204,288.878c-2.526,2.061-2.896,5.777-0.887,8.344c40.646,51.985,35.539,98.905,35.539,152.094
-				c0,3.649-0.467,7.19-1.345,10.57c-0.986,3.796,1.906,7.49,5.829,7.49h177.6c9.974,0,18.06-8.086,18.06-18.06v-48.799
-				C512,278.194,369.744,213.381,277.204,288.878z" fill="currentColor"></path>
-              <path d="M270.641,222.44L270.641,222.44c0,9.974,8.086,18.06,18.06,18.06h158.823c9.974,0,18.06-8.086,18.06-18.06v-80.333
-				c0-0.001,0-0.002,0-0.002c-0.005-53.964-44.013-97.482-97.478-97.482c-55.908,0-99.56,46.932-97.466,101.414V222.44z
-				 M306.791,139.032h122.598c1.735,35.174-26.395,64.421-61.281,64.421C332.511,203.453,304.98,173.234,306.791,139.032z"
-                    fill="currentColor"></path>
-            </svg>
           </div>
-          Configurations
+          Error Trace
           <div class="sb-sidenav-collapse-arrow">
             <svg aria-hidden="true" class="svg-inline--fa fa-angle-down" data-fa-i2svg=""
                  data-icon="angle-down" data-prefix="fas" focusable="false"
@@ -81,13 +52,21 @@
           </div>
         </a>
         <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
-             id="collapsePages">
+             id="errorTraces">
           <nav class="sb-sidenav-menu-nested nav">
-            <a class="nav-link" th:href="@{/}">API RateLimit</a>
-            <a class="nav-link" th:href="@{/}">Error Tracing</a>
-            <a class="nav-link" th:href="@{/}">Slow Response</a>
+            <a class="nav-link" th:href="@{/}">Manage</a>
+            <a class="nav-link" th:href="@{/}">Monitor</a>
           </nav>
         </div>
+
+
+        <div class="sb-sidenav-menu-heading">Service Setting</div>
+
+        <a class="nav-link" th:href="@{/service/change-pw}">
+          <div class="sb-nav-link-icon">
+          </div>
+          Change Password
+        </a>
 
         <a class="nav-link" th:href="@{/logout}">
           <div class="sb-nav-link-icon">
