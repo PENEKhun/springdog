@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html layout:decorate="~{/templates/layout/default_layout.html}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<th:block layout:fragment="css"></th:block>
+<th:block layout:fragment="script">
+  <script>
+    window.onload = function () {
+      new DataTable('#table', {
+        columns: [
+          {title: 'ID', data: 'id', visible: false},
+          {title: 'Endpoint', data: 'endpoint'},
+          {title: 'Class', data: 'controller'},
+          {title: 'Request Type', data: 'requestType'},
+          {
+            title: 'Rule Activated',
+            data: 'activated',
+            render: function (data) {
+              if (data) {
+                return '<span class="badge bg-success">Activated</span>';
+              } else {
+                return '<span class="badge bg-danger">Deactivated</span>';
+              }
+            }
+          },
+          {title: 'Last modified', data: 'updatedAt'},
+          {
+            title: 'Actions',
+            data: 'id',
+            render: function (data, type, row, meta) {
+              return '<button class="btn btn-primary btn-sm" onclick="configure(' + data
+                  + ')" title="Configure"><i class="bi bi-gear-fill"></i></button> ' +
+                  '<button class="btn btn-info btn-sm" onclick="analyze(' + data
+                  + ')" title="Analyze"><i class="bi bi-bar-chart-line-fill"></i></button>';
+            }
+          }
+        ],
+        data: [
+          {
+            id: 1,
+            endpoint: '/api/v1/user',
+            controller: 'UserController',
+            requestType: 'GET',
+            activated: true,
+            updatedAt: '2021-08-01 12:00:00',
+          },
+          {
+            id: 2,
+            endpoint: '/api/v1/user',
+            controller: 'UserController',
+            requestType: 'POST',
+            activated: false,
+            updatedAt: '2021-08-01 12:00:00',
+          },
+          {
+            id: 3,
+            endpoint: '/api/v1/user',
+            controller: 'UserController',
+            requestType: 'PUT',
+            activated: false,
+            updatedAt: '2021-08-01 12:00:00',
+          },
+          {
+            id: 4,
+            endpoint: '/api/v1/user',
+            controller: 'UserController',
+            requestType: 'DELETE',
+            activated: true,
+            updatedAt: '2021-08-01 12:00:00',
+          },
+        ],
+      });
+    }
+
+    function configure(id) {
+      window.location.href = window.location.pathname + '/' + id;
+    }
+
+    function analyze(id) {
+      window.location.href = window.location.pathname + '/' + id + '/analytics';
+    }
+  </script>
+</th:block>
+
+<div class="content" layout:fragment="content">
+  <h1 class="mt-4">Rate Limit</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">Manage</li>
+  </ol>
+
+  <table id="table">
+
+  </table>
+</div>
+
+</html>
