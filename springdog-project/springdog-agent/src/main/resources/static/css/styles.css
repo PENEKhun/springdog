@@ -12372,3 +12372,18 @@ body {
   font-size: 0.75rem;
   border-radius: 0.25rem !important;
 }
+
+main div.content {
+  padding: 1rem;
+}
+
+.logo {
+  max-width: 3rem;
+  max-height: 3rem;
+}
+
+.navbar-brand a {
+  text-decoration: none;
+  vertical-align: middle;
+  color: white;
+}
