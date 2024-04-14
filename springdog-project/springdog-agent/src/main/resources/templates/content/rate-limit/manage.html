@@ -4,8 +4,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 
-<th:block layout:fragment="css"></th:block>
-<th:block layout:fragment="script">
+<head>
   <script>
     window.onload = function () {
       new DataTable('#table', {
@@ -82,7 +81,8 @@
       window.location.href = window.location.pathname + '/' + id + '/analytics';
     }
   </script>
-</th:block>
+  <title>Manage</title>
+</head>
 
 <div class="content" layout:fragment="content">
   <h1 class="mt-4">Rate Limit</h1>
