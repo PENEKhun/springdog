@@ -16,7 +16,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
 
     api project(":springdog-project:springdog-agent")
-    api project(":springdog-project:springdog-datastore")
 }
 
 mavenPublishing {
