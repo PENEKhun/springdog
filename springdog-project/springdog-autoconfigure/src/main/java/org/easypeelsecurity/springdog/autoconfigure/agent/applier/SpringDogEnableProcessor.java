@@ -29,16 +29,14 @@ import javax.lang.model.element.TypeElement;
 import javax.sql.DataSource;
 import javax.tools.Diagnostic.Kind;
 
-import org.easypeelsecurity.springdog.agent.ViewStructures;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 
@@ -46,7 +44,6 @@ import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.TypeSpec.Builder;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 
 /**
@@ -83,7 +80,7 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
       String fullPackageName = element.getEnclosingElement().toString();
       generateThymeleafConfig(fullPackageName);
       generateJPAConfig(fullPackageName);
-      generateController(fullPackageName);
+      generateAgentViewApplier(fullPackageName);
     });
   }
 
@@ -183,33 +180,22 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
     }
   }
 
-  private void generateController(String fullPackageName) {
-    Builder controllerClass = TypeSpec.classBuilder("View")
-        .addAnnotation(Controller.class)
-        .addModifiers(Modifier.PUBLIC);
+  private void generateAgentViewApplier(String fullPackageName) {
+    TypeSpec agentViewApplier = TypeSpec.classBuilder("SpringdogAgentComponentScanHelper")
+        .addAnnotation(Configuration.class)
+        .addAnnotation(AnnotationSpec.builder(ComponentScan.class)
+            .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.agent")
+            .build())
+        .addModifiers(Modifier.PUBLIC)
+        .build();
 
-    for (ViewStructures value : ViewStructures.values()) {
-      MethodSpec method = MethodSpec.methodBuilder(value.name())
-          .addAnnotation(
-              AnnotationSpec.builder(GetMapping.class)
-                  .addMember("value", "$S", value.getUrlPath())
-                  .build())
-          .addModifiers(Modifier.PUBLIC)
-          .returns(String.class)
-          .addStatement("return $S", value.getResourcePath())
-          .build();
-
-      controllerClass.addMethod(method);
-    }
-
-    assert !controllerClass.methodSpecs.isEmpty() : "view method wasn't generated";
-    TypeSpec controllerSpec = controllerClass.build();
     try {
-      JavaFile.builder(fullPackageName, controllerSpec)
+      JavaFile.builder(fullPackageName, agentViewApplier)
           .build()
           .writeTo(processingEnv.getFiler());
     } catch (IOException e) {
-      processingEnv.getMessager().printMessage(Kind.ERROR, "Error writing controller class: " + e.getMessage());
+      processingEnv.getMessager()
+          .printMessage(Kind.ERROR, "Error writing agentViewApplier: " + e.getMessage());
     }
   }
 
