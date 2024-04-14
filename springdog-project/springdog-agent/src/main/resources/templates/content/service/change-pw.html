@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html layout:decorate="~{/templates/layout/default_layout.html}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<th:block layout:fragment="css"></th:block>
+<th:block layout:fragment="script"></th:block>
+
+<div class="content" layout:fragment="content">
+  <h1 class="mt-4">Services</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">Change Admin Password</li>
+  </ol>
+
+
+  <div class="card">
+    <div class="card-body">
+      <form class="container mt-4">
+        <div class="mb-3">
+          <label for="currentPassword" class="form-label">Current Password</label>
+          <input type="password" class="form-control" id="currentPassword"
+                 placeholder="Enter current password">
+        </div>
+
+        <hr/>
+
+        <div class="mb-3">
+          <label for="newPassword" class="form-label">New Password</label>
+          <input type="password" class="form-control" id="newPassword"
+                 placeholder="Enter new password">
+        </div>
+        <div class="mb-3">
+          <label for="confirmPassword" class="form-label">Confirm New Password</label>
+          <input type="password" class="form-control" id="confirmPassword"
+                 placeholder="Confirm new password">
+        </div>
+        <button type="submit" class="btn btn-primary">Change Password</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+</html>
