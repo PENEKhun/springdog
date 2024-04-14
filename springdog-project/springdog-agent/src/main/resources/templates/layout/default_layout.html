@@ -28,17 +28,17 @@
 
 </head>
 <body class="sb-nav-fixed">
-<div th:replace="/templates/fragments/header.html :: headerFragment"></div>
+<div th:replace="~{/templates/fragments/header.html :: headerFragment}"></div>
 
 <div id="layoutSidenav">
-  <div th:replace="/templates/fragments/sidebar.html :: sidebarFragment"></div>
+  <div th:replace="~{/templates/fragments/sidebar.html :: sidebarFragment}"></div>
   <div id="layoutSidenav_content">
     <main>
       <div class="container-fluid">
         <div layout:fragment="content">
         </div>
       </div>
-      <footer th:replace="/templates/fragments/footer.html :: footerFragment"></footer>
+      <footer th:replace="~{/templates/fragments/footer.html :: footerFragment}"></footer>
     </main>
   </div>
 
