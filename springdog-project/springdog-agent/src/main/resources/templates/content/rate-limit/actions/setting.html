@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html layout:decorate="~{/templates/layout/default_layout.html}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<th:block layout:fragment="css"></th:block>
+<th:block layout:fragment="script">
+  <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+      let checkbox = document.getElementById("permanentBan");
+      checkbox.addEventListener("change", function () {
+        let banDurationGroup = document.getElementById("banDurationGroup");
+        for (let input of banDurationGroup.getElementsByTagName("input")) {
+          input.value = "";
+          input.disabled = checkbox.checked;
+        }
+      });
+
+      /*<![CDATA[*/
+      let parameterItems = [[${paramItems}]].map(item => ({id: item, text: item}));
+      let headerItems = [[${headerItems}]].map(item => ({id: item, text: item}));
+      /*]]>*/
+
+      $("#parametersOption").select2({
+        data: parameterItems,
+        placeholder: 'Select parameters',
+        allowClear: true
+      });
+
+      $("#headerOption").select2({
+        data: headerItems,
+        placeholder: 'Select header',
+        allowClear: true
+      });
+    });
+  </script>
+</th:block>
+
+<div class="container content" layout:fragment="content">
+  <h1 class="mt-4">Rate Limit Settings</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">Setting</li>
+  </ol>
+
+  <form>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Endpoint Information</h5>
+        <p class="card-text">
+          <strong>API Path:</strong>
+        <div class="alert alert-info" th:text="${apiPath}"></div>
+        <strong>Request Type:</strong>
+        <div class="alert alert-info" th:text="${requestType}"></div>
+        <strong>Controller Class:</strong>
+        <div class="alert alert-info" th:text="${controllerClass}"></div>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-body">
+        <h5 class="card-title">Request Control Settings</h5>
+        <form>
+          <div class="mb-3">
+            <label for="requestLimit" class="form-label">Request Limit</label>
+            <input type="number" class="form-control" id="requestLimit"
+                   placeholder="Number of requests">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Time Frame</label>
+            <div class="d-flex flex-row" id="timeFrameGroup">
+              <div class="form-floating me-2 flex-fill">
+                <input type="number" class="form-control" id="timeFrameDays" placeholder="Days">
+                <label for="timeFrameDays">Days</label>
+              </div>
+              <div class="form-floating me-2 flex-fill">
+                <input type="number" class="form-control" id="timeFrameHours" placeholder="Hours">
+                <label for="timeFrameHours">Hours</label>
+              </div>
+              <div class="form-floating me-2 flex-fill">
+                <input type="number" class="form-control" id="timeFrameMinutes"
+                       placeholder="Minutes">
+                <label for="timeFrameMinutes">Minutes</label>
+              </div>
+              <div class="form-floating flex-fill">
+                <input type="number" class="form-control" id="timeFrameSeconds"
+                       placeholder="Seconds">
+                <label for="timeFrameSeconds">Seconds</label>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Ban Duration</label>
+            <div class="d-flex flex-row" id="banDurationGroup">
+              <div class="form-floating me-2 flex-fill">
+                <input type="number" class="form-control" id="banDurationDays" placeholder="Days">
+                <label for="banDurationDays">Days</label>
+              </div>
+              <div class="form-floating me-2 flex-fill">
+                <input type="number" class="form-control" id="banDurationHours" placeholder="Hours">
+                <label for="banDurationHours">Hours</label>
+              </div>
+              <div class="form-floating me-2 flex-fill">
+                <input type="number" class="form-control" id="banDurationMinutes"
+                       placeholder="Minutes">
+                <label for="banDurationMinutes">Minutes</label>
+              </div>
+              <div class="form-floating flex-fill">
+                <input type="number" class="form-control" id="banDurationSeconds"
+                       placeholder="Seconds">
+                <label for="banDurationSeconds">Seconds</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="align-checkbox">
+              <input type="checkbox" class="form-check-input" id="permanentBan">
+              <label class="form-check-label" for="permanentBan">Permanent Ban</label>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-body">
+        <h5 class="card-title">Ban Ruleset combinations</h5>
+        <div class="mb-3 row">
+          <label for="parametersOption" class="form-label">Parameters</label>
+          <select class="form-control" id="parametersOption" multiple></select>
+        </div>
+        <div class="mb-3 row">
+          <label for="headerOption" class="form-label">Custom Header</label>
+          <select class="form-control" id="headerOption" multiple></select>
+        </div>
+        <div class="form-check mb-3">
+          <input type="checkbox" class="form-check-input" id="ipBlock">
+          <label class="form-check-label" for="ipBlock">Enable IP-based Blocking</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <button type="submit" class="btn btn-primary">Apply</button>
+    </div>
+  </form>
+</div>
+
+</html>
