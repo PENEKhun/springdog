@@ -15,6 +15,7 @@ dependencies {
     implementation "org.apache.derby:derbytools:${derbyVersion}"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
 
+    testImplementation "com.google.testing.compile:compile-testing:${compileTestingVersion}"
     api project(":springdog-project:springdog-agent")
 }
 
