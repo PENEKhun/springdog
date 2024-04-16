@@ -34,9 +34,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 
@@ -51,7 +53,8 @@ import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
  */
 public class SpringDogEnableProcessor extends AbstractProcessor {
 
-  private static final String DATABASE_URL = "jdbc:derby:springdog-embedded-database;create=true";
+  private static final String DATABASE_URL =
+      "jdbc:derby:springdog-embedded-database;create=true;";
 
   /**
    * Registers support for the SpringDogEnable annotation.
@@ -80,7 +83,8 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
       String fullPackageName = element.getEnclosingElement().toString();
       generateThymeleafConfig(fullPackageName);
       generateJPAConfig(fullPackageName);
-      generateAgentViewApplier(fullPackageName);
+      springdogAgentControllerApplier(fullPackageName);
+      autoconfigurationBeanApplier(fullPackageName);
     });
   }
 
@@ -92,10 +96,10 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
         .addStatement("$T em = new $T()", LocalContainerEntityManagerFactoryBean.class,
             LocalContainerEntityManagerFactoryBean.class)
         .addStatement("em.setDataSource(dataSource())")
-        .addStatement("em.setPackagesToScan($S)", "org.easypeelsecurity.springdog.agent")
+        .addStatement("em.setPackagesToScan($S)", "org.easypeelsecurity.springdog.shared")
         .addStatement("$T vendorAdapter = new $T()", JpaVendorAdapter.class, HibernateJpaVendorAdapter.class)
         .addStatement("em.setJpaVendorAdapter(vendorAdapter)")
-        .addStatement("em.setJpaProperties(additionalProperties())")
+        .addStatement("em.setJpaProperties(additionalProperties())") // TODO: reference to MethodSpec
         .addStatement("return em")
         .build();
 
@@ -105,6 +109,7 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
         .addModifiers(Modifier.PUBLIC)
         .addStatement("$T dataSource = new $T()", DriverManagerDataSource.class, DriverManagerDataSource.class)
         .addStatement("dataSource.setDriverClassName($S)", "org.apache.derby.jdbc.EmbeddedDriver")
+        // ddl-auto: create
         .addStatement("dataSource.setUrl($S)", DATABASE_URL)
         .addStatement("return dataSource")
         .build();
@@ -117,15 +122,27 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
         (key, value) -> tempAdditionalProperties.addStatement("properties.setProperty($S, $S)", key, value));
     MethodSpec additionalProperties = tempAdditionalProperties.addStatement("return properties").build();
 
+    MethodSpec springdogTransactionManager = MethodSpec.methodBuilder("springdogTransactionManager")
+        .addAnnotation(Bean.class)
+        .returns(PlatformTransactionManager.class)
+        .addModifiers(Modifier.PUBLIC)
+        .addParameter(LocalContainerEntityManagerFactoryBean.class, "entityManagerFactory")
+        .addStatement("$T jpaTransactionManager = new $T()", JpaTransactionManager.class,
+            JpaTransactionManager.class)
+        .addStatement("jpaTransactionManager.setEntityManagerFactory(entityManagerFactory.getObject())")
+        .addStatement("return jpaTransactionManager")
+        .build();
+
     TypeSpec jpaConfig = TypeSpec.classBuilder("JPAConfiguration")
         .addAnnotation(Configuration.class)
         .addAnnotation(AnnotationSpec.builder(EnableJpaRepositories.class)
-            .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.agent")
+            .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.manager")
             .addMember("entityManagerFactoryRef", "$S", "springdogEntityManagerFactory")
             .addMember("transactionManagerRef", "$S", "springdogTransactionManager")
             .build())
         .addModifiers(Modifier.PUBLIC)
         .addMethod(springdogEntityManagerFactory)
+        .addMethod(springdogTransactionManager)
         .addMethod(dataSource)
         .addMethod(additionalProperties)
         .build();
@@ -180,8 +197,8 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
     }
   }
 
-  private void generateAgentViewApplier(String fullPackageName) {
-    TypeSpec agentViewApplier = TypeSpec.classBuilder("SpringdogAgentComponentScanHelper")
+  private void springdogAgentControllerApplier(String fullPackageName) {
+    TypeSpec agentApplier = TypeSpec.classBuilder("SpringdogAgentControllerApplier")
         .addAnnotation(Configuration.class)
         .addAnnotation(AnnotationSpec.builder(ComponentScan.class)
             .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.agent")
@@ -190,12 +207,31 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
         .build();
 
     try {
-      JavaFile.builder(fullPackageName, agentViewApplier)
+      JavaFile.builder(fullPackageName, agentApplier)
           .build()
           .writeTo(processingEnv.getFiler());
     } catch (IOException e) {
       processingEnv.getMessager()
-          .printMessage(Kind.ERROR, "Error writing agentViewApplier: " + e.getMessage());
+          .printMessage(Kind.ERROR, "Error writing SpringdogAgentControllerApplier: " + e.getMessage());
+    }
+  }
+
+  private void autoconfigurationBeanApplier(String fullPackageName) {
+    TypeSpec autoconfigurationBeanApplier = TypeSpec.classBuilder("SpringdogAutoconfigurationBeanApplier")
+        .addAnnotation(Configuration.class)
+        .addAnnotation(AnnotationSpec.builder(ComponentScan.class)
+            .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.autoconfigure")
+            .build())
+        .addModifiers(Modifier.PUBLIC)
+        .build();
+
+    try {
+      JavaFile.builder(fullPackageName, autoconfigurationBeanApplier)
+          .build()
+          .writeTo(processingEnv.getFiler());
+    } catch (IOException e) {
+      processingEnv.getMessager()
+          .printMessage(Kind.ERROR, "Error writing SpringdogAutoconfigurationBeanApplier: " + e.getMessage());
     }
   }
 
@@ -204,8 +240,8 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
    */
   private HashMap<String, String> hibernateProperties() {
     HashMap<String, String> properties = new HashMap<>();
-    properties.put("hibernate.hbm2ddl.auto", "create");
-    properties.put("hibernate.dialect", "org.hibernate.dialect.DerbyDialect");
+    properties.put("hibernate.hbm2ddl.auto", "update");
+    properties.put("hibernate.show_sql", "true");
     return properties;
   }
 }
