@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.autoconfigure.agent.applier;
+package org.easypeelsecurity.springdog.autoconfigure.applier;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

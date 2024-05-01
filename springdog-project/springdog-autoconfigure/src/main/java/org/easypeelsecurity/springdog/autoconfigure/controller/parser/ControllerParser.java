@@ -17,19 +17,16 @@
 package org.easypeelsecurity.springdog.autoconfigure.controller.parser;
 
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointRepository;
-import org.easypeelsecurity.springdog.shared.ratelimit.ApiParameter;
-import org.easypeelsecurity.springdog.shared.ratelimit.ApiParameterType;
-import org.easypeelsecurity.springdog.shared.ratelimit.HttpMethod;
-import org.easypeelsecurity.springdog.shared.ratelimit.ParsedMetadata;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointParameter;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.ApiParameterType;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
@@ -47,7 +44,7 @@ import jakarta.transaction.Transactional;
 @Component("springdogControllerParserComponent")
 public class ControllerParser {
 
-  private static final HashMap<ParsedMetadata, List<ApiParameter>> RESULT = new HashMap<>();
+  private static final Set<EndpointDto> RESULT = new HashSet<>();
 
   private final RequestMappingHandlerMapping handlerMapping;
   private final EndpointRepository endpointRepository;
@@ -68,7 +65,23 @@ public class ControllerParser {
   public void listEndpointsAndParameters() {
     Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
     handlerMethods.forEach((info, method) -> {
-      String endPoint = info.getDirectPaths().toString();
+      // TODO : handle multiple paths
+      String endPoint = null;
+      if (!info.getDirectPaths().isEmpty()) {
+        if (info.getDirectPaths().size() > 1) {
+          System.out.println(
+              "Multiple paths found for " + method.getMethod().getName() + " in " + method.getBeanType() +
+                  ". but not supported yet.");
+          return;
+        }
+
+        endPoint = info.getDirectPaths().iterator().next();
+      }
+
+      if (endPoint == null) {
+        return;
+      }
+
       Set<RequestMethod> methods = info.getMethodsCondition().getMethods();
       HttpMethod httpMethod = null;
       if (!methods.isEmpty()) {
@@ -79,30 +92,31 @@ public class ControllerParser {
         return;
       }
 
-      String fqcn = method.getBeanType() + "." + method.getMethod().getName();
-      ParsedMetadata metadata = new ParsedMetadata(endPoint, fqcn, httpMethod);
-      List<ApiParameter> parameters = new ArrayList<>();
-
-      for (Parameter parameter : method.getMethod().getParameters()) {
-        ApiParameter parameterItem =
-            new ApiParameter(parameter.getName(), ApiParameterType.resolve(parameter.getAnnotations()));
-        parameters.add(parameterItem);
+      EndpointDto api = getEndpointDto(method, endPoint, httpMethod);
+      if (!api.getFqcn().contains("org.easypeelsecurity.springdog")) {
+        RESULT.add(api);
       }
-
-      RESULT.put(metadata, parameters);
     });
 
-    List<Endpoint> endpoints = new ArrayList<>();
-    RESULT.forEach((metadata, parameters) -> {
-      List<EndpointParameter> endpointParameters =
-          // if parameter.type == null then use ApiParameterType.QUERY
-          parameters.stream()
-              .map(parameter -> new EndpointParameter(parameter.name(), parameter.type() == null ? ApiParameterType.QUERY : parameter.type()))
-              .toList();
-      Endpoint endpoint = new Endpoint(metadata.endpoint(), metadata.httpMethod(), endpointParameters);
-      endpoints.add(endpoint);
-    });
+    endpointRepository.saveAll(
+        RESULT.stream()
+            .map(EndpointConverter::toEntity)
+            .toList());
+  }
 
-    endpointRepository.saveAll(endpoints);
+  private static EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod) {
+    String fqcn = method.getBeanType() + "." + method.getMethod().getName();
+
+    EndpointDto api = new EndpointDto(endPoint, fqcn, httpMethod);
+    Set<EndpointParameterDto> parameters = new HashSet<>();
+
+    for (Parameter parameter : method.getMethod().getParameters()) {
+      EndpointParameterDto parameterItem =
+          new EndpointParameterDto(parameter.getName(), ApiParameterType.resolve(parameter.getAnnotations()));
+      parameters.add(parameterItem);
+    }
+
+    api.addParameters(parameters);
+    return api;
   }
 }

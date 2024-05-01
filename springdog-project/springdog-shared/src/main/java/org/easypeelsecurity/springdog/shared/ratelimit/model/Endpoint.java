@@ -16,10 +16,8 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.easypeelsecurity.springdog.shared.ratelimit.HttpMethod;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -42,24 +40,26 @@ public class Endpoint {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  private String fqcn;
   private String path;
   @Enumerated(EnumType.STRING)
   private HttpMethod httpMethod;
   @OneToMany(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "endpoint_id")
-  private List<EndpointParameter> parameters = new ArrayList<>();
+  private Set<EndpointParameter> parameters = new HashSet<>();
 
   /**
    * Constructor.
    *
-   * @param path       api path
+   * @param path       api path e.g. /api/v1/user
+   * @param fqcn       fully qualified class name e.g. org.penekhun.controller.UserController.method1
    * @param httpMethod http method
    * @param parameters api parameter list
    */
-  public Endpoint(String path, HttpMethod httpMethod, List<EndpointParameter> parameters) {
+  public Endpoint(String path, String fqcn, HttpMethod httpMethod, Set<EndpointParameter> parameters) {
     this.path = path;
+    this.fqcn = fqcn;
     this.httpMethod = httpMethod;
-
     parameters.forEach(parameter -> parameter.setEndpoint(this));
     this.parameters = parameters;
   }
@@ -68,5 +68,50 @@ public class Endpoint {
    * no-arg Constructor.
    */
   public Endpoint() {
+  }
+
+  /**
+   * Get endpoint id.
+   *
+   * @return endpoint id
+   */
+  public Long getId() {
+    return id;
+  }
+
+  /**
+   * Get fully qualified class name.
+   *
+   * @return fully qualified class name
+   */
+  public String getFqcn() {
+    return fqcn;
+  }
+
+  /**
+   * Get endpoint path.
+   *
+   * @return endpoint path
+   */
+  public String getPath() {
+    return path;
+  }
+
+  /**
+   * Get http method.
+   *
+   * @return http method
+   */
+  public HttpMethod getHttpMethod() {
+    return httpMethod;
+  }
+
+  /**
+   * Get endpoint parameters.
+   *
+   * @return endpoint parameters
+   */
+  public Set<EndpointParameter> getParameters() {
+    return parameters;
   }
 }
