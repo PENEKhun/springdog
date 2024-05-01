@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to enable the SpringDog application.
+ *
  * @author PENEKhun
  */
 @Target(ElementType.TYPE)
