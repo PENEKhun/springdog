@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
  */
 @Controller
 public class View {
+
   @GetMapping("/")
   public String home() {
     return "/templates/content/main.html";
