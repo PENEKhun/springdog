@@ -14,20 +14,7 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.shared.ratelimit;
-
 /**
- * Controller parameter item.
- *
- * @author PENEKhun
+ * Applier for springdog.
  */
-public record ApiParameter(String name, ApiParameterType type) {
-
-  @Override
-  public String toString() {
-    return "Parameter{" +
-        "name='" + name + '\'' +
-        ", type=" + type +
-        '}';
-  }
-}
+package org.easypeelsecurity.springdog.autoconfigure.applier;

@@ -5,18 +5,29 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <script>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    let endpoints = [[${endpoints}]];
+    /*]]>*/
+
+    console.log(endpoints);
+
     window.onload = function () {
       new DataTable('#table', {
         columns: [
           {title: 'ID', data: 'id', visible: false},
           {title: 'Endpoint', data: 'endpoint'},
-          {title: 'Class', data: 'controller'},
-          {title: 'Request Type', data: 'requestType'},
+          {title: 'fqcn', data: 'fqcn'},
+          {title: 'Http method', data: 'httpMethod'},
           {
             title: 'Rule Activated',
             data: 'activated',
             render: function (data) {
+              // temporary fix for null data
+              if (data === null) {
+                return '<span class="badge bg-warning">Not configured</span>';
+              }
+
               if (data) {
                 return '<span class="badge bg-success">Activated</span>';
               } else {
@@ -37,38 +48,7 @@
           }
         ],
         data: [
-          {
-            id: 1,
-            endpoint: '/api/v1/user',
-            controller: 'UserController',
-            requestType: 'GET',
-            activated: true,
-            updatedAt: '2021-08-01 12:00:00',
-          },
-          {
-            id: 2,
-            endpoint: '/api/v1/user',
-            controller: 'UserController',
-            requestType: 'POST',
-            activated: false,
-            updatedAt: '2021-08-01 12:00:00',
-          },
-          {
-            id: 3,
-            endpoint: '/api/v1/user',
-            controller: 'UserController',
-            requestType: 'PUT',
-            activated: false,
-            updatedAt: '2021-08-01 12:00:00',
-          },
-          {
-            id: 4,
-            endpoint: '/api/v1/user',
-            controller: 'UserController',
-            requestType: 'DELETE',
-            activated: true,
-            updatedAt: '2021-08-01 12:00:00',
-          },
+          ...endpoints
         ],
       });
     }

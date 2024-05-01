@@ -16,7 +16,6 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
-import org.easypeelsecurity.springdog.shared.ratelimit.ApiParameterType;
 import org.springframework.util.Assert;
 
 import jakarta.persistence.Entity;
@@ -26,6 +25,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+
+import java.util.Objects;
 
 /**
  * Entity class for endpoint parameter.
@@ -49,11 +50,12 @@ public class EndpointParameter {
    * Constructor.
    *
    * @param name parameter name
-   * @param type parameter type (query, path, body, model)
+   * @param type parameter type (query, path, body, model), default is query
    */
   public EndpointParameter(String name, ApiParameterType type) {
+    Assert.notNull(name, "Name must not be null");
     this.name = name;
-    this.type = type;
+    this.type = Objects.requireNonNullElse(type, ApiParameterType.QUERY);
   }
 
   /**
@@ -70,5 +72,32 @@ public class EndpointParameter {
    * no-arg Constructor.
    */
   public EndpointParameter() {
+  }
+
+  /**
+   * Get id.
+   *
+   * @return id
+   */
+  public Long getId() {
+    return id;
+  }
+
+  /**
+   * Get parameter name.
+   *
+   * @return parameter name
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Get parameter type.
+   *
+   * @return parameter type
+   */
+  public ApiParameterType getType() {
+    return type;
   }
 }

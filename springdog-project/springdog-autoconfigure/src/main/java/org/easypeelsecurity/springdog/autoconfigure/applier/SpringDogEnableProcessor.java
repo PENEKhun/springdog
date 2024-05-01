@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.autoconfigure.agent.applier;
+package org.easypeelsecurity.springdog.autoconfigure.applier;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -84,8 +84,28 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
       generateThymeleafConfig(fullPackageName);
       generateJPAConfig(fullPackageName);
       springdogAgentControllerApplier(fullPackageName);
+      springdogManagerApplier(fullPackageName);
       autoconfigurationBeanApplier(fullPackageName);
     });
+  }
+
+  private void springdogManagerApplier(String fullPackageName) {
+    TypeSpec managertApplier = TypeSpec.classBuilder("SpringdogManagerApplier")
+        .addAnnotation(Configuration.class)
+        .addAnnotation(AnnotationSpec.builder(ComponentScan.class)
+            .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.manager")
+            .build())
+        .addModifiers(Modifier.PUBLIC)
+        .build();
+
+    try {
+      JavaFile.builder(fullPackageName, managertApplier)
+          .build()
+          .writeTo(processingEnv.getFiler());
+    } catch (IOException e) {
+      processingEnv.getMessager()
+          .printMessage(Kind.ERROR, "Error writing SpringdogManagerApplier: " + e.getMessage());
+    }
   }
 
   private void generateJPAConfig(String fullPackageName) {

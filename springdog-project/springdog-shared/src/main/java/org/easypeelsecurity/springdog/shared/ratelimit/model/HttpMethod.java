@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.shared.ratelimit;
+package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 import org.springframework.util.Assert;
 

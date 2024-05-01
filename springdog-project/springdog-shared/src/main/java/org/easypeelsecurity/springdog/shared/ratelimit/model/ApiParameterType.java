@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.shared.ratelimit;
+package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 import java.lang.annotation.Annotation;
 
@@ -38,9 +38,10 @@ public enum ApiParameterType {
 
   /**
    * Resolve parameter type from annotation.
+   * MUST BE USED IN CONTROLLER PARSER.
    *
    * @param annotation annotation
-   * @return parameter type or {@code null} if not found
+   * @return parameter type or {@code QUERY} if not found
    */
   public static ApiParameterType resolve(Annotation[] annotation) {
     for (Annotation a : annotation) {
@@ -57,6 +58,6 @@ public enum ApiParameterType {
       }
     }
 
-    return null;
+    return QUERY;
   }
 }
