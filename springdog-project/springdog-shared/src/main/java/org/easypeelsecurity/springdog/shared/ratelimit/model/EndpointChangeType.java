@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.manager.ratelimit;
-
-import java.util.Collection;
-import java.util.List;
-
-import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 /**
- * Repository for endpoint.
- *
- * @author PENEKhun
+ * Enum for endpoint change type for showing how changes.
  */
-public interface EndpointRepository extends JpaRepository<Endpoint, Long> {
+public enum EndpointChangeType {
+  API_DELETED("Can’t found endpoints that existed before."),
+  API_ADDED("New endpoint added."),
+//  API_PARAMETER_DELETE("Endpoint parameter changed."),
+//  API_PARAMETER_ADD("Endpoint parameter changed."),
+  ACTIVATED("Endpoint activated."),
+  DEACTIVATED("Endpoint deactivated."),
+  RULE_CHANGED("Endpoint rule changed.");
 
-  List<Endpoint> findAllByHashIn(List<String> list);
+  private String description;
+
+  EndpointChangeType(String description) {
+    this.description = description;
+  }
 }

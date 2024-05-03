@@ -17,15 +17,28 @@
 package org.easypeelsecurity.springdog.autoconfigure.controller.parser;
 
 import java.lang.reflect.Parameter;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
+import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointRepository;
+import org.easypeelsecurity.springdog.manager.ratelimit.EndpointVersionControlRepository;
+import org.easypeelsecurity.springdog.manager.ratelimit.VersionControlRepository;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointHash;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointHashProvider;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.VersionCompare;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.ApiParameterType;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeLog;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeType;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -47,22 +60,38 @@ public class ControllerParser {
   private static final Set<EndpointDto> RESULT = new HashSet<>();
 
   private final RequestMappingHandlerMapping handlerMapping;
+  //  private final EndpointRepository endpointRepository;
+  private final EndpointQuery endpointQuery;
+  private final EndpointCommand endpointCommand;
   private final EndpointRepository endpointRepository;
+  private final EndpointVersionControlRepository endpointVersionControlRepository;
+  private final VersionControlRepository versionControlRepository;
 
   /**
    * Constructor.
    */
-  public ControllerParser(RequestMappingHandlerMapping handlerMapping, EndpointRepository endpointRepository) {
+  public ControllerParser(RequestMappingHandlerMapping handlerMapping, EndpointQuery endpointQuery,
+      EndpointCommand endpointCommand, EndpointRepository endpointRepository,
+      EndpointVersionControlRepository endpointVersionControlRepository,
+      VersionControlRepository versionControlRepository) {
+    this.handlerMapping = handlerMapping;
+    this.endpointQuery = endpointQuery;
+    this.endpointCommand = endpointCommand;
+    this.endpointRepository = endpointRepository;
+    this.endpointVersionControlRepository = endpointVersionControlRepository;
+    this.versionControlRepository = versionControlRepository;
+  }
+  /*public ControllerParser(RequestMappingHandlerMapping handlerMapping, EndpointRepository endpointRepository) {
     this.handlerMapping = handlerMapping;
     this.endpointRepository = endpointRepository;
-  }
+  }*/
 
   /**
    * List all endpoints and parameters.
    */
   @Transactional
   @PostConstruct
-  public void listEndpointsAndParameters() {
+  public void listEndpointsAndParameters() throws NoSuchAlgorithmException {
     Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
     handlerMethods.forEach((info, method) -> {
       // TODO : handle multiple paths
@@ -98,10 +127,56 @@ public class ControllerParser {
       }
     });
 
-    endpointRepository.saveAll(
-        RESULT.stream()
-            .map(EndpointConverter::toEntity)
-            .toList());
+    EndpointHash hashProvider = new EndpointHashProvider();
+
+    LocalDateTime now = LocalDateTime.now();
+    String nowFullHash = hashProvider.getHash(RESULT.toArray(EndpointDto[]::new));
+    EndpointVersionControl vc = new EndpointVersionControl(now, nowFullHash);
+    // 일단 기존 최신 버전 hash와 비교.
+    VersionCompare nowVersion = endpointQuery.compareToLatestVersion(nowFullHash);
+
+    switch (nowVersion) {
+      case SAME:
+        System.out.println("Same version. Skip.");
+        break;
+      case FIRST_RUN:
+        // 그냥 등록
+        System.out.println("First run. Save all.");
+        endpointRepository
+            .saveAll(
+                RESULT.stream()
+                    .map(item -> EndpointConverter.toEntity(hashProvider, item))
+                    .toList()
+            );
+
+        versionControlRepository.save(
+            new EndpointVersionControl(now, nowFullHash)
+        );
+
+        break;
+      case DIFFERENT:
+        Set<EndpointDto> db = endpointQuery.findAll();
+
+        // db에만 있는 것 (삭제된 것)
+        Set<EndpointDto> dbOnly = db.stream()
+            .filter(dbItem -> !RESULT.contains(dbItem))
+            .collect(Collectors.toSet());
+
+        // RESULT에만 있는 것 (추가된 것)
+        Set<EndpointDto> nowOnly = RESULT.stream()
+            .filter(localItem -> !db.contains(localItem))
+            .collect(Collectors.toSet());
+        // TODO: PARAMETER 비교도 포함
+
+        dbOnly.forEach(item -> vc.addChangeLog(new EndpointChangeLog(vc, EndpointChangeType.API_DELETED,
+            "[" + item.getHttpMethod()  + "] " + item.getPath() + " was deleted")));
+        nowOnly.forEach(item -> vc.addChangeLog(new EndpointChangeLog(vc, EndpointChangeType.API_ADDED,
+            "[" + item.getHttpMethod()  + "] " + item.getPath() + " was added")));
+
+        endpointCommand.applyChanges(hashProvider, nowOnly, dbOnly);
+        versionControlRepository.save(vc);
+        break;
+    }
   }
 
   private static EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod) {

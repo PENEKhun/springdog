@@ -26,22 +26,22 @@ import org.springframework.util.Assert;
  */
 public class EndpointParameterDto {
 
-  private final Long id;
+  private final String paramHash;
   private final String name;
   private final ApiParameterType type;
 
   /**
    * All-arg Constructor.
    *
-   * @param id   id
+   * @param paramHash hashed
    * @param name name of parameter
    * @param type type of parameter
    */
-  public EndpointParameterDto(Long id, String name, ApiParameterType type) {
+  public EndpointParameterDto(String paramHash, String name, ApiParameterType type) {
     Assert.hasText(name, "Name must not be null or empty");
     Assert.notNull(type, "Type must not be null");
 
-    this.id = id;
+    this.paramHash = paramHash;
     this.name = name;
     this.type = type;
   }
@@ -54,12 +54,12 @@ public class EndpointParameterDto {
   }
 
   /**
-   * Get id of parameter.
+   * Get object hashed string.
    *
-   * @return id of parameter
+   * @return hashed string
    */
-  public Long getId() {
-    return this.id;
+  public String getParamHash() {
+    return this.paramHash;
   }
 
   /**

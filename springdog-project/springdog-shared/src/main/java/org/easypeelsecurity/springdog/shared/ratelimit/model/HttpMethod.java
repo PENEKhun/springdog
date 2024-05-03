@@ -23,6 +23,7 @@ import org.springframework.util.Assert;
  *
  * @author PENEKhun
  */
+
 public enum HttpMethod {
   GET,
   HEAD,

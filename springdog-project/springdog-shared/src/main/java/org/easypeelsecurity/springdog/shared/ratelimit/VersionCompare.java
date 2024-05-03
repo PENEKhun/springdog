@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.manager.ratelimit;
-
-import java.util.Collection;
-import java.util.List;
-
-import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+package org.easypeelsecurity.springdog.shared.ratelimit;
 
 /**
- * Repository for endpoint.
- *
- * @author PENEKhun
+ * Enum to compare version.
  */
-public interface EndpointRepository extends JpaRepository<Endpoint, Long> {
+public enum VersionCompare {
 
-  List<Endpoint> findAllByHashIn(List<String> list);
+  FIRST_RUN,
+  SAME,
+  DIFFERENT,
 }
