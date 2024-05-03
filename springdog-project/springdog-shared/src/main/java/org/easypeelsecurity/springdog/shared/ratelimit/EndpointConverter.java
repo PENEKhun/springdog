@@ -16,6 +16,8 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,12 +37,14 @@ public class EndpointConverter {
    * @param endpointDto target DTO instance to transform to Entity
    * @return entity object
    */
-  public static Endpoint toEntity(EndpointDto endpointDto) {
-    return new Endpoint(endpointDto.getEndpoint(), endpointDto.getFqcn(), endpointDto.getHttpMethod(),
-        endpointDto.getParameters()
-            .stream()
-            .map(EndpointConverter::toEntity)
-            .collect(Collectors.toSet()));
+  public static Endpoint toEntity(EndpointHash hashProvider, EndpointDto endpointDto) {
+    Set<EndpointParameter> parameters = new HashSet<>();
+    for (EndpointParameterDto param : endpointDto.getParameters()) {
+      parameters.add(toEntity(hashProvider, param));
+    }
+
+    return new Endpoint(hashProvider.getHash(endpointDto), endpointDto.getPath(), endpointDto.getFqcn(),
+        endpointDto.getHttpMethod(), parameters);
   }
 
   /**
@@ -49,8 +53,9 @@ public class EndpointConverter {
    * @param endpointParameterDto target DTO instance to transform to Entity
    * @return entity object
    */
-  public static EndpointParameter toEntity(EndpointParameterDto endpointParameterDto) {
-    return new EndpointParameter(endpointParameterDto.getName(), endpointParameterDto.getType());
+  public static EndpointParameter toEntity(EndpointHash hashProvider, EndpointParameterDto endpointParameterDto) {
+    return new EndpointParameter(hashProvider.getHash(endpointParameterDto), endpointParameterDto.getName(),
+        endpointParameterDto.getType());
   }
 
   /**
@@ -61,7 +66,7 @@ public class EndpointConverter {
    */
   public static EndpointDto toDto(Endpoint endpointEntity) {
     EndpointDto transform =
-        new EndpointDto(endpointEntity.getId(), endpointEntity.getPath(), endpointEntity.getFqcn(),
+        new EndpointDto(endpointEntity.getHash(), endpointEntity.getPath(), endpointEntity.getFqcn(),
             endpointEntity.getHttpMethod());
     transform.addParameters(
         endpointEntity.getParameters().stream().map(EndpointConverter::toDto).collect(Collectors.toSet()));
@@ -75,7 +80,7 @@ public class EndpointConverter {
    * @return dto object
    */
   public static EndpointParameterDto toDto(EndpointParameter endpointParameterEntity) {
-    return new EndpointParameterDto(endpointParameterEntity.getId(), endpointParameterEntity.getName(),
+    return new EndpointParameterDto(endpointParameterEntity.getParamHash(), endpointParameterEntity.getName(),
         endpointParameterEntity.getType());
   }
 

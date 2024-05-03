@@ -19,14 +19,14 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.util.Assert;
+
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 
 /**
@@ -40,23 +40,29 @@ public class Endpoint {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  @Column(length = 64, unique = true, nullable = false)
+  private String hash;
   private String fqcn;
   private String path;
-  @Enumerated(EnumType.STRING)
+
   private HttpMethod httpMethod;
-  @OneToMany(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "endpoint_id")
+  @OneToMany(cascade = {CascadeType.ALL})
   private Set<EndpointParameter> parameters = new HashSet<>();
 
   /**
    * Constructor.
    *
+   * @param hash       endpoint hashed String
    * @param path       api path e.g. /api/v1/user
    * @param fqcn       fully qualified class name e.g. org.penekhun.controller.UserController.method1
    * @param httpMethod http method
    * @param parameters api parameter list
    */
-  public Endpoint(String path, String fqcn, HttpMethod httpMethod, Set<EndpointParameter> parameters) {
+  public Endpoint(String hash, String path, String fqcn, HttpMethod httpMethod,
+      Set<EndpointParameter> parameters) {
+    Assert.hasText(hash, "Hash must not be null or empty");
+
+    this.hash = hash;
     this.path = path;
     this.fqcn = fqcn;
     this.httpMethod = httpMethod;
@@ -71,12 +77,12 @@ public class Endpoint {
   }
 
   /**
-   * Get endpoint id.
+   * Get endpoint hash id.
    *
-   * @return endpoint id
+   * @return endpoint hash id
    */
-  public Long getId() {
-    return id;
+  public String getHash() {
+    return this.hash;
   }
 
   /**
@@ -113,5 +119,23 @@ public class Endpoint {
    */
   public Set<EndpointParameter> getParameters() {
     return parameters;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    Endpoint endpoint = (Endpoint) o;
+    return hash.equals(endpoint.hash);
+  }
+
+  @Override
+  public int hashCode() {
+    return hash.hashCode();
   }
 }

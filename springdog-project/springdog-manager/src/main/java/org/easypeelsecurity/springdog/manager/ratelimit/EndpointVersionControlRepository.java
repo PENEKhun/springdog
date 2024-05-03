@@ -16,20 +16,20 @@
 
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Optional;
 
-import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 
 /**
- * Repository for endpoint.
- *
- * @author PENEKhun
+ * Repository for {@link EndpointVersionControl}.
  */
-public interface EndpointRepository extends JpaRepository<Endpoint, Long> {
+public interface EndpointVersionControlRepository extends JpaRepository<EndpointVersionControl, Long> {
 
-  List<Endpoint> findAllByHashIn(List<String> list);
+  /**
+   * Find latest version object in the database.
+   *
+   * @return endpoint version control
+   */
+  Optional<EndpointVersionControl> findTopByOrderByDateOfVersionDesc();
 }

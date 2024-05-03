@@ -16,11 +16,14 @@
 
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.VersionCompare;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +37,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class EndpointQuery {
 
   private final EndpointRepository endpointRepository;
+  private final EndpointVersionControlRepository endpointVersionControlRepository;
 
   /**
    * Constructor.
    */
-  public EndpointQuery(EndpointRepository endpointRepository) {
+  public EndpointQuery(EndpointRepository endpointRepository,
+      EndpointVersionControlRepository endpointVersionControlRepository) {
     this.endpointRepository = endpointRepository;
+    this.endpointVersionControlRepository = endpointVersionControlRepository;
   }
 
   /**
@@ -53,4 +59,22 @@ public class EndpointQuery {
         .map(EndpointConverter::toDto)
         .collect(Collectors.toSet());
   }
+
+  /**
+   * Compare hash to latest version.
+   *
+   * @param compareWith hash to compare
+   * @return version compare
+   */
+  public VersionCompare compareToLatestVersion(String compareWith) {
+    Optional<EndpointVersionControl> latest =
+        endpointVersionControlRepository.findTopByOrderByDateOfVersionDesc();
+    if (latest.isEmpty()) {
+      return VersionCompare.FIRST_RUN;
+    }
+
+    String latestVersionHash = latest.get().getFullHashOfEndpoints();
+    return latestVersionHash.equals(compareWith) ? VersionCompare.SAME : VersionCompare.DIFFERENT;
+  }
+
 }

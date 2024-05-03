@@ -16,6 +16,8 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
+import java.util.Objects;
+
 import org.springframework.util.Assert;
 
 import jakarta.persistence.Entity;
@@ -24,9 +26,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
-import java.util.Objects;
 
 /**
  * Entity class for endpoint parameter.
@@ -39,21 +40,27 @@ public class EndpointParameter {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  private String paramHash;
   private String name;
   @Enumerated(EnumType.STRING)
   private ApiParameterType type;
 
   @ManyToOne
+  @JoinColumn(referencedColumnName = "hash")
   private Endpoint endpoint;
 
   /**
    * Constructor.
    *
-   * @param name parameter name
-   * @param type parameter type (query, path, body, model), default is query
+   * @param paramHash parameter hashed
+   * @param name      parameter name
+   * @param type      parameter type (query, path, body, model), default is query
    */
-  public EndpointParameter(String name, ApiParameterType type) {
-    Assert.notNull(name, "Name must not be null");
+  public EndpointParameter(String paramHash, String name, ApiParameterType type) {
+    Assert.hasText(paramHash, "Hash must not be null or empty");
+    Assert.hasText(name, "Name must not be null or empty");
+
+    this.paramHash = paramHash;
     this.name = name;
     this.type = Objects.requireNonNullElse(type, ApiParameterType.QUERY);
   }
@@ -75,12 +82,12 @@ public class EndpointParameter {
   }
 
   /**
-   * Get id.
+   * Get hashed object.
    *
-   * @return id
+   * @return hash
    */
-  public Long getId() {
-    return id;
+  public String getParamHash() {
+    return this.paramHash;
   }
 
   /**
@@ -89,7 +96,7 @@ public class EndpointParameter {
    * @return parameter name
    */
   public String getName() {
-    return name;
+    return this.name;
   }
 
   /**
@@ -98,6 +105,6 @@ public class EndpointParameter {
    * @return parameter type
    */
   public ApiParameterType getType() {
-    return type;
+    return this.type;
   }
 }

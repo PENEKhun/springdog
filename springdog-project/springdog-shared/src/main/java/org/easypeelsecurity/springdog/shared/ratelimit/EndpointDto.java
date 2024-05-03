@@ -29,8 +29,8 @@ import org.springframework.util.Assert;
  */
 public class EndpointDto {
 
-  private final Long id;
-  private final String endpoint;
+  private final String hash;
+  private final String path;
   private final String fqcn;
   private final HttpMethod httpMethod;
   private final HashSet<EndpointParameterDto> parameters = new HashSet<>();
@@ -38,19 +38,19 @@ public class EndpointDto {
   /**
    * All-arg constructor.
    *
-   * @param id         id of the endpoint
-   * @param endpoint   api endpoint string (e.g. /api/v1/user)
+   * @param hash       hash of the endpoint
+   * @param path       api path string (e.g. /api/v1/user)
    * @param fqcn       fully qualified class name of the method (e.g.
    *                   org.penekhun.controller.UserController.method1)
    * @param httpMethod HTTP request method (e.g. GET, POST, PUT, DELETE, PATCH)
    */
-  public EndpointDto(Long id, String endpoint, String fqcn, HttpMethod httpMethod) {
-    Assert.hasText(endpoint, "Endpoint must not be null or empty");
+  public EndpointDto(String hash, String path, String fqcn, HttpMethod httpMethod) {
+    Assert.hasText(path, "Endpoint must not be null or empty");
     Assert.hasText(fqcn, "FQCN must not be null or empty");
     Assert.notNull(httpMethod, "HttpMethod must not be null");
 
-    this.id = id;
-    this.endpoint = endpoint;
+    this.hash = hash;
+    this.path = path;
     this.fqcn = fqcn;
     this.httpMethod = httpMethod;
   }
@@ -58,8 +58,8 @@ public class EndpointDto {
   /**
    * Constructor.
    */
-  public EndpointDto(String endpoint, String fqcn, HttpMethod httpMethod) {
-    this(null, endpoint, fqcn, httpMethod);
+  public EndpointDto(String path, String fqcn, HttpMethod httpMethod) {
+    this(null, path, fqcn, httpMethod);
   }
 
   @Override
@@ -73,7 +73,7 @@ public class EndpointDto {
 
     EndpointDto that = (EndpointDto) object;
 
-    if (!this.endpoint.equals(that.endpoint)) {
+    if (!this.path.equals(that.path)) {
       return false;
     }
     return this.httpMethod == that.httpMethod;
@@ -81,26 +81,27 @@ public class EndpointDto {
 
   @Override
   public int hashCode() {
-    int result = this.endpoint.hashCode();
+    int result = this.path.hashCode();
     result = 31 * result + this.httpMethod.hashCode();
     return result;
   }
 
   /**
-   * Get the endpoint.
+   * Get the api path.
    *
-   * @return the endpoint
+   * @return the api path
    */
-  public String getEndpoint() {
-    return this.endpoint;
+  public String getPath() {
+    return this.path;
   }
 
   /**
-   * Get the id.
-   * @return the id
+   * Get the hashed object (id).
+   *
+   * @return hashed object (id)
    */
-  public Long getId() {
-    return this.id;
+  public String getHash() {
+    return this.hash;
   }
 
   /**
