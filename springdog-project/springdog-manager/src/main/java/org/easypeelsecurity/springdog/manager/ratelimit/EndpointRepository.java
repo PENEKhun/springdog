@@ -16,19 +16,17 @@
 
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 
 /**
  * Repository for endpoint.
  *
  * @author PENEKhun
  */
+@SuppressWarnings("checkstyle:MissingJavadocMethod")
 public interface EndpointRepository extends JpaRepository<Endpoint, Long> {
 
   List<Endpoint> findAllByHashIn(List<String> list);
