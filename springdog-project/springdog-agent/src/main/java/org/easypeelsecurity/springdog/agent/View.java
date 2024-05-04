@@ -43,16 +43,10 @@ public class View {
     return "/templates/content/rate-limit/manage.html";
   }
 
-  @GetMapping("/rate-limit/manage/{id}")
-  public String rateLimitManage(@PathVariable("id") Integer id, Model model) {
-    model.addAttribute("apiPath", "/api/test");
-    model.addAttribute("requestType", "POST");
-    model.addAttribute("controllerClass", "UserController");
-    List<String> parameters = new ArrayList<>();
-    parameters.add("username");
-    parameters.add("keyword");
-    model.addAttribute("paramItems", parameters);
-
+  @GetMapping("/rate-limit/manage/{apiHash}")
+  public String rateLimitManage(@PathVariable(name = "apiHash") String apiHash, Model model) {
+    EndpointDto endpointDto = rateLimitQuery.findApi(apiHash);
+    model.addAttribute("api", endpointDto);
     List<String> headers = new ArrayList<>();
     headers.add("X-Auth-Token");
     model.addAttribute("headerItems", headers);

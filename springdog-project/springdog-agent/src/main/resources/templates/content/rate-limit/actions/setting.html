@@ -4,10 +4,11 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 
-<th:block layout:fragment="css"></th:block>
-<th:block layout:fragment="script">
-  <script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function () {
+
+<head>
+  <title>Ratelimit - API Setting</title>
+  <script>
+    $(document).ready(function () {
       let checkbox = document.getElementById("permanentBan");
       checkbox.addEventListener("change", function () {
         let banDurationGroup = document.getElementById("banDurationGroup");
@@ -17,25 +18,13 @@
         }
       });
 
-      /*<![CDATA[*/
-      let parameterItems = [[${paramItems}]].map(item => ({id: item, text: item}));
-      let headerItems = [[${headerItems}]].map(item => ({id: item, text: item}));
-      /*]]>*/
-
       $("#parametersOption").select2({
-        data: parameterItems,
         placeholder: 'Select parameters',
-        allowClear: true
-      });
-
-      $("#headerOption").select2({
-        data: headerItems,
-        placeholder: 'Select header',
         allowClear: true
       });
     });
   </script>
-</th:block>
+</head>
 
 <div class="container content" layout:fragment="content">
   <h1 class="mt-4">Rate Limit Settings</h1>
@@ -49,11 +38,11 @@
         <h5 class="card-title">Endpoint Information</h5>
         <p class="card-text">
           <strong>API Path:</strong>
-        <div class="alert alert-info" th:text="${apiPath}"></div>
+        <div class="alert alert-info" th:text="${api.path}"></div>
         <strong>Request Type:</strong>
-        <div class="alert alert-info" th:text="${requestType}"></div>
+        <div class="alert alert-info" th:text="${api.httpMethod}"></div>
         <strong>Controller Class:</strong>
-        <div class="alert alert-info" th:text="${controllerClass}"></div>
+        <div class="alert alert-info" th:text="${api.fqcn}"></div>
       </div>
     </div>
 
@@ -128,7 +117,11 @@
         <h5 class="card-title">Ban Ruleset combinations</h5>
         <div class="mb-3 row">
           <label for="parametersOption" class="form-label">Parameters</label>
-          <select class="form-control" id="parametersOption" multiple></select>
+          <select class="form-control" id="parametersOption" multiple>
+            <option th:each="parameter : ${api.parameters}"
+                    th:text="${parameter.name + '[' + parameter.type + ']'}"
+                    th:data-paramhash="${parameter.paramHash}"></option>
+          </select>
         </div>
         <div class="mb-3 row">
           <label for="headerOption" class="form-label">Custom Header</label>

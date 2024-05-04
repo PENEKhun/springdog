@@ -12,10 +12,11 @@
 
     console.log(endpoints);
 
-    window.onload = function () {
+    $(document).ready(function () {
+
       new DataTable('#table', {
         columns: [
-          {title: 'ID', data: 'id', visible: false},
+          {title: 'hash', data: 'hash', visible: false},
           {title: 'path', data: 'path'},
           {title: 'fqcn', data: 'fqcn'},
           {title: 'Http method', data: 'httpMethod'},
@@ -24,7 +25,7 @@
             data: 'activated',
             render: function (data) {
               // temporary fix for null data
-              if (data === null) {
+              if (data === undefined || data === null) {
                 return '<span class="badge bg-warning">Not configured</span>';
               }
 
@@ -35,15 +36,16 @@
               }
             }
           },
-          {title: 'Last modified', data: 'updatedAt'},
+          // TODO: support it
+          // {title: 'Last modified', data: 'updatedAt'},
           {
             title: 'Actions',
-            data: 'id',
+            data: 'hash',
             render: function (data, type, row, meta) {
-              return '<button class="btn btn-primary btn-sm" onclick="configure(' + data
-                  + ')" title="Configure"><i class="bi bi-gear-fill"></i></button> ' +
-                  '<button class="btn btn-info btn-sm" onclick="analyze(' + data
-                  + ')" title="Analyze"><i class="bi bi-bar-chart-line-fill"></i></button>';
+              return '<button class="btn btn-primary btn-sm" onclick="configure(\'' + data
+                  + '\')" title="Configure"><i class="bi bi-gear-fill"></i></button> ' +
+                  '<button class="btn btn-info btn-sm" onclick="analyze(\'' + data
+                  + '\')" title="Analyze"><i class="bi bi-bar-chart-line-fill"></i></button>';
             }
           }
         ],
@@ -51,14 +53,14 @@
           ...endpoints
         ],
       });
+    });
+
+    function configure(apiHash) {
+      window.location.href = window.location.pathname + '/' + apiHash;
     }
 
-    function configure(id) {
-      window.location.href = window.location.pathname + '/' + id;
-    }
-
-    function analyze(id) {
-      window.location.href = window.location.pathname + '/' + id + '/analytics';
+    function analyze(apiHash) {
+      window.location.href = window.location.pathname + '/' + apiHash + '/analytics';
     }
   </script>
   <title>Manage</title>

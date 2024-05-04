@@ -77,4 +77,16 @@ public class EndpointQuery {
     return latestVersionHash.equals(compareWith) ? VersionCompare.SAME : VersionCompare.DIFFERENT;
   }
 
+  /**
+   * Find endpoint by hash.
+   *
+   * @param apiHash hash of the endpoint
+   * @return endpoint DTO
+   * @throws IllegalArgumentException if endpoint not found
+   */
+  public EndpointDto findApi(String apiHash) {
+    return endpointRepository.findByHash(apiHash)
+        .map(EndpointConverter::toDto)
+        .orElseThrow(() -> new IllegalArgumentException("Endpoint not found"));
+  }
 }
