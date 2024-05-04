@@ -42,9 +42,7 @@ public class EndpointChangeLog {
   @Enumerated(EnumType.STRING)
   private EndpointChangeType changeType;
 
-//  @Embedded
   private String changeHistory;
-
   private boolean isResolved;
 
   /**
