@@ -24,6 +24,8 @@ import org.springframework.util.Assert;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -44,7 +46,7 @@ public class Endpoint {
   private String hash;
   private String fqcn;
   private String path;
-
+  @Enumerated(EnumType.STRING)
   private HttpMethod httpMethod;
   @OneToMany(cascade = {CascadeType.ALL})
   private Set<EndpointParameter> parameters = new HashSet<>();
