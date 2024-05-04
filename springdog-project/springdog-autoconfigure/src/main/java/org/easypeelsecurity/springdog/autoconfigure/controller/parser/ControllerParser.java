@@ -17,7 +17,6 @@
 package org.easypeelsecurity.springdog.autoconfigure.controller.parser;
 
 import java.lang.reflect.Parameter;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Map;
@@ -91,7 +90,7 @@ public class ControllerParser {
    */
   @Transactional
   @PostConstruct
-  public void listEndpointsAndParameters() throws NoSuchAlgorithmException {
+  public void listEndpointsAndParameters() {
     Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
     handlerMethods.forEach((info, method) -> {
       // TODO : handle multiple paths
