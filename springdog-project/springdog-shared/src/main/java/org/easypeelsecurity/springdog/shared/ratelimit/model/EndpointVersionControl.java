@@ -37,6 +37,7 @@ public class EndpointVersionControl {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  @Column(unique = true)
   private LocalDateTime dateOfVersion;
   @Column(length = 64)
   private String fullHashOfEndpoints;
