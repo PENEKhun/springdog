@@ -21,7 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.springframework.util.Assert;
+import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
  * Endpoint version system.
@@ -47,6 +47,8 @@ public class EndpointHashProvider implements EndpointHash {
   public boolean isSameHash(String hash, EndpointDto... endpointDto) {
     Assert.notNull(hash, "Hash must not be null");
     Assert.isTrue(endpointDto.length > 0, "EndpointDto must not be empty");
+    Assert.notNull(apiParams, "EndpointParameterDto must not be null");
+    Assert.isTrue(apiParams.length > 0, "EndpointParameterDto must not be empty");
 
     return hash.equals(getHash(endpointDto));
   }

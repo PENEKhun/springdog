@@ -35,18 +35,10 @@ public interface EndpointHash {
   /**
    * Get hash of endpoint parameters.
    *
-   * @param endpointParameterDtos endpoint parameter dtos
+   * @param apiInfo   endpoint dto
+   * @param apiParams endpoint parameters
    * @return hash string of endpoint parameters
    */
-  String getHash(EndpointParameterDto... endpointParameterDtos);
-
-  /**
-   * Check if hash is same.
-   *
-   * @param hash        hash string
-   * @param endpointDto endpoint dto
-   * @return true if hash is same
-   */
-  boolean isSameHash(String hash, EndpointDto... endpointDto);
+  String getParamHash(EndpointDto apiInfo, EndpointParameterDto... apiParams);
 
 }
