@@ -20,6 +20,9 @@
 
       $("#parametersOption").select2({
         placeholder: 'Select parameters',
+        "language" : {
+          noResults: () => "No parameters found."
+        },
         allowClear: true
       });
     });
