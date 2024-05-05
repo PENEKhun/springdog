@@ -16,7 +16,6 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,7 +39,7 @@ public class EndpointConverter {
   public static Endpoint toEntity(EndpointHash hashProvider, EndpointDto endpointDto) {
     Set<EndpointParameter> parameters = new HashSet<>();
     for (EndpointParameterDto param : endpointDto.getParameters()) {
-      parameters.add(toEntity(hashProvider, param));
+      parameters.add(toEntity(hashProvider, endpointDto, param));
     }
 
     return new Endpoint(hashProvider.getHash(endpointDto), endpointDto.getPath(), endpointDto.getFqcn(),
@@ -53,8 +52,10 @@ public class EndpointConverter {
    * @param endpointParameterDto target DTO instance to transform to Entity
    * @return entity object
    */
-  public static EndpointParameter toEntity(EndpointHash hashProvider, EndpointParameterDto endpointParameterDto) {
-    return new EndpointParameter(hashProvider.getHash(endpointParameterDto), endpointParameterDto.getName(),
+  public static EndpointParameter toEntity(EndpointHash hashProvider, EndpointDto apiInfo,
+      EndpointParameterDto endpointParameterDto) {
+    return new EndpointParameter(hashProvider.getParamHash(apiInfo, endpointParameterDto),
+        endpointParameterDto.getName(),
         endpointParameterDto.getType());
   }
 
