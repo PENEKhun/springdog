@@ -50,6 +50,7 @@ public class Endpoint {
   private HttpMethod httpMethod;
   @OneToMany(cascade = {CascadeType.ALL})
   private Set<EndpointParameter> parameters = new HashSet<>();
+  private boolean isPatternPath;
 
   /**
    * Constructor.
@@ -59,9 +60,10 @@ public class Endpoint {
    * @param fqcn       fully qualified class name e.g. org.penekhun.controller.UserController.method1
    * @param httpMethod http method
    * @param parameters api parameter list
+   * @param isPatternPath boolean of path has pattern or not
    */
   public Endpoint(String hash, String path, String fqcn, HttpMethod httpMethod,
-      Set<EndpointParameter> parameters) {
+      Set<EndpointParameter> parameters, boolean isPatternPath) {
     Assert.hasText(hash, "Hash must not be null or empty");
 
     this.hash = hash;
@@ -70,6 +72,7 @@ public class Endpoint {
     this.httpMethod = httpMethod;
     parameters.forEach(parameter -> parameter.setEndpoint(this));
     this.parameters = parameters;
+    this.isPatternPath = isPatternPath;
   }
 
   /**
@@ -139,5 +142,13 @@ public class Endpoint {
   @Override
   public int hashCode() {
     return hash.hashCode();
+  }
+
+  /**
+   * Check if path is pattern path.
+   * @return true if path is pattern path
+   */
+  public boolean isPatternPath() {
+    return this.isPatternPath;
   }
 }

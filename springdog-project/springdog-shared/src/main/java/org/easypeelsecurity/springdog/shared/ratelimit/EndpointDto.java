@@ -34,6 +34,7 @@ public class EndpointDto {
   private final String fqcn;
   private final HttpMethod httpMethod;
   private final HashSet<EndpointParameterDto> parameters = new HashSet<>();
+  private final boolean isPatternPath;
 
   /**
    * All-arg constructor.
@@ -43,8 +44,9 @@ public class EndpointDto {
    * @param fqcn       fully qualified class name of the method (e.g.
    *                   org.penekhun.controller.UserController.method1)
    * @param httpMethod HTTP request method (e.g. GET, POST, PUT, DELETE, PATCH)
+   * @param isPatternPath is the path a pattern path
    */
-  public EndpointDto(String hash, String path, String fqcn, HttpMethod httpMethod) {
+  public EndpointDto(String hash, String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath) {
     Assert.hasText(path, "Endpoint must not be null or empty");
     Assert.hasText(fqcn, "FQCN must not be null or empty");
     Assert.notNull(httpMethod, "HttpMethod must not be null");
@@ -53,13 +55,14 @@ public class EndpointDto {
     this.path = path;
     this.fqcn = fqcn;
     this.httpMethod = httpMethod;
+    this.isPatternPath = isPatternPath;
   }
 
   /**
    * Constructor.
    */
-  public EndpointDto(String path, String fqcn, HttpMethod httpMethod) {
-    this(null, path, fqcn, httpMethod);
+  public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath) {
+    this(null, path, fqcn, httpMethod, isPatternPath);
   }
 
   @Override
@@ -140,5 +143,13 @@ public class EndpointDto {
     if (parameters != null && !parameters.isEmpty()) {
       this.parameters.addAll(parameters);
     }
+  }
+
+  /**
+   * Is the path a pattern path.
+   * @return true if the path is a pattern path
+   */
+  public boolean isPatternPath() {
+    return this.isPatternPath;
   }
 }

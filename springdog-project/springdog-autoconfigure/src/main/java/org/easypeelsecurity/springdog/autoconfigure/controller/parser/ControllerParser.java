@@ -94,7 +94,9 @@ public class ControllerParser {
     Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
     handlerMethods.forEach((info, method) -> {
       // TODO : handle multiple paths
-      String endPoint = null;
+      String endpoint = null;
+      boolean isPatternPath = false;
+      // path condition or directPaths
       if (!info.getDirectPaths().isEmpty()) {
         if (info.getDirectPaths().size() > 1) {
           System.out.println(
@@ -103,10 +105,20 @@ public class ControllerParser {
           return;
         }
 
-        endPoint = info.getDirectPaths().iterator().next();
+        endpoint = info.getDirectPaths().iterator().next();
+      } else if (!info.getPatternValues().isEmpty()) {
+        if (info.getPatternValues().size() > 1) {
+          System.out.println(
+              "Multiple paths found for " + method.getMethod().getName() + " in " + method.getBeanType() +
+                  ". but not supported yet.");
+          return;
+        }
+
+        isPatternPath = true;
+        endpoint = info.getPatternValues().iterator().next();
       }
 
-      if (endPoint == null) {
+      if (endpoint == null) {
         return;
       }
 
@@ -120,7 +132,7 @@ public class ControllerParser {
         return;
       }
 
-      EndpointDto api = getEndpointDto(method, endPoint, httpMethod);
+      EndpointDto api = getEndpointDto(method, endpoint, httpMethod, isPatternPath);
       if (!api.getFqcn().contains("org.easypeelsecurity.springdog")) {
         RESULT.add(api);
       }
@@ -168,9 +180,9 @@ public class ControllerParser {
         // TODO: PARAMETER 비교도 포함
 
         dbOnly.forEach(item -> vc.addChangeLog(new EndpointChangeLog(vc, EndpointChangeType.API_DELETED,
-            "[" + item.getHttpMethod()  + "] " + item.getPath() + " was deleted")));
+            "[" + item.getHttpMethod() + "] " + item.getPath() + " was deleted")));
         nowOnly.forEach(item -> vc.addChangeLog(new EndpointChangeLog(vc, EndpointChangeType.API_ADDED,
-            "[" + item.getHttpMethod()  + "] " + item.getPath() + " was added")));
+            "[" + item.getHttpMethod() + "] " + item.getPath() + " was added")));
 
         endpointCommand.applyChanges(hashProvider, nowOnly, dbOnly);
         versionControlRepository.save(vc);
@@ -178,10 +190,11 @@ public class ControllerParser {
     }
   }
 
-  private static EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod) {
+  private static EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod,
+      boolean isPatternPath) {
     String fqcn = method.getBeanType() + "." + method.getMethod().getName();
 
-    EndpointDto api = new EndpointDto(endPoint, fqcn, httpMethod);
+    EndpointDto api = new EndpointDto(endPoint, fqcn, httpMethod, isPatternPath);
     Set<EndpointParameterDto> parameters = new HashSet<>();
 
     for (Parameter parameter : method.getMethod().getParameters()) {
