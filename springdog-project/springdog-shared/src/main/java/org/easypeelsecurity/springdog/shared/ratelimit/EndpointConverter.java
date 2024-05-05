@@ -44,7 +44,7 @@ public class EndpointConverter {
     }
 
     return new Endpoint(hashProvider.getHash(endpointDto), endpointDto.getPath(), endpointDto.getFqcn(),
-        endpointDto.getHttpMethod(), parameters);
+        endpointDto.getHttpMethod(), parameters, endpointDto.isPatternPath());
   }
 
   /**
@@ -67,7 +67,7 @@ public class EndpointConverter {
   public static EndpointDto toDto(Endpoint endpointEntity) {
     EndpointDto transform =
         new EndpointDto(endpointEntity.getHash(), endpointEntity.getPath(), endpointEntity.getFqcn(),
-            endpointEntity.getHttpMethod());
+            endpointEntity.getHttpMethod(), endpointEntity.isPatternPath());
     transform.addParameters(
         endpointEntity.getParameters().stream().map(EndpointConverter::toDto).collect(Collectors.toSet()));
     return transform;
