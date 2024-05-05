@@ -66,12 +66,10 @@ public class EndpointConverter {
    * @return dto object
    */
   public static EndpointDto toDto(Endpoint endpointEntity) {
-    EndpointDto transform =
-        new EndpointDto(endpointEntity.getHash(), endpointEntity.getPath(), endpointEntity.getFqcn(),
-            endpointEntity.getHttpMethod(), endpointEntity.isPatternPath());
-    transform.addParameters(
-        endpointEntity.getParameters().stream().map(EndpointConverter::toDto).collect(Collectors.toSet()));
-    return transform;
+    return new EndpointDto(endpointEntity.getHash(), endpointEntity.getPath(), endpointEntity.getFqcn(),
+            endpointEntity.getHttpMethod(),
+            endpointEntity.getParameters().stream().map(EndpointConverter::toDto).collect(Collectors.toSet()),
+            endpointEntity.isPatternPath());
   }
 
   /**

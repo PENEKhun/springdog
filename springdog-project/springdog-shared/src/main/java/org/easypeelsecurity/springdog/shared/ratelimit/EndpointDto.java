@@ -39,14 +39,16 @@ public class EndpointDto {
   /**
    * All-arg constructor.
    *
-   * @param hash       hash of the endpoint
-   * @param path       api path string (e.g. /api/v1/user)
-   * @param fqcn       fully qualified class name of the method (e.g.
-   *                   org.penekhun.controller.UserController.method1)
-   * @param httpMethod HTTP request method (e.g. GET, POST, PUT, DELETE, PATCH)
+   * @param hash          hash of the endpoint
+   * @param path          api path string (e.g. /api/v1/user)
+   * @param fqcn          fully qualified class name of the method (e.g.
+   *                      org.penekhun.controller.UserController.method1)
+   * @param httpMethod    HTTP request method (e.g. GET, POST, PUT, DELETE, PATCH)
+   * @param parameters    parameters of the endpoint
    * @param isPatternPath is the path a pattern path
    */
-  public EndpointDto(String hash, String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath) {
+  public EndpointDto(String hash, String path, String fqcn, HttpMethod httpMethod,
+      Set<EndpointParameterDto> parameters, boolean isPatternPath) {
     Assert.hasText(path, "Endpoint must not be null or empty");
     Assert.hasText(fqcn, "FQCN must not be null or empty");
     Assert.notNull(httpMethod, "HttpMethod must not be null");
@@ -56,13 +58,25 @@ public class EndpointDto {
     this.fqcn = fqcn;
     this.httpMethod = httpMethod;
     this.isPatternPath = isPatternPath;
+
+    if (parameters != null && !parameters.isEmpty()) {
+      this.parameters.addAll(parameters);
+    }
   }
 
   /**
    * Constructor.
    */
   public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath) {
-    this(null, path, fqcn, httpMethod, isPatternPath);
+    this(null, path, fqcn, httpMethod, null, isPatternPath);
+  }
+
+  /**
+   * Constructor.
+   */
+  public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath,
+      Set<EndpointParameterDto> parameters) {
+    this(null, path, fqcn, httpMethod, parameters, isPatternPath);
   }
 
   @Override
@@ -147,6 +161,7 @@ public class EndpointDto {
 
   /**
    * Is the path a pattern path.
+   *
    * @return true if the path is a pattern path
    */
   public boolean isPatternPath() {
