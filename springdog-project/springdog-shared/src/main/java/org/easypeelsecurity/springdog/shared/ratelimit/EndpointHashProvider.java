@@ -36,21 +36,11 @@ public class EndpointHashProvider implements EndpointHash {
   }
 
   @Override
-  public String getHash(EndpointParameterDto... endpointParameterDtos) {
-    Assert.notNull(endpointParameterDtos, "EndpointParameterDto must not be null");
-    Assert.isTrue(endpointParameterDtos.length > 0, "EndpointParameterDto must not be empty");
-
-    return generateSHA256Hex(parametersToString(endpointParameterDtos));
-  }
-
-  @Override
-  public boolean isSameHash(String hash, EndpointDto... endpointDto) {
-    Assert.notNull(hash, "Hash must not be null");
-    Assert.isTrue(endpointDto.length > 0, "EndpointDto must not be empty");
+  public String getParamHash(EndpointDto apiInfo, EndpointParameterDto... apiParams) {
     Assert.notNull(apiParams, "EndpointParameterDto must not be null");
     Assert.isTrue(apiParams.length > 0, "EndpointParameterDto must not be empty");
 
-    return hash.equals(getHash(endpointDto));
+    return generateSHA256Hex(parametersToString(apiInfo, apiParams));
   }
 
   private String endpointsToString(EndpointDto... endpoints) {
@@ -71,28 +61,29 @@ public class EndpointHashProvider implements EndpointHash {
 
     StringBuilder sb = new StringBuilder();
     for (EndpointDto endpoint : endpoints) {
-      sb.append(endpoint.getPath())
-          .append(PROPERTY_DELIMITER)
-          .append(endpoint.getHttpMethod())
-          .append(PROPERTY_DELIMITER)
-          .append(endpoint.getFqcn());
-
       if (endpoint.getParameters() != null) {
         sb.append(PROPERTY_DELIMITER)
-            .append(parametersToString(endpoint.getParameters().toArray(new EndpointParameterDto[0])));
+            .append(
+                parametersToString(endpoint, endpoint.getParameters().toArray(new EndpointParameterDto[0])));
       }
     }
 
     return sb.toString();
   }
 
-  private String parametersToString(EndpointParameterDto... parameters) {
+  private String parametersToString(EndpointDto api, EndpointParameterDto... parameters) {
     Comparator<EndpointParameterDto> comparator = Comparator
         .comparing(EndpointParameterDto::getName)
         .thenComparing(EndpointParameterDto::getType);
     Arrays.sort(parameters, comparator);
 
-    StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder()
+        .append(api.getPath())
+        .append(PROPERTY_DELIMITER)
+        .append(api.getHttpMethod())
+        .append(PROPERTY_DELIMITER)
+        .append(api.getFqcn());
+
     for (EndpointParameterDto parameter : parameters) {
       sb.append(parameter.getName())
           .append(PROPERTY_DELIMITER)
