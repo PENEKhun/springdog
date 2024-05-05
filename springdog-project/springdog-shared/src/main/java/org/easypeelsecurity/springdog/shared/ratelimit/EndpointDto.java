@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
-import org.springframework.util.Assert;
+import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
  * Metadata to group and identify information parsed by the controller.

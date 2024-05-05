@@ -16,7 +16,7 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
-import org.springframework.util.Assert;
+import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
  * Enum for HTTP methods.

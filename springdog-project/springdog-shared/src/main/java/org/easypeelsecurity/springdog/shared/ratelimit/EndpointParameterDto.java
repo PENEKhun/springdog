@@ -17,7 +17,7 @@
 package org.easypeelsecurity.springdog.shared.ratelimit;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.ApiParameterType;
-import org.springframework.util.Assert;
+import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
  * Controller parameter item.

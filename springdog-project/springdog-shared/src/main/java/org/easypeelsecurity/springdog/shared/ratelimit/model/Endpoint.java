@@ -19,7 +19,7 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.util.Assert;
+import org.easypeelsecurity.springdog.shared.util.Assert;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

@@ -18,7 +18,7 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 import java.util.Objects;
 
-import org.springframework.util.Assert;
+import org.easypeelsecurity.springdog.shared.util.Assert;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
