@@ -35,6 +35,7 @@ public class EndpointDto {
   private final HttpMethod httpMethod;
   private final HashSet<EndpointParameterDto> parameters = new HashSet<>();
   private final boolean isPatternPath;
+  private final RulesetDto ruleset;
 
   /**
    * All-arg constructor.
@@ -46,9 +47,10 @@ public class EndpointDto {
    * @param httpMethod    HTTP request method (e.g. GET, POST, PUT, DELETE, PATCH)
    * @param parameters    parameters of the endpoint
    * @param isPatternPath is the path a pattern path
+   * @param ruleset       ruleset of the endpoint
    */
   public EndpointDto(String hash, String path, String fqcn, HttpMethod httpMethod,
-      Set<EndpointParameterDto> parameters, boolean isPatternPath) {
+      Set<EndpointParameterDto> parameters, boolean isPatternPath, RulesetDto ruleset) {
     Assert.hasText(path, "Endpoint must not be null or empty");
     Assert.hasText(fqcn, "FQCN must not be null or empty");
     Assert.notNull(httpMethod, "HttpMethod must not be null");
@@ -58,6 +60,7 @@ public class EndpointDto {
     this.fqcn = fqcn;
     this.httpMethod = httpMethod;
     this.isPatternPath = isPatternPath;
+    this.ruleset = ruleset;
 
     if (parameters != null && !parameters.isEmpty()) {
       this.parameters.addAll(parameters);
@@ -68,7 +71,15 @@ public class EndpointDto {
    * Constructor.
    */
   public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath) {
-    this(null, path, fqcn, httpMethod, null, isPatternPath);
+    this(null, path, fqcn, httpMethod, new HashSet<>(), isPatternPath, null);
+  }
+
+  /**
+   * Constructor.
+   */
+  public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath,
+      RulesetDto ruleset) {
+    this(null, path, fqcn, httpMethod, new HashSet<>(), isPatternPath, ruleset);
   }
 
   /**
@@ -76,7 +87,7 @@ public class EndpointDto {
    */
   public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath,
       Set<EndpointParameterDto> parameters) {
-    this(null, path, fqcn, httpMethod, parameters, isPatternPath);
+    this(null, path, fqcn, httpMethod, parameters, isPatternPath, null);
   }
 
   @Override
@@ -166,5 +177,14 @@ public class EndpointDto {
    */
   public boolean isPatternPath() {
     return this.isPatternPath;
+  }
+
+  /**
+   * Get the ruleset.
+   *
+   * @return the ruleset
+   */
+  public RulesetDto getRuleset() {
+    return ruleset;
   }
 }

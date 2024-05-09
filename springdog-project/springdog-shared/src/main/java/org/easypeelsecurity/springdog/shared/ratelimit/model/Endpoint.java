@@ -29,7 +29,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 /**
  * Entity class for endpoint.
@@ -51,15 +53,18 @@ public class Endpoint {
   @OneToMany(cascade = {CascadeType.ALL})
   private Set<EndpointParameter> parameters = new HashSet<>();
   private boolean isPatternPath;
+  @OneToOne(cascade = {CascadeType.ALL})
+  @JoinColumn(referencedColumnName = "hash")
+  private Ruleset ruleset;
 
   /**
    * Constructor.
    *
-   * @param hash       endpoint hashed String
-   * @param path       api path e.g. /api/v1/user
-   * @param fqcn       fully qualified class name e.g. org.penekhun.controller.UserController.method1
-   * @param httpMethod http method
-   * @param parameters api parameter list
+   * @param hash          endpoint hashed String
+   * @param path          api path e.g. /api/v1/user
+   * @param fqcn          fully qualified class name e.g. org.penekhun.controller.UserController.method1
+   * @param httpMethod    http method
+   * @param parameters    api parameter list
    * @param isPatternPath boolean of path has pattern or not
    */
   public Endpoint(String hash, String path, String fqcn, HttpMethod httpMethod,
@@ -73,6 +78,7 @@ public class Endpoint {
     parameters.forEach(parameter -> parameter.setEndpoint(this));
     this.parameters = parameters;
     this.isPatternPath = isPatternPath;
+    this.ruleset = new Ruleset(hash);
   }
 
   /**
@@ -146,9 +152,19 @@ public class Endpoint {
 
   /**
    * Check if path is pattern path.
+   *
    * @return true if path is pattern path
    */
   public boolean isPatternPath() {
     return this.isPatternPath;
+  }
+
+  /**
+   * Get ruleset.
+   *
+   * @return ruleset
+   */
+  public Ruleset getRuleset() {
+    return ruleset;
   }
 }
