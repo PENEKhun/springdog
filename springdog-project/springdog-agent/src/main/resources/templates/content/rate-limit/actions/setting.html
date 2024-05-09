@@ -7,7 +7,27 @@
 
 <head>
   <title>Ratelimit - API Setting</title>
+  <style>
+    [data-card-type="request-control"]:not([data-enabled="true"]) .hover-message {
+      display: block;
+      position: absolute;
+      background-color: #f8f9fa;
+      border: 1px solid #ccc;
+      padding: 10px;
+      z-index: 100;
+      width: 100%;
+      top: 0;
+      left: 0;
+      text-align: center;
+    }
+
+  </style>
   <script>
+    function updateStatusValue(obj) {
+      let hiddenInput = document.getElementById('statusValue');
+      hiddenInput.value = obj.checked ? 'ACTIVE' : 'INACTIVE';
+    }
+
     $(document).ready(function () {
       let checkbox = document.getElementById("permanentBan");
       checkbox.addEventListener("change", function () {
@@ -18,9 +38,31 @@
         }
       });
 
+      let requestControlCard = document.querySelector('[data-card-type="request-control"]');
+
+      function toggleCardAvailability(isEnabled) {
+        [requestControlCard].forEach(card => {
+          let inputs = card.querySelectorAll('input, select');
+          inputs.forEach(input => input.disabled = !isEnabled);
+        });
+      }
+
+      let statusToggle = document.getElementById('statusToggle');
+      toggleCardAvailability(statusToggle.checked);
+
+      document.getElementById('statusToggle').addEventListener('change', function () {
+        let isEnabled = this.checked;
+        let inputs = requestControlCard.querySelectorAll('input, select');
+        inputs.forEach(input => input.disabled = !isEnabled);
+
+        requestControlCard.setAttribute('data-enabled', isEnabled);
+        let label = this.nextElementSibling;
+        label.innerText = isEnabled ? 'enabled' : 'disabled';
+      });
+
       $("#parametersOption").select2({
         placeholder: 'Select parameters',
-        "language" : {
+        "language": {
           noResults: () => "No parameters found."
         },
         allowClear: true
@@ -43,7 +85,24 @@
     <li class="breadcrumb-item active">Setting</li>
   </ol>
 
-  <form>
+  <form method="post" th:object="${api}">
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="form-check form-switch">
+          <p class="card-text">
+            <strong>RateLimit</strong>
+            <input type="hidden" id="statusValue" th:field="*{ruleset.status}"/>
+            <input type="checkbox" class="form-check-input" id="statusToggle"
+                   th:checked="${api.ruleset.status == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE}"
+                   onchange="updateStatusValue(this)">
+            will be
+            <label class="form-check-label text-decoration-underline" for="statusToggle"
+                   th:text="${api.ruleset.status == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE ? 'enabled' : 'disabled'}"></label>
+            on this API.
+        </div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-body">
         <h5 class="card-title">Endpoint Information</h5>
@@ -57,81 +116,86 @@
       </div>
     </div>
 
-    <div class="card mt-3">
+    <div class="card mt-3" data-card-type="request-control">
       <div class="card-body">
         <h5 class="card-title">Request Control Settings</h5>
-        <form>
-          <div class="mb-3">
-            <label for="requestLimit" class="form-label">Request Limit</label>
-            <input type="number" class="form-control" id="requestLimit"
-                   placeholder="Number of requests">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Time Frame</label>
-            <div class="d-flex flex-row" id="timeFrameGroup">
-              <div class="form-floating me-2 flex-fill">
-                <input type="number" class="form-control" id="timeFrameDays" placeholder="Days">
-                <label for="timeFrameDays">Days</label>
-              </div>
-              <div class="form-floating me-2 flex-fill">
-                <input type="number" class="form-control" id="timeFrameHours" placeholder="Hours">
-                <label for="timeFrameHours">Hours</label>
-              </div>
-              <div class="form-floating me-2 flex-fill">
-                <input type="number" class="form-control" id="timeFrameMinutes"
-                       placeholder="Minutes">
-                <label for="timeFrameMinutes">Minutes</label>
-              </div>
-              <div class="form-floating flex-fill">
-                <input type="number" class="form-control" id="timeFrameSeconds"
-                       placeholder="Seconds">
-                <label for="timeFrameSeconds">Seconds</label>
-              </div>
+        <div class="hover-message" style="display: none;">If you want to change values, please
+          enable RateLimit.
+        </div>
+        <div class="mb-3">
+          <label for="requestLimit" class="form-label">Request Limit</label>
+          <input type="number" class="form-control" id="requestLimit"
+                 placeholder="Number of requests" th:field="*{ruleset.requestLimitCount}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Time Frame</label>
+          <div class="d-flex flex-row" id="timeFrameGroup">
+            <div class="form-floating me-2 flex-fill">
+              <input type="number" class="form-control" id="timeFrameDays" placeholder="Days"
+                     th:field="*{ruleset.timeLimitDays}">
+              <label for="timeFrameDays">Days</label>
+            </div>
+            <div class="form-floating me-2 flex-fill">
+              <input type="number" class="form-control" id="timeFrameHours" placeholder="Hours"
+                     th:field="*{ruleset.timeLimitHours}">
+              <label for="timeFrameHours">Hours</label>
+            </div>
+            <div class="form-floating me-2 flex-fill">
+              <input type="number" class="form-control" id="timeFrameMinutes"
+                     placeholder="Minutes" th:field="*{ruleset.timeLimitMinutes}">
+              <label for="timeFrameMinutes">Minutes</label>
+            </div>
+            <div class="form-floating flex-fill">
+              <input type="number" class="form-control" id="timeFrameSeconds"
+                     placeholder="Seconds" th:field="*{ruleset.timeLimitSeconds}">
+              <label for="timeFrameSeconds">Seconds</label>
             </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Ban Duration</label>
-            <div class="d-flex flex-row" id="banDurationGroup">
-              <div class="form-floating me-2 flex-fill">
-                <input type="number" class="form-control" id="banDurationDays" placeholder="Days">
-                <label for="banDurationDays">Days</label>
-              </div>
-              <div class="form-floating me-2 flex-fill">
-                <input type="number" class="form-control" id="banDurationHours" placeholder="Hours">
-                <label for="banDurationHours">Hours</label>
-              </div>
-              <div class="form-floating me-2 flex-fill">
-                <input type="number" class="form-control" id="banDurationMinutes"
-                       placeholder="Minutes">
-                <label for="banDurationMinutes">Minutes</label>
-              </div>
-              <div class="form-floating flex-fill">
-                <input type="number" class="form-control" id="banDurationSeconds"
-                       placeholder="Seconds">
-                <label for="banDurationSeconds">Seconds</label>
-              </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Ban Duration</label>
+          <div class="d-flex flex-row" id="banDurationGroup">
+            <div class="form-floating me-2 flex-fill">
+              <input type="number" class="form-control" id="banDurationDays" placeholder="Days"
+                     th:field="*{ruleset.banTimeDays}">
+              <label for="banDurationDays">Days</label>
+            </div>
+            <div class="form-floating me-2 flex-fill">
+              <input type="number" class="form-control" id="banDurationHours" placeholder="Hours"
+                     th:field="*{ruleset.banTimeHours}">
+              <label for="banDurationHours">Hours</label>
+            </div>
+            <div class="form-floating me-2 flex-fill">
+              <input type="number" class="form-control" id="banDurationMinutes"
+                     placeholder="Minutes" th:field="*{ruleset.banTimeMinutes}">
+              <label for="banDurationMinutes">Minutes</label>
+            </div>
+            <div class="form-floating flex-fill">
+              <input type="number" class="form-control" id="banDurationSeconds"
+                     placeholder="Seconds" th:field="*{ruleset.banTimeSeconds}">
+              <label for="banDurationSeconds">Seconds</label>
             </div>
           </div>
+        </div>
 
-          <div class="mb-3">
-            <div class="align-checkbox">
-              <input type="checkbox" class="form-check-input" id="permanentBan">
-              <label class="form-check-label" for="permanentBan">Permanent Ban</label>
-            </div>
+        <div class="mb-3">
+          <div class="align-checkbox">
+            <input type="checkbox" class="form-check-input" id="permanentBan">
+            <label class="form-check-label" for="permanentBan"
+                   th:field="*{ruleset.permanentBan}">Permanent Ban</label>
           </div>
-        </form>
+        </div>
       </div>
-    </div>
 
-    <div class="card mt-3">
       <div class="card-body">
         <h5 class="card-title">Ban Ruleset combinations</h5>
         <div class="mb-3 row">
           <label for="parametersOption" class="form-label">Parameters</label>
           <select class="form-control" id="parametersOption" multiple>
-            <option th:each="parameter : ${api.parameters}"
+            <option th:each="parameter : ${parameters}"
                     th:text="${parameter.name + '[' + parameter.type + ']'}"
-                    th:data-paramhash="${parameter.paramHash}"></option>
+                    th:data-paramhash="${parameter.paramHash}"
+                    th:selected="${ruleset.params.contains(parameter)}"></option>
           </select>
         </div>
         <div class="mb-3 row">
@@ -139,7 +203,8 @@
           <select class="form-control" id="headerOption" multiple></select>
         </div>
         <div class="form-check mb-3">
-          <input type="checkbox" class="form-check-input" id="ipBlock">
+          <input type="checkbox" class="form-check-input"
+                 th:field="*{ruleset.ipBased}">
           <label class="form-check-label" for="ipBlock">Enable IP-based Blocking</label>
         </div>
       </div>
