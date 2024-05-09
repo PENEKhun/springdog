@@ -25,6 +25,14 @@
         },
         allowClear: true
       });
+
+      $("#headerOption").select2({
+        placeholder: 'Select headers',
+        "language": {
+          noResults: () => "No headers found."
+        },
+        allowClear: true
+      });
     });
   </script>
 </head>
