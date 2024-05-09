@@ -19,6 +19,7 @@ package org.easypeelsecurity.springdog.autoconfigure.controller.parser;
 import java.lang.reflect.Parameter;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ import org.easypeelsecurity.springdog.shared.ratelimit.EndpointHashProvider;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.VersionCompare;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.ApiParameterType;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeLog;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeType;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
@@ -56,6 +58,7 @@ import jakarta.transaction.Transactional;
 @Component("springdogControllerParserComponent")
 public class ControllerParser {
 
+  private final String SPRINGDOG_PACKAGE = "org.easypeelsecurity.springdog";
   private static final Set<EndpointDto> RESULT = new HashSet<>();
 
   private final RequestMappingHandlerMapping handlerMapping;
@@ -133,7 +136,7 @@ public class ControllerParser {
       }
 
       EndpointDto api = getEndpointDto(method, endpoint, httpMethod, isPatternPath);
-      if (!api.getFqcn().contains("org.easypeelsecurity.springdog")) {
+      if (!api.getFqcn().contains(SPRINGDOG_PACKAGE)) {
         RESULT.add(api);
       }
     });
@@ -153,12 +156,11 @@ public class ControllerParser {
       case FIRST_RUN:
         // 그냥 등록
         System.out.println("First run. Save all.");
-        endpointRepository
-            .saveAll(
-                RESULT.stream()
-                    .map(item -> EndpointConverter.toEntity(hashProvider, item))
-                    .toList()
-            );
+        List<Endpoint> endpointList = RESULT.stream()
+            .map(item -> EndpointConverter.toEntity(hashProvider, item))
+            .toList();
+
+        endpointRepository.saveAll(endpointList);
 
         versionControlRepository.save(
             new EndpointVersionControl(now, nowFullHash)

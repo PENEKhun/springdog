@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointParameter;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.Ruleset;
 
 /**
  * Converter for rate limit. between DTO and Entity.
@@ -42,7 +43,8 @@ public class EndpointConverter {
       parameters.add(toEntity(hashProvider, endpointDto, param));
     }
 
-    return new Endpoint(hashProvider.getHash(endpointDto), endpointDto.getPath(), endpointDto.getFqcn(),
+    String hash = hashProvider.getHash(endpointDto);
+    return new Endpoint(hash, endpointDto.getPath(), endpointDto.getFqcn(),
         endpointDto.getHttpMethod(), parameters, endpointDto.isPatternPath());
   }
 
@@ -67,9 +69,10 @@ public class EndpointConverter {
    */
   public static EndpointDto toDto(Endpoint endpointEntity) {
     return new EndpointDto(endpointEntity.getHash(), endpointEntity.getPath(), endpointEntity.getFqcn(),
-            endpointEntity.getHttpMethod(),
-            endpointEntity.getParameters().stream().map(EndpointConverter::toDto).collect(Collectors.toSet()),
-            endpointEntity.isPatternPath());
+        endpointEntity.getHttpMethod(),
+        endpointEntity.getParameters().stream().map(EndpointConverter::toDto).collect(Collectors.toSet()),
+        endpointEntity.isPatternPath(),
+        toDto(endpointEntity.getRuleset()));
   }
 
   /**
@@ -81,6 +84,12 @@ public class EndpointConverter {
   public static EndpointParameterDto toDto(EndpointParameter endpointParameterEntity) {
     return new EndpointParameterDto(endpointParameterEntity.getParamHash(), endpointParameterEntity.getName(),
         endpointParameterEntity.getType());
+  }
+
+  private static RulesetDto toDto(Ruleset ruleset) {
+    return new RulesetDto(ruleset.getId(), ruleset.getStatus(), ruleset.isIpBased(),
+        ruleset.isPermanentBan(), ruleset.getRequestLimitCount(), ruleset.getTimeLimitInSeconds(),
+        ruleset.getBanTimeInSeconds());
   }
 
   /**
