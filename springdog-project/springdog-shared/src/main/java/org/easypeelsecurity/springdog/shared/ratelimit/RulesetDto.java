@@ -73,6 +73,7 @@ public class RulesetDto {
     }
 
     this.id = id;
+    this.status = status;
     this.ipBased = ipBased;
     this.permanentBan = permanentBan;
     this.requestLimitCount = requestLimitCount;
