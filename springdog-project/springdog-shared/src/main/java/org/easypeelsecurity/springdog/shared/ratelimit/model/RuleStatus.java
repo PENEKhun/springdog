@@ -22,5 +22,25 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 public enum RuleStatus {
   NOT_CONFIGURED,
   ACTIVE,
-  INACTIVE
+  INACTIVE;
+
+  /**
+   * String to Enum Object.
+   *
+   * @param value String value
+   * @return RuleStatus
+   */
+  public static RuleStatus of(String value) {
+    if (value == null || value.isEmpty()) {
+      throw new IllegalArgumentException("Value cannot be null or empty");
+    }
+
+    for (RuleStatus status : RuleStatus.values()) {
+      if (status.name().equalsIgnoreCase(value)) {
+        return status;
+      }
+    }
+
+    throw new IllegalArgumentException("Unknown RuleStatus: " + value);
+  }
 }

@@ -21,18 +21,16 @@
           {title: 'fqcn', data: 'fqcn'},
           {title: 'Http method', data: 'httpMethod'},
           {
-            title: 'Rule Activated',
-            data: 'activated',
+            title: 'status',
+            data: 'ruleset.status',
             render: function (data) {
-              // temporary fix for null data
-              if (data === undefined || data === null) {
-                return '<span class="badge bg-warning">Not configured</span>';
-              }
-
-              if (data) {
-                return '<span class="badge bg-success">Activated</span>';
-              } else {
-                return '<span class="badge bg-danger">Deactivated</span>';
+              switch (data) {
+                case 'NOT_CONFIGURED':
+                  return '<span class="badge bg-warning">Not configured</span>';
+                case 'ACTIVE':
+                  return '<span class="badge bg-success">ACTIVE</span>';
+                default:
+                  return '<span class="badge bg-danger">INACTIVE</span>';
               }
             }
           },

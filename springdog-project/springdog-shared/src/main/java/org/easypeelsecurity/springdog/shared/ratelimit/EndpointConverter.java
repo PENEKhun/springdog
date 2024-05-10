@@ -86,7 +86,13 @@ public class EndpointConverter {
         endpointParameterEntity.getType());
   }
 
-  private static RulesetDto toDto(Ruleset ruleset) {
+  /**
+   * Resolve a given Entity {@code Ruleset} as DTO {@code RulesetDto}.
+   *
+   * @param ruleset target Entity instance to transform to DTO
+   * @return dto object
+   */
+  public static RulesetDto toDto(Ruleset ruleset) {
     return new RulesetDto(ruleset.getId(), ruleset.getStatus(), ruleset.isIpBased(),
         ruleset.isPermanentBan(), ruleset.getRequestLimitCount(), ruleset.getTimeLimitInSeconds(),
         ruleset.getBanTimeInSeconds());
