@@ -29,13 +29,13 @@ import org.easypeelsecurity.springdog.shared.util.Assert;
  */
 public class EndpointDto {
 
-  private final String hash;
-  private final String path;
-  private final String fqcn;
-  private final HttpMethod httpMethod;
-  private final HashSet<EndpointParameterDto> parameters = new HashSet<>();
-  private final boolean isPatternPath;
-  private final RulesetDto ruleset;
+  private String hash;
+  private String path;
+  private String fqcn;
+  private HttpMethod httpMethod;
+  private HashSet<EndpointParameterDto> parameters = new HashSet<>();
+  private boolean isPatternPath;
+  private RulesetDto ruleset;
 
   /**
    * All-arg constructor.
@@ -88,6 +88,12 @@ public class EndpointDto {
   public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath,
       Set<EndpointParameterDto> parameters) {
     this(null, path, fqcn, httpMethod, parameters, isPatternPath, null);
+  }
+
+  /**
+   * Constructor.
+   */
+  public EndpointDto() {
   }
 
   @Override
@@ -186,5 +192,55 @@ public class EndpointDto {
    */
   public RulesetDto getRuleset() {
     return ruleset;
+  }
+
+  /**
+   * Setter.
+   */
+  public void setHash(String hash) {
+    this.hash = hash;
+  }
+
+  /**
+   * Setter.
+   */
+  public void setPath(String path) {
+    this.path = path;
+  }
+
+  /**
+   * Setter.
+   */
+  public void setFqcn(String fqcn) {
+    this.fqcn = fqcn;
+  }
+
+  /**
+   * Setter.
+   */
+  public void setHttpMethod(HttpMethod httpMethod) {
+    this.httpMethod = httpMethod;
+  }
+
+  /**
+   * Setter.
+   */
+  public void setParameters(
+      HashSet<EndpointParameterDto> parameters) {
+    this.parameters = parameters;
+  }
+
+  /**
+   * Setter.
+   */
+  public void setPatternPath(boolean patternPath) {
+    isPatternPath = patternPath;
+  }
+
+  /**
+   * Setter.
+   */
+  public void setRuleset(RulesetDto ruleset) {
+    this.ruleset = ruleset;
   }
 }

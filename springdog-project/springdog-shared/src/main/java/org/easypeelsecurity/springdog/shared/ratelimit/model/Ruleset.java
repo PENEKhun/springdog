@@ -19,7 +19,8 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.easypeelsecurity.springdog.shared.util.Assert;
+import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
+import org.easypeelsecurity.springdog.shared.util.TimeUtil;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -67,9 +68,9 @@ public class Ruleset {
    * Constructor.
    */
   public Ruleset(String hash) {
-    Assert.notNull(hash, "endpoint hash must not be null");
-
     this.hash = hash;
+
+    this.validate();
   }
 
   /**
@@ -78,8 +79,6 @@ public class Ruleset {
   public Ruleset(String hash, RuleStatus status, boolean ipBased, boolean permanentBan,
       int requestLimitCount,
       int timeLimitInSeconds, int banTimeInSeconds) {
-    Assert.notNull(hash, "endpoint hash must not be null");
-
     this.hash = hash;
     this.status = status;
     this.ipBased = ipBased;
@@ -87,50 +86,8 @@ public class Ruleset {
     this.requestLimitCount = requestLimitCount;
     this.timeLimitInSeconds = timeLimitInSeconds;
     this.banTimeInSeconds = banTimeInSeconds;
-  }
 
-  /**
-   * Change status of the rule.
-   *
-   * @param status new status
-   */
-  public void changeStatus(RuleStatus status) {
-    this.status = status;
-  }
-
-  /**
-   * setter.
-   */
-  public void setPermanentBan(boolean permanentBan) {
-    this.permanentBan = permanentBan;
-  }
-
-  /**
-   * setter.
-   */
-  public void setRequestLimitCount(int requestLimitCount) {
-    this.requestLimitCount = requestLimitCount;
-  }
-
-  /**
-   * setter.
-   */
-  public void setTimeLimitInSeconds(int timeLimitInSeconds) {
-    this.timeLimitInSeconds = timeLimitInSeconds;
-  }
-
-  /**
-   * setter.
-   */
-  public void setBanTimeInSeconds(int banTimeInSeconds) {
-    this.banTimeInSeconds = banTimeInSeconds;
-  }
-
-  /**
-   * setter.
-   */
-  public void setIpBased(boolean ipBased) {
-    this.ipBased = ipBased;
+    this.validate();
   }
 
   /**
@@ -139,7 +96,6 @@ public class Ruleset {
   public Long getId() {
     return this.id;
   }
-
 
   /**
    * Getter.
@@ -181,5 +137,44 @@ public class Ruleset {
    */
   public int getTimeLimitInSeconds() {
     return this.timeLimitInSeconds;
+  }
+
+  /**
+   * Update fields.
+   */
+  public void update(RulesetDto dto) {
+    this.status = dto.getStatus();
+    this.ipBased = dto.isIpBased();
+    this.permanentBan = dto.isPermanentBan();
+    this.requestLimitCount = dto.getRequestLimitCount();
+    this.timeLimitInSeconds =
+        TimeUtil.convertToSeconds(dto.getTimeLimitDays(), dto.getTimeLimitHours(), dto.getTimeLimitMinutes(),
+            dto.getTimeLimitSeconds());
+    this.banTimeInSeconds =
+        TimeUtil.convertToSeconds(dto.getBanTimeDays(), dto.getBanTimeHours(), dto.getBanTimeMinutes(),
+            dto.getBanTimeSeconds());
+
+    this.validate();
+  }
+
+  private void validate() {
+    if (this.hash.isEmpty()) {
+      throw new IllegalArgumentException("Hash must not be empty");
+    }
+
+    if (RuleStatus.ACTIVE.equals(this.status)) {
+      if (this.requestLimitCount < 0) {
+        throw new IllegalArgumentException("Request limit count must be greater than 0");
+      }
+      if (this.timeLimitInSeconds < 0) {
+        throw new IllegalArgumentException("Time limit must be greater than 0");
+      }
+      if (this.banTimeInSeconds < 0 && !this.permanentBan) {
+        throw new IllegalArgumentException("Ban time must be greater than 0");
+      }
+      if (!ipBased && this.enabledParameters.isEmpty()) {
+        throw new IllegalArgumentException("At least one combinations must be enabled");
+      }
+    }
   }
 }

@@ -30,6 +30,7 @@ import org.easypeelsecurity.springdog.shared.util.TimeUtil.Time;
 /**
  * dto class for ruleset.
  */
+@SuppressWarnings("checkstyle:MissingJavadocMethod")
 public class RulesetDto {
 
   private Long id;
@@ -47,7 +48,7 @@ public class RulesetDto {
   private int banTimeMinutes;
   private int banTimeSeconds;
 
-  private Set<Param> params = new HashSet<>();
+  private final Set<Param> params = new HashSet<>();
 
   /**
    * Param class.
@@ -55,6 +56,30 @@ public class RulesetDto {
   public static class Param {
 
     private String name;
+  }
+
+  /**
+   * Constructor.
+   */
+  public RulesetDto(Long id, RuleStatus status, boolean ipBased, boolean permanentBan, int requestLimitCount,
+      int timeLimitDays, int timeLimitHours, int timeLimitMinutes, int timeLimitSeconds, int banTimeDays,
+      int banTimeHours, int banTimeMinutes, int banTimeSeconds) {
+    this.id = id;
+    this.status = status;
+    this.ipBased = ipBased;
+    this.permanentBan = permanentBan;
+    this.requestLimitCount = requestLimitCount;
+    this.timeLimitDays = timeLimitDays;
+    this.timeLimitHours = timeLimitHours;
+    this.timeLimitMinutes = timeLimitMinutes;
+    this.timeLimitSeconds = timeLimitSeconds;
+    this.banTimeDays = banTimeDays;
+    this.banTimeHours = banTimeHours;
+    this.banTimeMinutes = banTimeMinutes;
+    this.banTimeSeconds = banTimeSeconds;
+  }
+
+  public RulesetDto() {
   }
 
   /**
@@ -94,101 +119,111 @@ public class RulesetDto {
     }
   }
 
-  /**
-   * Getter.
-   */
   public Long getId() {
     return this.id;
   }
 
-  /**
-   * Getter.
-   */
   public RuleStatus getStatus() {
     return this.status;
   }
 
-  /**
-   * Getter.
-   */
   public boolean isIpBased() {
     return this.ipBased;
   }
 
-  /**
-   * Getter.
-   */
   public boolean isPermanentBan() {
     return this.permanentBan;
   }
 
-  /**
-   * Getter.
-   */
   public int getRequestLimitCount() {
     return this.requestLimitCount;
   }
 
-  /**
-   * Getter.
-   */
   public int getTimeLimitDays() {
     return this.timeLimitDays;
   }
 
-  /**
-   * Getter.
-   */
   public int getTimeLimitHours() {
     return this.timeLimitHours;
   }
 
-  /**
-   * Getter.
-   */
   public int getTimeLimitMinutes() {
     return this.timeLimitMinutes;
   }
 
-  /**
-   * Getter.
-   */
   public int getTimeLimitSeconds() {
     return this.timeLimitSeconds;
   }
 
-  /**
-   * Getter.
-   */
   public int getBanTimeDays() {
     return this.banTimeDays;
   }
 
-  /**
-   * Getter.
-   */
   public int getBanTimeHours() {
     return this.banTimeHours;
   }
 
-  /**
-   * Getter.
-   */
   public int getBanTimeMinutes() {
     return this.banTimeMinutes;
   }
 
-  /**
-   * Getter.
-   */
   public int getBanTimeSeconds() {
     return this.banTimeSeconds;
   }
 
-  /**
-   * Getter.
-   */
   public Set<Param> getParams() {
     return this.params;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public void setStatus(RuleStatus status) {
+    this.status = status;
+  }
+
+  public void setIpBased(boolean ipBased) {
+    this.ipBased = ipBased;
+  }
+
+  public void setPermanentBan(boolean permanentBan) {
+    this.permanentBan = permanentBan;
+  }
+
+  public void setRequestLimitCount(int requestLimitCount) {
+    this.requestLimitCount = requestLimitCount;
+  }
+
+  public void setTimeLimitDays(int timeLimitDays) {
+    this.timeLimitDays = timeLimitDays;
+  }
+
+  public void setTimeLimitHours(int timeLimitHours) {
+    this.timeLimitHours = timeLimitHours;
+  }
+
+  public void setTimeLimitMinutes(int timeLimitMinutes) {
+    this.timeLimitMinutes = timeLimitMinutes;
+  }
+
+  public void setTimeLimitSeconds(int timeLimitSeconds) {
+    this.timeLimitSeconds = timeLimitSeconds;
+  }
+
+  public void setBanTimeDays(int banTimeDays) {
+    this.banTimeDays = banTimeDays;
+  }
+
+  public void setBanTimeHours(int banTimeHours) {
+    this.banTimeHours = banTimeHours;
+  }
+
+  public void setBanTimeMinutes(int banTimeMinutes) {
+    this.banTimeMinutes = banTimeMinutes;
+  }
+
+  public void setBanTimeSeconds(int banTimeSeconds) {
+    this.banTimeSeconds = banTimeSeconds;
   }
 }

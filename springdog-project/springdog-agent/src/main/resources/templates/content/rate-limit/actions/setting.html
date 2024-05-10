@@ -85,6 +85,16 @@
     <li class="breadcrumb-item active">Setting</li>
   </ol>
 
+  <th:block th:if="${result != null}">
+    <div class="alert alert-success" th:if="${result == true}">
+      <strong th:text="${message}"></strong>
+    </div>
+
+    <div class="alert alert-danger" th:if="${result == false}">
+      <strong>Error!</strong> <strong th:text="${message}"></strong>
+    </div>
+  </th:block>
+
   <form method="post" th:object="${api}">
     <div class="card mb-4">
       <div class="card-body">
@@ -204,6 +214,7 @@
         </div>
         <div class="form-check mb-3">
           <input type="checkbox" class="form-check-input"
+                 id="ipBlock"
                  th:field="*{ruleset.ipBased}">
           <label class="form-check-label" for="ipBlock">Enable IP-based Blocking</label>
         </div>
