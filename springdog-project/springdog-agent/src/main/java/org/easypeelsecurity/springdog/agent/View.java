@@ -63,7 +63,7 @@ public class View {
       @ModelAttribute("api") EndpointDto endpointDto, Model model) {
     try {
       RulesetDto changes = endpointDto.getRuleset();
-      rateLimitCommand.updateRule(apiHash, changes);
+      rateLimitCommand.updateRule(endpointDto.getFqcn(), apiHash, changes);
     } catch (Exception e) {
       model.addAttribute("result", false);
       model.addAttribute("message", e.getMessage());

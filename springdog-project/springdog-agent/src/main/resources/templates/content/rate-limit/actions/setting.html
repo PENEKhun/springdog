@@ -138,6 +138,7 @@
         <div class="alert alert-info" th:text="${api.httpMethod}"></div>
         <strong>Controller Class:</strong>
         <div class="alert alert-info" th:text="${api.fqcn}"></div>
+        <input type="hidden" th:field="*{fqcn}"/>
       </div>
     </div>
 

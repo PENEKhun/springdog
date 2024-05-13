@@ -68,7 +68,7 @@ public class EndpointCommand {
    * @param apiHash api hash
    * @param changes ruleset dto that include changes
    */
-  public void updateRule(String apiHash, RulesetDto changes) {
+  public void updateRule(String fqcn, String apiHash, RulesetDto changes) {
     Endpoint endpoint = endpointRepository.findByHash(apiHash)
         .orElseThrow(() -> new IllegalArgumentException("Endpoint not found"));
 
@@ -91,5 +91,6 @@ public class EndpointCommand {
     );
 
     endpoint.changeRuleset(newRuleset);
+    RuleCache.changeRuleCached(fqcn, EndpointConverter.toDto(endpoint.getRuleset()));
   }
 }

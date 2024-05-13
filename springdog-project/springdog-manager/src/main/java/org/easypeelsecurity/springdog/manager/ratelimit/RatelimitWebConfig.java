@@ -16,11 +16,27 @@
 
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
-import org.easypeelsecurity.springdog.shared.ratelimit.model.Ruleset;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Ruleset repository.
+ * Applier for ratelimit interceptor.
  */
-public interface RulesetRepository extends JpaRepository<Ruleset, Long> {
+@Configuration
+public class RatelimitWebConfig implements WebMvcConfigurer {
+
+  private final EndpointQuery endpointQuery;
+
+  /**
+   * Constructor.
+   */
+  public RatelimitWebConfig(EndpointQuery endpointQuery) {
+    this.endpointQuery = endpointQuery;
+  }
+
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(new RatelimitInterceptor(this.endpointQuery));
+  }
 }
