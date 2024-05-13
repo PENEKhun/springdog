@@ -33,7 +33,7 @@
       checkbox.addEventListener("change", function () {
         let banDurationGroup = document.getElementById("banDurationGroup");
         for (let input of banDurationGroup.getElementsByTagName("input")) {
-          input.value = "";
+          input.value = "0";
           input.disabled = checkbox.checked;
         }
       });
