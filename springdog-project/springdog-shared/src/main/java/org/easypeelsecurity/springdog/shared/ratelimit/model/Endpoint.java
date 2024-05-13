@@ -45,9 +45,12 @@ public class Endpoint {
   private Long id;
   @Column(length = 64, unique = true, nullable = false)
   private String hash;
+  @Column(unique = true, nullable = false)
   private String fqcn;
+  @Column(nullable = false)
   private String path;
   @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private HttpMethod httpMethod;
   @OneToMany(cascade = {CascadeType.ALL})
   private Set<EndpointParameter> parameters = new HashSet<>();

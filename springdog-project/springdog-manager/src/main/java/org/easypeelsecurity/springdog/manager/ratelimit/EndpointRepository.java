@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.lang.NonNull;
 
 /**
  * Repository for endpoint.
@@ -32,5 +33,7 @@ public interface EndpointRepository extends JpaRepository<Endpoint, Long> {
 
   List<Endpoint> findAllByHashIn(List<String> list);
 
-  Optional<Endpoint> findByHash(String apiHash);
+  Optional<Endpoint> findByHash(@NonNull String apiHash);
+
+  Optional<Endpoint> findByFqcn(@NonNull String fqcn);
 }

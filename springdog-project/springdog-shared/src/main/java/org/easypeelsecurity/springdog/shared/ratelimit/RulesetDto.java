@@ -211,4 +211,23 @@ public class RulesetDto {
   public void setParamHashes(Set<String> paramHashes) {
     this.paramHashes = paramHashes;
   }
+
+  @Override
+  public String toString() {
+    return "RulesetDto{" +
+        "status=" + status +
+        ", ipBased=" + ipBased +
+        ", permanentBan=" + permanentBan +
+        ", requestLimitCount=" + requestLimitCount +
+        ", timeLimitDays=" + timeLimitDays +
+        ", timeLimitHours=" + timeLimitHours +
+        ", timeLimitMinutes=" + timeLimitMinutes +
+        ", timeLimitSeconds=" + timeLimitSeconds +
+        ", banTimeDays=" + banTimeDays +
+        ", banTimeHours=" + banTimeHours +
+        ", banTimeMinutes=" + banTimeMinutes +
+        ", banTimeSeconds=" + banTimeSeconds +
+        ", paramHashes=" + paramHashes +
+        '}';
+  }
 }
