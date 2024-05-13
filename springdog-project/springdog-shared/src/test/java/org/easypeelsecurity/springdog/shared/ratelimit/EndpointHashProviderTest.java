@@ -32,6 +32,20 @@ class EndpointHashProviderTest {
 
   private static final EndpointHashProvider endpointHashProvider = new EndpointHashProvider();
 
+  @Test
+  @DisplayName("Should generate the appropriate endpoint hash value.")
+  void endpointHashTest() {
+    // given
+    EndpointDto endpointDto =
+        new EndpointDto("/api/v1/test", "com.example.TestController", HttpMethod.GET, false);
+
+    // when
+    String hash = endpointHashProvider.getHash(endpointDto);
+
+    // then
+    assertEquals("9a2771064548028f33813ae084aa14d3b65de6148ed1e22d04ff2b753d553433", hash);
+  }
+
   @ParameterizedTest
   @EnumSource(HttpMethod.class)
   @DisplayName("Should generate identical hashes for identical endpoints")
@@ -191,5 +205,20 @@ class EndpointHashProviderTest {
 
     // then
     assertNotEquals(hash1, hash2);
+  }
+
+  @Test
+  @DisplayName("Should generate the appropriate parameter hash value.")
+  void parameterHashTest() {
+    // given
+    EndpointDto endpoint =
+        new EndpointDto("/api/v1/test1", "com.example.TestController", HttpMethod.GET, false);
+    EndpointParameterDto parameter = new EndpointParameterDto("param1", ApiParameterType.QUERY);
+
+    // when
+    String hash = endpointHashProvider.getParamHash(endpoint, parameter);
+
+    // then
+    assertEquals("013d3db4f4a80ec41d5956705403874d57d317cd4fa8fc2f5b164ff78793f48c", hash);
   }
 }
