@@ -136,7 +136,7 @@ public class ControllerParser {
       }
 
       EndpointDto api = getEndpointDto(method, endpoint, httpMethod, isPatternPath);
-      if (!api.getFqcn().contains(SPRINGDOG_PACKAGE)) {
+      if (!api.getFqcn().startsWith(SPRINGDOG_PACKAGE)) {
         RESULT.add(api);
       }
     });
@@ -194,7 +194,8 @@ public class ControllerParser {
 
   private static EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod,
       boolean isPatternPath) {
-    String fqcn = method.getBeanType().getPackageName() + "." + method.getMethod().getName();
+    String fqcn = method.getBeanType().getPackageName() + "." + method.getBeanType().getSimpleName() + "." +
+        method.getMethod().getName();
 
     EndpointDto api = new EndpointDto(endPoint, fqcn, httpMethod, isPatternPath);
     Set<EndpointParameterDto> parameters = new HashSet<>();
