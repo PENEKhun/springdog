@@ -33,7 +33,7 @@ public class EndpointDto {
   private String path;
   private String fqcn;
   private HttpMethod httpMethod;
-  private HashSet<EndpointParameterDto> parameters = new HashSet<>();
+  private Set<EndpointParameterDto> parameters = new HashSet<>();
   private boolean isPatternPath;
   private RulesetDto ruleset;
 
@@ -218,7 +218,7 @@ public class EndpointDto {
    * Setter.
    */
   public void setParameters(
-      HashSet<EndpointParameterDto> parameters) {
+      Set<EndpointParameterDto> parameters) {
     this.parameters = parameters;
   }
 

@@ -60,13 +60,6 @@
         label.innerText = isEnabled ? 'enabled' : 'disabled';
       });
 
-      $("#parametersOption").select2({
-        placeholder: 'Select parameters',
-        "language": {
-          noResults: () => "No parameters found."
-        },
-        allowClear: true
-      });
 
       $("#headerOption").select2({
         placeholder: 'Select headers',
@@ -74,6 +67,28 @@
           noResults: () => "No headers found."
         },
         allowClear: true
+      })
+
+      const paramHashesInput = document.createElement("input");
+      paramHashesInput.type = "hidden";
+      paramHashesInput.name = "ruleset.paramHashes";
+
+      const form = document.querySelector("form[name=editRule]");
+      form.appendChild(paramHashesInput);
+
+      $("#parametersOption").select2({
+        placeholder: 'Select parameters',
+        "language": {
+          noResults: () => "No parameters found."
+        },
+        allowClear: true
+      }).on("change", function() {
+        const selectedData = $(this).select2("data");
+        const paramHashes = selectedData.map(function (item) {
+          return item.element.dataset.paramhash;
+        });
+
+        paramHashesInput.value = paramHashes.join(",");
       });
     });
   </script>
@@ -95,7 +110,7 @@
     </div>
   </th:block>
 
-  <form method="post" th:object="${api}">
+  <form name="editRule" method="post" th:object="${api}">
     <div class="card mb-4">
       <div class="card-body">
         <div class="form-check form-switch">
@@ -201,11 +216,11 @@
         <h5 class="card-title">Ban Ruleset combinations</h5>
         <div class="mb-3 row">
           <label for="parametersOption" class="form-label">Parameters</label>
-          <select class="form-control" id="parametersOption" name="ruleset.params" multiple>
+          <select class="form-control" id="parametersOption" multiple>
             <option th:each="parameter : ${api.parameters}"
                     th:text="${parameter.name + '[' + parameter.type + ']'}"
                     th:data-paramhash="${parameter.paramHash}"
-                    th:selected="${api.ruleset.params.contains(parameter)}"></option>
+                    th:selected="${api.ruleset.paramHashes.contains(parameter.paramHash)}"></option>
           </select>
         </div>
         <div class="mb-3 row">

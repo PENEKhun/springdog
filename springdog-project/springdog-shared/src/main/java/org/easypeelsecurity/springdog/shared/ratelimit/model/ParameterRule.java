@@ -18,8 +18,6 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 
 /**
  * Rule for parameter.
@@ -28,23 +26,19 @@ import jakarta.persistence.OneToOne;
 @DiscriminatorValue("parameter")
 public class ParameterRule extends Rule {
 
-  @OneToOne
-  @JoinColumn(referencedColumnName = "paramHash")
-  private EndpointParameter endpointParameter;
+  private String paramHash;
 
   /**
    * Constructor.
    */
-  public ParameterRule() {
-    super();
+  public ParameterRule(String paramHash) {
+    this.paramHash = paramHash;
   }
 
   /**
    * Constructor.
    */
-  public ParameterRule(Long id, EndpointParameter endpointParameter) {
-    super(id);
-    this.endpointParameter = endpointParameter;
+  public ParameterRule() {
   }
 
   @Override
@@ -57,11 +51,18 @@ public class ParameterRule extends Rule {
     }
 
     ParameterRule that = (ParameterRule) o;
-    return endpointParameter.equals(that.endpointParameter);
+    return paramHash.equals(that.paramHash);
   }
 
   @Override
   public int hashCode() {
-    return endpointParameter.hashCode();
+    return paramHash.hashCode();
+  }
+
+  /**
+   * Getter.
+   */
+  public String getParamHash() {
+    return paramHash;
   }
 }

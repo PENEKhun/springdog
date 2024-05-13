@@ -67,9 +67,8 @@ public class EndpointCommand {
    *
    * @param apiHash api hash
    * @param changes ruleset dto that include changes
-   * @return updated ruleset
    */
-  public RulesetDto updateRule(String apiHash, RulesetDto changes) {
+  public void updateRule(String apiHash, RulesetDto changes) {
     Endpoint endpoint = endpointRepository.findByHash(apiHash)
         .orElseThrow(() -> new IllegalArgumentException("Endpoint not found"));
 
@@ -87,10 +86,10 @@ public class EndpointCommand {
             changes.getBanTimeDays(),
             changes.getBanTimeHours(),
             changes.getBanTimeMinutes(),
-            changes.getBanTimeSeconds())
-        );
+            changes.getBanTimeSeconds()),
+        changes.getParamHashes()
+    );
 
     endpoint.changeRuleset(newRuleset);
-    return EndpointConverter.toDto(endpoint.getRuleset());
   }
 }
