@@ -23,15 +23,14 @@ import org.easypeelsecurity.springdog.shared.util.Assert;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 
 /**
  * Entity class for endpoint.
@@ -53,8 +52,8 @@ public class Endpoint {
   @OneToMany(cascade = {CascadeType.ALL})
   private Set<EndpointParameter> parameters = new HashSet<>();
   private boolean isPatternPath;
-  @OneToOne(cascade = {CascadeType.ALL})
-  @JoinColumn(referencedColumnName = "hash")
+
+  @Embedded
   private Ruleset ruleset;
 
   /**
@@ -71,6 +70,7 @@ public class Endpoint {
       Set<EndpointParameter> parameters, boolean isPatternPath) {
     Assert.hasText(hash, "Hash must not be null or empty");
 
+    this.ruleset = new Ruleset();
     this.hash = hash;
     this.path = path;
     this.fqcn = fqcn;
@@ -78,13 +78,12 @@ public class Endpoint {
     parameters.forEach(parameter -> parameter.setEndpoint(this));
     this.parameters = parameters;
     this.isPatternPath = isPatternPath;
-    this.ruleset = new Ruleset(hash);
   }
 
   /**
    * no-arg Constructor.
    */
-  public Endpoint() {
+  protected Endpoint() {
   }
 
   /**
@@ -165,6 +164,15 @@ public class Endpoint {
    * @return ruleset
    */
   public Ruleset getRuleset() {
-    return ruleset;
+    return this.ruleset;
+  }
+
+  /**
+   * Change ruleset.
+   *
+   * @param newRuleset new ruleset
+   */
+  public void changeRuleset(Ruleset newRuleset) {
+    this.ruleset = newRuleset;
   }
 }

@@ -42,8 +42,8 @@ public class ParameterRule extends Rule {
   /**
    * Constructor.
    */
-  public ParameterRule(Long id, Ruleset ruleset, EndpointParameter endpointParameter) {
-    super(id, ruleset);
+  public ParameterRule(Long id, EndpointParameter endpointParameter) {
+    super(id);
     this.endpointParameter = endpointParameter;
   }
 

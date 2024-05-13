@@ -23,12 +23,9 @@ import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
 import org.easypeelsecurity.springdog.shared.util.TimeUtil;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
 /**
@@ -36,25 +33,20 @@ import jakarta.persistence.OneToMany;
  *
  * @author PENEKhun
  */
-@Entity
+@Embeddable
 public class Ruleset {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
-  private String hash;
   @Enumerated(EnumType.STRING)
-  private RuleStatus status = RuleStatus.NOT_CONFIGURED;
+  private final RuleStatus status;
 
-  private boolean ipBased = false;
-  private boolean permanentBan = false;
-  private int requestLimitCount = 10;
-  private int timeLimitInSeconds = 10;
-  private int banTimeInSeconds = 10;
+  private final boolean ipBased;
+  private final boolean permanentBan;
+  private final int requestLimitCount;
+  private final int timeLimitInSeconds;
+  private final int banTimeInSeconds;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "ruleset")
-  private Set<ParameterRule> enabledParameters = new HashSet<>();
+  @OneToMany(cascade = CascadeType.ALL)
+  private final Set<ParameterRule> enabledParameters = new HashSet<>();
 
   //  private LocalDateTime lastUpdate;
 
@@ -62,13 +54,12 @@ public class Ruleset {
    * Constructor.
    */
   public Ruleset() {
-  }
-
-  /**
-   * Constructor.
-   */
-  public Ruleset(String hash) {
-    this.hash = hash;
+    this.status = RuleStatus.NOT_CONFIGURED;
+    this.ipBased = false;
+    this.permanentBan = false;
+    this.requestLimitCount = 0;
+    this.timeLimitInSeconds = 0;
+    this.banTimeInSeconds = 0;
 
     this.validate();
   }
@@ -76,10 +67,9 @@ public class Ruleset {
   /**
    * Constructor.
    */
-  public Ruleset(String hash, RuleStatus status, boolean ipBased, boolean permanentBan,
+  public Ruleset(RuleStatus status, boolean ipBased, boolean permanentBan,
       int requestLimitCount,
       int timeLimitInSeconds, int banTimeInSeconds) {
-    this.hash = hash;
     this.status = status;
     this.ipBased = ipBased;
     this.permanentBan = permanentBan;
@@ -88,13 +78,6 @@ public class Ruleset {
     this.banTimeInSeconds = banTimeInSeconds;
 
     this.validate();
-  }
-
-  /**
-   * Getter.
-   */
-  public Long getId() {
-    return this.id;
   }
 
   /**
@@ -139,29 +122,7 @@ public class Ruleset {
     return this.timeLimitInSeconds;
   }
 
-  /**
-   * Update fields.
-   */
-  public void update(RulesetDto dto) {
-    this.status = dto.getStatus();
-    this.ipBased = dto.isIpBased();
-    this.permanentBan = dto.isPermanentBan();
-    this.requestLimitCount = dto.getRequestLimitCount();
-    this.timeLimitInSeconds =
-        TimeUtil.convertToSeconds(dto.getTimeLimitDays(), dto.getTimeLimitHours(), dto.getTimeLimitMinutes(),
-            dto.getTimeLimitSeconds());
-    this.banTimeInSeconds =
-        TimeUtil.convertToSeconds(dto.getBanTimeDays(), dto.getBanTimeHours(), dto.getBanTimeMinutes(),
-            dto.getBanTimeSeconds());
-
-    this.validate();
-  }
-
   private void validate() {
-    if (this.hash.isEmpty()) {
-      throw new IllegalArgumentException("Hash must not be empty");
-    }
-
     if (RuleStatus.ACTIVE.equals(this.status)) {
       if (this.requestLimitCount < 0) {
         throw new IllegalArgumentException("Request limit count must be greater than 0");

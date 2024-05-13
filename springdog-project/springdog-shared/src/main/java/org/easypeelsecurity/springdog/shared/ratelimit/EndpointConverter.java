@@ -93,7 +93,7 @@ public class EndpointConverter {
    * @return dto object
    */
   public static RulesetDto toDto(Ruleset ruleset) {
-    return new RulesetDto(ruleset.getId(), ruleset.getStatus(), ruleset.isIpBased(),
+    return new RulesetDto(ruleset.getStatus(), ruleset.isIpBased(),
         ruleset.isPermanentBan(), ruleset.getRequestLimitCount(), ruleset.getTimeLimitInSeconds(),
         ruleset.getBanTimeInSeconds());
   }

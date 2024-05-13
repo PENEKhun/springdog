@@ -201,11 +201,11 @@
         <h5 class="card-title">Ban Ruleset combinations</h5>
         <div class="mb-3 row">
           <label for="parametersOption" class="form-label">Parameters</label>
-          <select class="form-control" id="parametersOption" multiple>
-            <option th:each="parameter : ${parameters}"
+          <select class="form-control" id="parametersOption" name="ruleset.params" multiple>
+            <option th:each="parameter : ${api.parameters}"
                     th:text="${parameter.name + '[' + parameter.type + ']'}"
                     th:data-paramhash="${parameter.paramHash}"
-                    th:selected="${ruleset.params.contains(parameter)}"></option>
+                    th:selected="${api.ruleset.params.contains(parameter)}"></option>
           </select>
         </div>
         <div class="mb-3 row">

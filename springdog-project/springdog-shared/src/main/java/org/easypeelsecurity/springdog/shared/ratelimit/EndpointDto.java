@@ -78,14 +78,6 @@ public class EndpointDto {
    * Constructor.
    */
   public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath,
-      RulesetDto ruleset) {
-    this(null, path, fqcn, httpMethod, new HashSet<>(), isPatternPath, ruleset);
-  }
-
-  /**
-   * Constructor.
-   */
-  public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath,
       Set<EndpointParameterDto> parameters) {
     this(null, path, fqcn, httpMethod, parameters, isPatternPath, null);
   }
@@ -191,7 +183,7 @@ public class EndpointDto {
    * @return the ruleset
    */
   public RulesetDto getRuleset() {
-    return ruleset;
+    return this.ruleset;
   }
 
   /**
