@@ -19,9 +19,6 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
-import org.easypeelsecurity.springdog.shared.util.TimeUtil;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
@@ -69,13 +66,18 @@ public class Ruleset {
    */
   public Ruleset(RuleStatus status, boolean ipBased, boolean permanentBan,
       int requestLimitCount,
-      int timeLimitInSeconds, int banTimeInSeconds) {
+      int timeLimitInSeconds, int banTimeInSeconds,
+      Set<String> paramHashes) {
     this.status = status;
     this.ipBased = ipBased;
     this.permanentBan = permanentBan;
     this.requestLimitCount = requestLimitCount;
     this.timeLimitInSeconds = timeLimitInSeconds;
     this.banTimeInSeconds = banTimeInSeconds;
+
+    for (String paramHash : paramHashes) {
+      this.enabledParameters.add(new ParameterRule(paramHash));
+    }
 
     this.validate();
   }
@@ -120,6 +122,13 @@ public class Ruleset {
    */
   public int getTimeLimitInSeconds() {
     return this.timeLimitInSeconds;
+  }
+
+  /**
+   * Getter.
+   */
+  public Set<ParameterRule> getEnabledParameters() {
+    return enabledParameters;
   }
 
   private void validate() {

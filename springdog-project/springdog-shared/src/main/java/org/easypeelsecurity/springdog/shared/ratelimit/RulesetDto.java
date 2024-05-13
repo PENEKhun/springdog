@@ -47,15 +47,7 @@ public class RulesetDto {
   private int banTimeMinutes;
   private int banTimeSeconds;
 
-  private final Set<Param> params = new HashSet<>();
-
-  /**
-   * Param class.
-   */
-  public static class Param {
-
-    private String name;
-  }
+  private Set<String> paramHashes = new HashSet<>();
 
   /**
    * Constructor.
@@ -84,14 +76,14 @@ public class RulesetDto {
    * Constructor.
    */
   public RulesetDto(RuleStatus status, boolean ipBased, boolean permanentBan, int requestLimitCount,
-      int timeLimitInSecond, int banTimeInSeconds, Param... params) {
+      int timeLimitInSecond, int banTimeInSeconds, Set<String> paramsHashes) {
     Assert.notNull(status, "status must not be null");
     if (status == ACTIVE) {
       Assert.isTrue(requestLimitCount > 0, "requestLimitCount must be greater than 0");
       Assert.isTrue(timeLimitInSecond > 0, "timeLimitInSeconds must be greater than 0");
       Assert.isTrue(banTimeInSeconds > 0, "banTimeInSeconds must be greater than 0");
       Assert.isTrue(
-          ipBased || (params != null && params.length > 0),
+          ipBased || (paramsHashes != null && !paramsHashes.isEmpty()),
           "At least rule must be ip-based or parameters-based-ban");
     }
 
@@ -111,8 +103,8 @@ public class RulesetDto {
     this.banTimeMinutes = banTime.minutes();
     this.banTimeSeconds = banTime.seconds();
 
-    if (params != null) {
-      Collections.addAll(this.params, params);
+    if (paramsHashes != null) {
+      this.paramHashes = paramsHashes;
     }
   }
 
@@ -164,8 +156,8 @@ public class RulesetDto {
     return this.banTimeSeconds;
   }
 
-  public Set<Param> getParams() {
-    return this.params;
+  public Set<String> getParamHashes() {
+    return this.paramHashes;
   }
 
   public void setStatus(RuleStatus status) {
@@ -214,5 +206,9 @@ public class RulesetDto {
 
   public void setBanTimeSeconds(int banTimeSeconds) {
     this.banTimeSeconds = banTimeSeconds;
+  }
+
+  public void setParamHashes(Set<String> paramHashes) {
+    this.paramHashes = paramHashes;
   }
 }
