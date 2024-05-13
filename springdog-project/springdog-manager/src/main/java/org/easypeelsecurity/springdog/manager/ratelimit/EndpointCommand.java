@@ -21,6 +21,10 @@ import java.util.Set;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointHash;
+import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.Ruleset;
+import org.easypeelsecurity.springdog.shared.util.TimeUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,5 +60,37 @@ public class EndpointCommand {
         endpointRepository.findAllByHashIn(deleted.stream()
             .map(EndpointDto::getHash)
             .toList()));
+  }
+
+  /**
+   * Update ruleset.
+   *
+   * @param apiHash api hash
+   * @param changes ruleset dto that include changes
+   * @return updated ruleset
+   */
+  public RulesetDto updateRule(String apiHash, RulesetDto changes) {
+    Endpoint endpoint = endpointRepository.findByHash(apiHash)
+        .orElseThrow(() -> new IllegalArgumentException("Endpoint not found"));
+
+    Ruleset newRuleset = new Ruleset(
+        changes.getStatus(),
+        changes.isIpBased(),
+        changes.isPermanentBan(),
+        changes.getRequestLimitCount(),
+        TimeUtil.convertToSeconds(
+            changes.getTimeLimitDays(),
+            changes.getTimeLimitHours(),
+            changes.getTimeLimitMinutes(),
+            changes.getTimeLimitSeconds()),
+        TimeUtil.convertToSeconds(
+            changes.getBanTimeDays(),
+            changes.getBanTimeHours(),
+            changes.getBanTimeMinutes(),
+            changes.getBanTimeSeconds())
+        );
+
+    endpoint.changeRuleset(newRuleset);
+    return EndpointConverter.toDto(endpoint.getRuleset());
   }
 }

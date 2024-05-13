@@ -33,7 +33,6 @@ import org.easypeelsecurity.springdog.shared.util.TimeUtil.Time;
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
 public class RulesetDto {
 
-  private Long id;
   private RuleStatus status;
   private boolean ipBased;
   private boolean permanentBan;
@@ -61,10 +60,9 @@ public class RulesetDto {
   /**
    * Constructor.
    */
-  public RulesetDto(Long id, RuleStatus status, boolean ipBased, boolean permanentBan, int requestLimitCount,
+  public RulesetDto(RuleStatus status, boolean ipBased, boolean permanentBan, int requestLimitCount,
       int timeLimitDays, int timeLimitHours, int timeLimitMinutes, int timeLimitSeconds, int banTimeDays,
       int banTimeHours, int banTimeMinutes, int banTimeSeconds) {
-    this.id = id;
     this.status = status;
     this.ipBased = ipBased;
     this.permanentBan = permanentBan;
@@ -85,7 +83,7 @@ public class RulesetDto {
   /**
    * Constructor.
    */
-  public RulesetDto(Long id, RuleStatus status, boolean ipBased, boolean permanentBan, int requestLimitCount,
+  public RulesetDto(RuleStatus status, boolean ipBased, boolean permanentBan, int requestLimitCount,
       int timeLimitInSecond, int banTimeInSeconds, Param... params) {
     Assert.notNull(status, "status must not be null");
     if (status == ACTIVE) {
@@ -97,7 +95,6 @@ public class RulesetDto {
           "At least rule must be ip-based or parameters-based-ban");
     }
 
-    this.id = id;
     this.status = status;
     this.ipBased = ipBased;
     this.permanentBan = permanentBan;
@@ -117,10 +114,6 @@ public class RulesetDto {
     if (params != null) {
       Collections.addAll(this.params, params);
     }
-  }
-
-  public Long getId() {
-    return this.id;
   }
 
   public RuleStatus getStatus() {
@@ -173,10 +166,6 @@ public class RulesetDto {
 
   public Set<Param> getParams() {
     return this.params;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
   }
 
   public void setStatus(RuleStatus status) {

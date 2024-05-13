@@ -23,7 +23,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
-import jakarta.persistence.ManyToOne;
 
 /**
  * items of Ruleset.
@@ -39,9 +38,6 @@ abstract class Rule {
 
   String apiHash;
 
-  @ManyToOne
-  private Ruleset ruleset;
-
   /**
    * Constructor.
    */
@@ -51,8 +47,7 @@ abstract class Rule {
   /**
    * Constructor.
    */
-  protected Rule(Long id, Ruleset ruleset) {
+  protected Rule(Long id) {
     this.id = id;
-    this.ruleset = ruleset;
   }
 }

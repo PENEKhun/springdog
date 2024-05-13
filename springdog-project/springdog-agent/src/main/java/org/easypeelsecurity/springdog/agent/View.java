@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
-import org.easypeelsecurity.springdog.manager.ratelimit.RulesetCommand;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
 import org.springframework.stereotype.Controller;
@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class View {
 
   private final EndpointQuery rateLimitQuery;
-  private final RulesetCommand rulesetCommand;
+  private final EndpointCommand rateLimitCommand;
 
-  public View(EndpointQuery rateLimitQuery, RulesetCommand rulesetCommand) {
+  public View(EndpointQuery rateLimitQuery, EndpointCommand rateLimitCommand) {
     this.rateLimitQuery = rateLimitQuery;
-    this.rulesetCommand = rulesetCommand;
+    this.rateLimitCommand = rateLimitCommand;
   }
 
   @GetMapping("/")
@@ -60,11 +60,10 @@ public class View {
 
   @PostMapping("/rate-limit/{apiHash}")
   public String modifyRateLimit(@PathVariable(name = "apiHash") String apiHash,
-      @ModelAttribute("api") EndpointDto endpointDto,
-      Model model) {
+      @ModelAttribute("api") EndpointDto endpointDto, Model model) {
     try {
-      RulesetDto ruleset = endpointDto.getRuleset();
-      rulesetCommand.update(apiHash, ruleset);
+      RulesetDto changes = endpointDto.getRuleset();
+      rateLimitCommand.updateRule(apiHash, changes);
     } catch (Exception e) {
       model.addAttribute("result", false);
       model.addAttribute("message", e.getMessage());
