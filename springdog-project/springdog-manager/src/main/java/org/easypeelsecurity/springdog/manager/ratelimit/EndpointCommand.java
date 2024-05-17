@@ -17,6 +17,7 @@
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
@@ -36,12 +37,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class EndpointCommand {
 
   private final EndpointRepository endpointRepository;
+  private final EndpointParameterRepository endpointParameterRepository;
 
   /**
    * Constructor.
    */
-  public EndpointCommand(EndpointRepository endpointRepository) {
+  public EndpointCommand(EndpointRepository endpointRepository,
+      EndpointParameterRepository endpointParameterRepository) {
     this.endpointRepository = endpointRepository;
+    this.endpointParameterRepository = endpointParameterRepository;
   }
 
   /**
@@ -87,8 +91,20 @@ public class EndpointCommand {
             changes.getBanTimeHours(),
             changes.getBanTimeMinutes(),
             changes.getBanTimeSeconds()),
-        changes.getParamHashes()
+        // FIXME : 나중에 수정
+        endpointParameterRepository.findAllByEndpoint(endpoint)
+            .stream().filter(parameter -> changes.getEnabledParameterNames().contains(parameter.getName()))
+            .collect(Collectors.toSet())
     );
+
+    endpointParameterRepository.findAllByEndpoint(endpoint)
+        .forEach(parameter -> {
+          if (changes.getEnabledParameterNames().contains(parameter.getName())) {
+            parameter.enable();
+          } else {
+            parameter.disable();
+          }
+        });
 
     endpoint.changeRuleset(newRuleset);
     RuleCache.changeRuleCached(fqcn, EndpointConverter.toDto(endpoint.getRuleset()));

@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointParameter;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.ParameterRule;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Ruleset;
 
 /**
@@ -84,7 +83,7 @@ public class EndpointConverter {
    */
   public static EndpointParameterDto toDto(EndpointParameter endpointParameterEntity) {
     return new EndpointParameterDto(endpointParameterEntity.getParamHash(), endpointParameterEntity.getName(),
-        endpointParameterEntity.getType());
+        endpointParameterEntity.getType(), endpointParameterEntity.isEnabled());
   }
 
   /**
@@ -97,7 +96,7 @@ public class EndpointConverter {
     return new RulesetDto(ruleset.getStatus(), ruleset.isIpBased(),
         ruleset.isPermanentBan(), ruleset.getRequestLimitCount(), ruleset.getTimeLimitInSeconds(),
         ruleset.getBanTimeInSeconds(),
-        ruleset.getEnabledParameters().stream().map(ParameterRule::getParamHash)
+        ruleset.getEnabledParameters().stream().map(EndpointParameter::getName)
             .collect(Collectors.toSet()));
   }
 

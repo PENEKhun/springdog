@@ -18,7 +18,6 @@ package org.easypeelsecurity.springdog.shared.ratelimit;
 
 import static org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus.ACTIVE;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -47,7 +46,7 @@ public class RulesetDto {
   private int banTimeMinutes;
   private int banTimeSeconds;
 
-  private Set<String> paramHashes = new HashSet<>();
+  private Set<String> enabledParameterNames = new HashSet<>();
 
   /**
    * Constructor.
@@ -104,7 +103,7 @@ public class RulesetDto {
     this.banTimeSeconds = banTime.seconds();
 
     if (paramsHashes != null) {
-      this.paramHashes = paramsHashes;
+      this.enabledParameterNames = paramsHashes;
     }
   }
 
@@ -156,8 +155,8 @@ public class RulesetDto {
     return this.banTimeSeconds;
   }
 
-  public Set<String> getParamHashes() {
-    return this.paramHashes;
+  public Set<String> getEnabledParameterNames() {
+    return this.enabledParameterNames;
   }
 
   public void setStatus(RuleStatus status) {
@@ -208,8 +207,8 @@ public class RulesetDto {
     this.banTimeSeconds = banTimeSeconds;
   }
 
-  public void setParamHashes(Set<String> paramHashes) {
-    this.paramHashes = paramHashes;
+  public void setEnabledParameterNames(Set<String> enabledParameterNames) {
+    this.enabledParameterNames = enabledParameterNames;
   }
 
   @Override
@@ -227,7 +226,7 @@ public class RulesetDto {
         ", banTimeHours=" + banTimeHours +
         ", banTimeMinutes=" + banTimeMinutes +
         ", banTimeSeconds=" + banTimeSeconds +
-        ", paramHashes=" + paramHashes +
+        ", paramHashes=" + enabledParameterNames +
         '}';
   }
 }
