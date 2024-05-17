@@ -107,6 +107,6 @@ public class EndpointCommand {
         });
 
     endpoint.changeRuleset(newRuleset);
-    RuleCache.changeRuleCached(fqcn, EndpointConverter.toDto(endpoint.getRuleset()));
+    RuleCache.changeRuleCached(fqcn, EndpointConverter.toDto(endpoint));
   }
 }
