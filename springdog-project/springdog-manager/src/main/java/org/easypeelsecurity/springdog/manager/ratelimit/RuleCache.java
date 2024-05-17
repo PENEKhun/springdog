@@ -18,7 +18,7 @@ package org.easypeelsecurity.springdog.manager.ratelimit;
 
 import java.util.Optional;
 
-import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -32,8 +32,8 @@ public final class RuleCache {
   private RuleCache() {
   }
 
-  public static Optional<RulesetDto> findRuleByFqcn(String fqcn) {
-    RulesetDto temp = getInstance().getIfPresent(fqcn);
+  public static Optional<EndpointDto> findEndpointByFqcn(String fqcn) {
+    EndpointDto temp = getInstance().getIfPresent(fqcn);
     if (temp != null) {
       getInstance().put(fqcn, temp);
       return Optional.of(temp);
@@ -41,20 +41,20 @@ public final class RuleCache {
     return Optional.empty();
   }
 
-  public static void cachingRule(String fqcn, RulesetDto rule) {
-    getInstance().put(fqcn, rule);
+  public static void cachingRule(String fqcn, EndpointDto endpointDto) {
+    getInstance().put(fqcn, endpointDto);
   }
 
-  public static void changeRuleCached(String fqcn, RulesetDto newRule) {
-    getInstance().put(fqcn, newRule);
+  public static void changeRuleCached(String fqcn, EndpointDto endpointDto) {
+    getInstance().put(fqcn, endpointDto);
   }
 
-  private static Cache<String, RulesetDto> getInstance() {
+  private static Cache<String, EndpointDto> getInstance() {
     return RuleCacheHolder.INSTANCE;
   }
 
   private static final class RuleCacheHolder {
 
-    private static final Cache<String, RulesetDto> INSTANCE = Caffeine.newBuilder().build();
+    private static final Cache<String, EndpointDto> INSTANCE = Caffeine.newBuilder().build();
   }
 }

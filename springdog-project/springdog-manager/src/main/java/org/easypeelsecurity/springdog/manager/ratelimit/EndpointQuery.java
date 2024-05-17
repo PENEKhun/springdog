@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.VersionCompare;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
@@ -95,14 +94,13 @@ public class EndpointQuery {
   }
 
   /**
-   * Get endpoint's ratelimit rule by fully qualified class name.
+   * Get endpoint by fully qualified class name.
    *
    * @param fqcn fully qualified class name
-   * @return ruleset DTO
-   * @throws EntityNotFoundException if rule not found
+   * @return Optional EndpointDto
    */
-  public Optional<RulesetDto> getRuleByFqcn(String fqcn) {
+  public Optional<EndpointDto> getEndpointByFqcn(String fqcn) {
     Optional<Endpoint> found = endpointRepository.findByFqcn(fqcn);
-    return found.map(endpoint -> EndpointConverter.toDto(endpoint.getRuleset()));
+    return found.map(EndpointConverter::toDto);
   }
 }

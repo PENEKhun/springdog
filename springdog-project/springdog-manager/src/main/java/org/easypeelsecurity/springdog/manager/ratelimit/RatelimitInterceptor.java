@@ -16,14 +16,21 @@
 
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
-import java.util.HashMap;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
+import org.easypeelsecurity.springdog.shared.util.Assert;
+import org.easypeelsecurity.springdog.shared.util.IpAddressUtil;
+import org.easypeelsecurity.springdog.shared.util.TimeUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -33,7 +40,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @Service
 public class RatelimitInterceptor implements HandlerInterceptor {
 
-  private static final HashMap<String, Cache<String, Integer>> localCache = new HashMap<>();
   private final EndpointQuery endpointQuery;
 
   /**
@@ -41,7 +47,6 @@ public class RatelimitInterceptor implements HandlerInterceptor {
    */
   public RatelimitInterceptor(EndpointQuery endpointQuery) {
     this.endpointQuery = endpointQuery;
-
   }
 
   @Override
@@ -57,13 +62,77 @@ public class RatelimitInterceptor implements HandlerInterceptor {
         return true;
       }
 
-      RulesetDto rule = RuleCache.findRuleByFqcn(fqcn)
-          .orElseGet(() -> endpointQuery.getRuleByFqcn(fqcn).orElse(null));
+      EndpointDto endpoint = RuleCache.findEndpointByFqcn(fqcn)
+          .orElseGet(() -> endpointQuery.getEndpointByFqcn(fqcn).orElse(null));
+      Assert.notNull(endpoint, "Endpoint not found");
+      RulesetDto rule = endpoint.getRuleset();
       if (rule == null) {
         return true;
+      }
+
+      if (!RuleStatus.ACTIVE.equals(rule.getStatus())) {
+        return true;
+      }
+
+      String requestHashed = generateRequestHash(request, fqcn, endpoint);
+
+      LocalDateTime now = LocalDateTime.now();
+      LocalDateTime[] timestamps = RatelimitCache.addTimestamp(requestHashed, now);
+      int timeFrameSeconds = TimeUtil.convertToSeconds(rule.getTimeLimitDays(), rule.getTimeLimitHours(),
+          rule.getTimeLimitMinutes(), rule.getTimeLimitSeconds());
+
+      if (RatelimitCache.checkBan(requestHashed, now)) {
+        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+        response.getWriter().write("Too many requests");
+        response.setHeader("Retry-After",
+            String.valueOf(TimeUtil.convertToSeconds(rule.getBanTimeDays(), rule.getBanTimeHours(),
+                rule.getBanTimeMinutes(), rule.getBanTimeSeconds())));
+        response.setHeader("X-RateLimit-Remaining", "0");
+        return false;
+      }
+
+      int count = 0;
+      for (LocalDateTime timestamp : timestamps) {
+        if (timestamp.isAfter(now.minusSeconds(timeFrameSeconds))) {
+          count++;
+        }
+      }
+
+      if (count > rule.getRequestLimitCount()) {
+        int banTimeSeconds = rule.isPermanentBan() ? Integer.MAX_VALUE
+            : TimeUtil.convertToSeconds(rule.getBanTimeDays(), rule.getBanTimeHours(), rule.getBanTimeMinutes(),
+                rule.getBanTimeSeconds());
+        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+        response.getWriter().write("Too many requests");
+        response.setHeader("Retry-After", String.valueOf(banTimeSeconds));
+        response.setHeader("X-RateLimit-Remaining", "0");
+        RatelimitCache.ban(requestHashed, now.plusSeconds(banTimeSeconds));
+        return false;
+      } else {
+        response.setHeader("X-RateLimit-Remaining", String.valueOf(rule.getRequestLimitCount() - count));
       }
     }
 
     return true;
+  }
+
+  private String generateRequestHash(HttpServletRequest request, String fqcn, EndpointDto endpoint) {
+    StringBuilder beforeHash = new StringBuilder();
+    beforeHash.append(fqcn).append("\n");
+
+    if (endpoint.getRuleset().isIpBased()) {
+      beforeHash.append(IpAddressUtil.getClientIpv4(request)).append("\n");
+    }
+
+    endpoint.getParameters().stream()
+        .sorted(Comparator.comparing(EndpointParameterDto::getName))
+        .filter(EndpointParameterDto::isEnabled)
+        .forEach(param -> {
+          String value = request.getParameter(param.getName());
+          if (value != null) {
+            beforeHash.append(param.getName()).append("=").append(value).append("\n");
+          }
+        });
+    return beforeHash.toString();
   }
 }
