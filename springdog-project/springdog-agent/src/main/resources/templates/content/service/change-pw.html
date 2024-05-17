@@ -2,7 +2,7 @@
 <html layout:decorate="~{/templates/layout/default_layout.html}"
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+>
 
 <div class="content" layout:fragment="content">
   <h1 class="mt-4">Services</h1>
@@ -15,24 +15,24 @@
     <div class="card-body">
       <form class="container mt-4">
         <div class="mb-3">
-          <label for="currentPassword" class="form-label">Current Password</label>
-          <input type="password" class="form-control" id="currentPassword"
-                 placeholder="Enter current password">
+          <label class="form-label" for="currentPassword">Current Password</label>
+          <input class="form-control" id="currentPassword" placeholder="Enter current password"
+                 type="password">
         </div>
 
         <hr/>
 
         <div class="mb-3">
-          <label for="newPassword" class="form-label">New Password</label>
-          <input type="password" class="form-control" id="newPassword"
-                 placeholder="Enter new password">
+          <label class="form-label" for="newPassword">New Password</label>
+          <input class="form-control" id="newPassword" placeholder="Enter new password"
+                 type="password">
         </div>
         <div class="mb-3">
-          <label for="confirmPassword" class="form-label">Confirm New Password</label>
-          <input type="password" class="form-control" id="confirmPassword"
-                 placeholder="Confirm new password">
+          <label class="form-label" for="confirmPassword">Confirm New Password</label>
+          <input class="form-control" id="confirmPassword" placeholder="Confirm new password"
+                 type="password">
         </div>
-        <button type="submit" class="btn btn-primary">Change Password</button>
+        <button class="btn btn-primary" type="submit">Change Password</button>
       </form>
     </div>
   </div>

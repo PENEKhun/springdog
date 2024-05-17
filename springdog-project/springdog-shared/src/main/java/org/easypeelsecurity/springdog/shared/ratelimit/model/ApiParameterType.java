@@ -37,8 +37,7 @@ public enum ApiParameterType {
   PATH;
 
   /**
-   * Resolve parameter type from annotation.
-   * MUST BE USED IN CONTROLLER PARSER.
+   * Resolve parameter type from annotation. MUST BE USED IN CONTROLLER PARSER.
    *
    * @param annotation annotation
    * @return parameter type or {@code QUERY} if not found

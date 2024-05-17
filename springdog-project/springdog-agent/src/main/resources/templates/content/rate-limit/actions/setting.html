@@ -105,16 +105,16 @@
     </div>
   </th:block>
 
-  <form name="editRule" method="post" th:object="${api}">
+  <form method="post" name="editRule" th:object="${api}">
     <div class="card mb-4">
       <div class="card-body">
         <div class="form-check form-switch">
           <p class="card-text">
             <strong>RateLimit</strong>
-            <input type="hidden" id="statusValue" th:field="*{ruleset.status}"/>
-            <input type="checkbox" class="form-check-input" id="statusToggle"
+            <input id="statusValue" th:field="*{ruleset.status}" type="hidden"/>
+            <input class="form-check-input" id="statusToggle" onchange="updateStatusValue(this)"
                    th:checked="${api.ruleset.status == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE}"
-                   onchange="updateStatusValue(this)">
+                   type="checkbox">
             will be
             <label class="form-check-label text-decoration-underline" for="statusToggle"
                    th:text="${api.ruleset.status == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE ? 'enabled' : 'disabled'}"></label>
@@ -133,7 +133,7 @@
         <div class="alert alert-info" th:text="${api.httpMethod}"></div>
         <strong>Controller Class:</strong>
         <div class="alert alert-info" th:text="${api.fqcn}"></div>
-        <input type="hidden" th:field="*{fqcn}"/>
+        <input th:field="*{fqcn}" type="hidden"/>
       </div>
     </div>
 
@@ -144,31 +144,31 @@
           enable RateLimit.
         </div>
         <div class="mb-3">
-          <label for="requestLimit" class="form-label">Request Limit</label>
-          <input type="number" class="form-control" id="requestLimit"
-                 placeholder="Number of requests" th:field="*{ruleset.requestLimitCount}">
+          <label class="form-label" for="requestLimit">Request Limit</label>
+          <input class="form-control" id="requestLimit" placeholder="Number of requests"
+                 th:field="*{ruleset.requestLimitCount}" type="number">
         </div>
         <div class="mb-3">
           <label class="form-label">Time Frame</label>
           <div class="d-flex flex-row" id="timeFrameGroup">
             <div class="form-floating me-2 flex-fill">
-              <input type="number" class="form-control" id="timeFrameDays" placeholder="Days"
-                     th:field="*{ruleset.timeLimitDays}">
+              <input class="form-control" id="timeFrameDays" placeholder="Days" th:field="*{ruleset.timeLimitDays}"
+                     type="number">
               <label for="timeFrameDays">Days</label>
             </div>
             <div class="form-floating me-2 flex-fill">
-              <input type="number" class="form-control" id="timeFrameHours" placeholder="Hours"
-                     th:field="*{ruleset.timeLimitHours}">
+              <input class="form-control" id="timeFrameHours" placeholder="Hours" th:field="*{ruleset.timeLimitHours}"
+                     type="number">
               <label for="timeFrameHours">Hours</label>
             </div>
             <div class="form-floating me-2 flex-fill">
-              <input type="number" class="form-control" id="timeFrameMinutes"
-                     placeholder="Minutes" th:field="*{ruleset.timeLimitMinutes}">
+              <input class="form-control" id="timeFrameMinutes" placeholder="Minutes"
+                     th:field="*{ruleset.timeLimitMinutes}" type="number">
               <label for="timeFrameMinutes">Minutes</label>
             </div>
             <div class="form-floating flex-fill">
-              <input type="number" class="form-control" id="timeFrameSeconds"
-                     placeholder="Seconds" th:field="*{ruleset.timeLimitSeconds}">
+              <input class="form-control" id="timeFrameSeconds" placeholder="Seconds"
+                     th:field="*{ruleset.timeLimitSeconds}" type="number">
               <label for="timeFrameSeconds">Seconds</label>
             </div>
           </div>
@@ -177,23 +177,23 @@
           <label class="form-label">Ban Duration</label>
           <div class="d-flex flex-row" id="banDurationGroup">
             <div class="form-floating me-2 flex-fill">
-              <input type="number" class="form-control" id="banDurationDays" placeholder="Days"
-                     th:field="*{ruleset.banTimeDays}">
+              <input class="form-control" id="banDurationDays" placeholder="Days" th:field="*{ruleset.banTimeDays}"
+                     type="number">
               <label for="banDurationDays">Days</label>
             </div>
             <div class="form-floating me-2 flex-fill">
-              <input type="number" class="form-control" id="banDurationHours" placeholder="Hours"
-                     th:field="*{ruleset.banTimeHours}">
+              <input class="form-control" id="banDurationHours" placeholder="Hours" th:field="*{ruleset.banTimeHours}"
+                     type="number">
               <label for="banDurationHours">Hours</label>
             </div>
             <div class="form-floating me-2 flex-fill">
-              <input type="number" class="form-control" id="banDurationMinutes"
-                     placeholder="Minutes" th:field="*{ruleset.banTimeMinutes}">
+              <input class="form-control" id="banDurationMinutes" placeholder="Minutes"
+                     th:field="*{ruleset.banTimeMinutes}" type="number">
               <label for="banDurationMinutes">Minutes</label>
             </div>
             <div class="form-floating flex-fill">
-              <input type="number" class="form-control" id="banDurationSeconds"
-                     placeholder="Seconds" th:field="*{ruleset.banTimeSeconds}">
+              <input class="form-control" id="banDurationSeconds" placeholder="Seconds"
+                     th:field="*{ruleset.banTimeSeconds}" type="number">
               <label for="banDurationSeconds">Seconds</label>
             </div>
           </div>
@@ -201,7 +201,7 @@
 
         <div class="mb-3">
           <div class="align-checkbox">
-            <input type="checkbox" class="form-check-input" id="permanentBan">
+            <input class="form-check-input" id="permanentBan" type="checkbox">
             <label class="form-check-label" for="permanentBan"
                    th:field="*{ruleset.permanentBan}">Permanent Ban</label>
           </div>
@@ -211,30 +211,30 @@
       <div class="card-body">
         <h5 class="card-title">Ban Ruleset combinations</h5>
         <div class="mb-3 row">
-          <label for="parametersOption" class="form-label">Parameters</label>
+          <label class="form-label" for="parametersOption">Parameters</label>
           <select class="form-control" id="parametersOption" multiple>
-            <option th:each="parameter : ${api.parameters}"
-                    th:text="${parameter.name + ' [' + parameter.type + ']'}"
+            <option th:data-name="${parameter.name}"
                     th:data-paramhash="${parameter.paramHash}"
-                    th:data-name="${parameter.name}"
-                    th:selected="${parameter.isEnabled()}"></option>
+                    th:each="parameter : ${api.parameters}"
+                    th:selected="${parameter.isEnabled()}"
+                    th:text="${parameter.name + ' [' + parameter.type + ']'}"></option>
           </select>
         </div>
         <div class="mb-3 row">
-          <label for="headerOption" class="form-label">Custom Header</label>
+          <label class="form-label" for="headerOption">Custom Header</label>
           <select class="form-control" id="headerOption" multiple></select>
         </div>
         <div class="form-check mb-3">
-          <input type="checkbox" class="form-check-input"
-                 id="ipBlock"
-                 th:field="*{ruleset.ipBased}">
+          <input class="form-check-input" id="ipBlock"
+                 th:field="*{ruleset.ipBased}"
+                 type="checkbox">
           <label class="form-check-label" for="ipBlock">Enable IP-based Blocking</label>
         </div>
       </div>
     </div>
 
     <div class="mt-3">
-      <button type="submit" class="btn btn-primary">Apply</button>
+      <button class="btn btn-primary" type="submit">Apply</button>
     </div>
   </form>
 </div>

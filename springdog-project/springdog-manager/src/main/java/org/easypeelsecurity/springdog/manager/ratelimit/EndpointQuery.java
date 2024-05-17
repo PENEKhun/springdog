@@ -28,8 +28,6 @@ import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionCont
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityNotFoundException;
-
 /**
  * Endpoint query service.
  *

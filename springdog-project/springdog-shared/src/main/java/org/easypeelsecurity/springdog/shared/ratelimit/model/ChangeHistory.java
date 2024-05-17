@@ -12,42 +12,57 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
-import jakarta.persistence.DiscriminatorColumn;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
+import jakarta.persistence.Embeddable;
 
+@Embeddable
+abstract class ChangeHistory {
+  
+  private String endpointHash;
+
+  */
 /**
- * items of Ruleset.
- */
-@Entity
-@DiscriminatorColumn(name = "rule_type")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-abstract class Rule {
+ * All-arg constructor.
+ * <p>
+ * No-arg constructor.
+ * <p>
+ * Getter.
+ * <p>
+ * Setter.
+ *//*
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
-  String apiHash;
-
-  /**
-   * Constructor.
-   */
-  protected Rule() {
+  protected ChangeHistory(String endpointHash) {
+    this.endpointHash = endpointHash;
   }
 
-  /**
-   * Constructor.
-   */
-  protected Rule(Long id) {
-    this.id = id;
+  */
+/**
+ * No-arg constructor.
+ *//*
+
+  protected ChangeHistory() {
+  }
+
+  */
+/**
+ * Getter.
+ *//*
+
+  public String getEndpointHash() {
+    return endpointHash;
+  }
+
+  */
+/**
+ * Setter.
+ *//*
+
+  public void setEndpointHash(String endpointHash) {
+    this.endpointHash = endpointHash;
   }
 }
+*/

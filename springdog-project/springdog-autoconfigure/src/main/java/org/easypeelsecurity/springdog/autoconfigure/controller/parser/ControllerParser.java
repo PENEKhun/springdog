@@ -58,9 +58,8 @@ import jakarta.transaction.Transactional;
 @Component("springdogControllerParserComponent")
 public class ControllerParser {
 
-  private final String SPRINGDOG_PACKAGE = "org.easypeelsecurity.springdog";
   private static final Set<EndpointDto> RESULT = new HashSet<>();
-
+  private final String SPRINGDOG_PACKAGE = "org.easypeelsecurity.springdog";
   private final RequestMappingHandlerMapping handlerMapping;
   //  private final EndpointRepository endpointRepository;
   private final EndpointQuery endpointQuery;
@@ -87,6 +86,24 @@ public class ControllerParser {
     this.handlerMapping = handlerMapping;
     this.endpointRepository = endpointRepository;
   }*/
+
+  private static EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod,
+      boolean isPatternPath) {
+    String fqcn = method.getBeanType().getPackageName() + "." + method.getBeanType().getSimpleName() + "." +
+        method.getMethod().getName();
+
+    EndpointDto api = new EndpointDto(endPoint, fqcn, httpMethod, isPatternPath);
+    Set<EndpointParameterDto> parameters = new HashSet<>();
+
+    for (Parameter parameter : method.getMethod().getParameters()) {
+      EndpointParameterDto parameterItem =
+          new EndpointParameterDto(parameter.getName(), ApiParameterType.resolve(parameter.getAnnotations()));
+      parameters.add(parameterItem);
+    }
+
+    api.addParameters(parameters);
+    return api;
+  }
 
   /**
    * List all endpoints and parameters.
@@ -190,23 +207,5 @@ public class ControllerParser {
         versionControlRepository.save(vc);
         break;
     }
-  }
-
-  private static EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod,
-      boolean isPatternPath) {
-    String fqcn = method.getBeanType().getPackageName() + "." + method.getBeanType().getSimpleName() + "." +
-        method.getMethod().getName();
-
-    EndpointDto api = new EndpointDto(endPoint, fqcn, httpMethod, isPatternPath);
-    Set<EndpointParameterDto> parameters = new HashSet<>();
-
-    for (Parameter parameter : method.getMethod().getParameters()) {
-      EndpointParameterDto parameterItem =
-          new EndpointParameterDto(parameter.getName(), ApiParameterType.resolve(parameter.getAnnotations()));
-      parameters.add(parameterItem);
-    }
-
-    api.addParameters(parameters);
-    return api;
   }
 }

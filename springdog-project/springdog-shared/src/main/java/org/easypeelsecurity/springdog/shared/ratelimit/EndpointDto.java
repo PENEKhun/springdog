@@ -122,12 +122,26 @@ public class EndpointDto {
   }
 
   /**
+   * Setter.
+   */
+  public void setPath(String path) {
+    this.path = path;
+  }
+
+  /**
    * Get the hashed object (id).
    *
    * @return hashed object (id)
    */
   public String getHash() {
     return this.hash;
+  }
+
+  /**
+   * Setter.
+   */
+  public void setHash(String hash) {
+    this.hash = hash;
   }
 
   /**
@@ -140,6 +154,13 @@ public class EndpointDto {
   }
 
   /**
+   * Setter.
+   */
+  public void setFqcn(String fqcn) {
+    this.fqcn = fqcn;
+  }
+
+  /**
    * Get the HTTP method.
    *
    * @return the HTTP method
@@ -149,12 +170,27 @@ public class EndpointDto {
   }
 
   /**
+   * Setter.
+   */
+  public void setHttpMethod(HttpMethod httpMethod) {
+    this.httpMethod = httpMethod;
+  }
+
+  /**
    * Get the parameters.
    *
    * @return the parameters
    */
   public Set<EndpointParameterDto> getParameters() {
     return this.parameters;
+  }
+
+  /**
+   * Setter.
+   */
+  public void setParameters(
+      Set<EndpointParameterDto> parameters) {
+    this.parameters = parameters;
   }
 
   /**
@@ -178,55 +214,19 @@ public class EndpointDto {
   }
 
   /**
+   * Setter.
+   */
+  public void setPatternPath(boolean patternPath) {
+    isPatternPath = patternPath;
+  }
+
+  /**
    * Get the ruleset.
    *
    * @return the ruleset
    */
   public RulesetDto getRuleset() {
     return this.ruleset;
-  }
-
-  /**
-   * Setter.
-   */
-  public void setHash(String hash) {
-    this.hash = hash;
-  }
-
-  /**
-   * Setter.
-   */
-  public void setPath(String path) {
-    this.path = path;
-  }
-
-  /**
-   * Setter.
-   */
-  public void setFqcn(String fqcn) {
-    this.fqcn = fqcn;
-  }
-
-  /**
-   * Setter.
-   */
-  public void setHttpMethod(HttpMethod httpMethod) {
-    this.httpMethod = httpMethod;
-  }
-
-  /**
-   * Setter.
-   */
-  public void setParameters(
-      Set<EndpointParameterDto> parameters) {
-    this.parameters = parameters;
-  }
-
-  /**
-   * Setter.
-   */
-  public void setPatternPath(boolean patternPath) {
-    isPatternPath = patternPath;
   }
 
   /**
