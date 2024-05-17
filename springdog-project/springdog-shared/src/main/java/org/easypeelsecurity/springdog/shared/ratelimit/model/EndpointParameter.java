@@ -45,6 +45,7 @@ public class EndpointParameter {
   private String name;
   @Enumerated(EnumType.STRING)
   private ApiParameterType type;
+  private boolean enabled = false;
 
   @ManyToOne
   private Endpoint endpoint;
@@ -82,6 +83,13 @@ public class EndpointParameter {
   }
 
   /**
+   * Constructor.
+   */
+  public EndpointParameter(String paramHash) {
+    this.paramHash = paramHash;
+  }
+
+  /**
    * Get hashed object.
    *
    * @return hash
@@ -106,5 +114,26 @@ public class EndpointParameter {
    */
   public ApiParameterType getType() {
     return this.type;
+  }
+
+  /**
+   * Enable parameter for ratelimit.
+   */
+  public void enable() {
+    this.enabled = true;
+  }
+
+  /**
+   * Disable parameter for ratelimit.
+   */
+  public void disable() {
+    this.enabled = false;
+  }
+
+  /**
+   * Getter.
+   */
+  public boolean isEnabled() {
+    return this.enabled;
   }
 }

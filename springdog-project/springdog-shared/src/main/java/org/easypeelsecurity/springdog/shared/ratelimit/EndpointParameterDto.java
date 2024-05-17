@@ -29,6 +29,7 @@ public class EndpointParameterDto {
   private final String paramHash;
   private final String name;
   private final ApiParameterType type;
+  private final boolean enabled;
 
   /**
    * All-arg Constructor.
@@ -36,21 +37,23 @@ public class EndpointParameterDto {
    * @param paramHash hashed
    * @param name name of parameter
    * @param type type of parameter
+   * @param enabled enabled or not
    */
-  public EndpointParameterDto(String paramHash, String name, ApiParameterType type) {
+  public EndpointParameterDto(String paramHash, String name, ApiParameterType type, boolean enabled) {
     Assert.hasText(name, "Name must not be null or empty");
     Assert.notNull(type, "Type must not be null");
 
     this.paramHash = paramHash;
     this.name = name;
     this.type = type;
+    this.enabled = enabled;
   }
 
   /**
    * Constructor.
    */
   public EndpointParameterDto(String name, ApiParameterType type) {
-    this(null, name, type);
+    this(null, name, type, false);
   }
 
   /**
@@ -78,5 +81,14 @@ public class EndpointParameterDto {
    */
   public ApiParameterType getType() {
     return this.type;
+  }
+
+  /**
+   * Get enabled or not.
+   *
+   * @return enabled or not
+   */
+  public boolean isEnabled() {
+    return enabled;
   }
 }

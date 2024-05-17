@@ -60,7 +60,6 @@
         label.innerText = isEnabled ? 'enabled' : 'disabled';
       });
 
-
       $("#headerOption").select2({
         placeholder: 'Select headers',
         "language": {
@@ -71,7 +70,7 @@
 
       const paramHashesInput = document.createElement("input");
       paramHashesInput.type = "hidden";
-      paramHashesInput.name = "ruleset.paramHashes";
+      paramHashesInput.name = "ruleset.enabledParameterNames";
 
       const form = document.querySelector("form[name=editRule]");
       form.appendChild(paramHashesInput);
@@ -82,13 +81,9 @@
           noResults: () => "No parameters found."
         },
         allowClear: true
-      }).on("change", function() {
+      }).on("change", function () {
         const selectedData = $(this).select2("data");
-        const paramHashes = selectedData.map(function (item) {
-          return item.element.dataset.paramhash;
-        });
-
-        paramHashesInput.value = paramHashes.join(",");
+        paramHashesInput.value = selectedData.map(item => item.element.dataset.name).join(",");
       });
     });
   </script>
@@ -219,9 +214,10 @@
           <label for="parametersOption" class="form-label">Parameters</label>
           <select class="form-control" id="parametersOption" multiple>
             <option th:each="parameter : ${api.parameters}"
-                    th:text="${parameter.name + '[' + parameter.type + ']'}"
+                    th:text="${parameter.name + ' [' + parameter.type + ']'}"
                     th:data-paramhash="${parameter.paramHash}"
-                    th:selected="${api.ruleset.paramHashes.contains(parameter.paramHash)}"></option>
+                    th:data-name="${parameter.name}"
+                    th:selected="${parameter.isEnabled()}"></option>
           </select>
         </div>
         <div class="mb-3 row">

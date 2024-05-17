@@ -19,11 +19,12 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
+import org.hibernate.annotations.Where;
+
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 
 /**
  * Ruleset entity.
@@ -42,13 +43,13 @@ public class Ruleset {
   private final int timeLimitInSeconds;
   private final int banTimeInSeconds;
 
-  @OneToMany(cascade = CascadeType.ALL)
-  private final Set<ParameterRule> enabledParameters = new HashSet<>();
-
+  @Transient
+  @Where(clause = "enabled = true")
+  private final Set<EndpointParameter> enabledParameters = new HashSet<>();
   //  private LocalDateTime lastUpdate;
 
   /**
-   * Constructor.
+   * No-arg constructor.
    */
   public Ruleset() {
     this.status = RuleStatus.NOT_CONFIGURED;
@@ -66,18 +67,14 @@ public class Ruleset {
    */
   public Ruleset(RuleStatus status, boolean ipBased, boolean permanentBan,
       int requestLimitCount,
-      int timeLimitInSeconds, int banTimeInSeconds,
-      Set<String> paramHashes) {
+      int timeLimitInSeconds, int banTimeInSeconds, Set<EndpointParameter> enabledParameters) {
     this.status = status;
     this.ipBased = ipBased;
     this.permanentBan = permanentBan;
     this.requestLimitCount = requestLimitCount;
     this.timeLimitInSeconds = timeLimitInSeconds;
     this.banTimeInSeconds = banTimeInSeconds;
-
-    for (String paramHash : paramHashes) {
-      this.enabledParameters.add(new ParameterRule(paramHash));
-    }
+    this.enabledParameters.addAll(enabledParameters);
 
     this.validate();
   }
@@ -127,7 +124,7 @@ public class Ruleset {
   /**
    * Getter.
    */
-  public Set<ParameterRule> getEnabledParameters() {
+  public Set<EndpointParameter> getEnabledParameters() {
     return enabledParameters;
   }
 
