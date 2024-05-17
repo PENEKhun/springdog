@@ -22,7 +22,7 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 public enum EndpointChangeType {
   API_DELETED("Can’t found endpoints that existed before."),
   API_ADDED("New endpoint added."),
-//  API_PARAMETER_DELETE("Endpoint parameter changed."),
+  //  API_PARAMETER_DELETE("Endpoint parameter changed."),
 //  API_PARAMETER_ADD("Endpoint parameter changed."),
   ACTIVATED("Endpoint activated."),
   DEACTIVATED("Endpoint deactivated."),

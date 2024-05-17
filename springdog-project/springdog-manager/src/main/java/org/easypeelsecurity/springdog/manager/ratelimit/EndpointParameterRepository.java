@@ -29,6 +29,7 @@ public interface EndpointParameterRepository extends JpaRepository<EndpointParam
 
   /**
    * Find all parameters in endpoint.
+   *
    * @param endpoint endpoint
    * @return list of endpoint parameters
    */

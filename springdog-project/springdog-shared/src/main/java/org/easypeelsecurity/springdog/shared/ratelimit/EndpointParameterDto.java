@@ -35,9 +35,9 @@ public class EndpointParameterDto {
    * All-arg Constructor.
    *
    * @param paramHash hashed
-   * @param name name of parameter
-   * @param type type of parameter
-   * @param enabled enabled or not
+   * @param name      name of parameter
+   * @param type      type of parameter
+   * @param enabled   enabled or not
    */
   public EndpointParameterDto(String paramHash, String name, ApiParameterType type, boolean enabled) {
     Assert.hasText(name, "Name must not be null or empty");

@@ -67,16 +67,6 @@ public class EndpointParameter {
   }
 
   /**
-   * set endpoint.
-   *
-   * @param endpoint endpoint object
-   */
-  public void setEndpoint(Endpoint endpoint) {
-    Assert.notNull(endpoint, "Endpoint must not be null");
-    this.endpoint = endpoint;
-  }
-
-  /**
    * no-arg Constructor.
    */
   public EndpointParameter() {
@@ -87,6 +77,16 @@ public class EndpointParameter {
    */
   public EndpointParameter(String paramHash) {
     this.paramHash = paramHash;
+  }
+
+  /**
+   * set endpoint.
+   *
+   * @param endpoint endpoint object
+   */
+  public void setEndpoint(Endpoint endpoint) {
+    Assert.notNull(endpoint, "Endpoint must not be null");
+    this.endpoint = endpoint;
   }
 
   /**

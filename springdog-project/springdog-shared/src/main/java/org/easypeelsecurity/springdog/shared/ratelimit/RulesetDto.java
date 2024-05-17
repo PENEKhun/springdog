@@ -111,100 +111,100 @@ public class RulesetDto {
     return this.status;
   }
 
-  public boolean isIpBased() {
-    return this.ipBased;
-  }
-
-  public boolean isPermanentBan() {
-    return this.permanentBan;
-  }
-
-  public int getRequestLimitCount() {
-    return this.requestLimitCount;
-  }
-
-  public int getTimeLimitDays() {
-    return this.timeLimitDays;
-  }
-
-  public int getTimeLimitHours() {
-    return this.timeLimitHours;
-  }
-
-  public int getTimeLimitMinutes() {
-    return this.timeLimitMinutes;
-  }
-
-  public int getTimeLimitSeconds() {
-    return this.timeLimitSeconds;
-  }
-
-  public int getBanTimeDays() {
-    return this.banTimeDays;
-  }
-
-  public int getBanTimeHours() {
-    return this.banTimeHours;
-  }
-
-  public int getBanTimeMinutes() {
-    return this.banTimeMinutes;
-  }
-
-  public int getBanTimeSeconds() {
-    return this.banTimeSeconds;
-  }
-
-  public Set<String> getEnabledParameterNames() {
-    return this.enabledParameterNames;
-  }
-
   public void setStatus(RuleStatus status) {
     this.status = status;
+  }
+
+  public boolean isIpBased() {
+    return this.ipBased;
   }
 
   public void setIpBased(boolean ipBased) {
     this.ipBased = ipBased;
   }
 
+  public boolean isPermanentBan() {
+    return this.permanentBan;
+  }
+
   public void setPermanentBan(boolean permanentBan) {
     this.permanentBan = permanentBan;
+  }
+
+  public int getRequestLimitCount() {
+    return this.requestLimitCount;
   }
 
   public void setRequestLimitCount(int requestLimitCount) {
     this.requestLimitCount = requestLimitCount;
   }
 
+  public int getTimeLimitDays() {
+    return this.timeLimitDays;
+  }
+
   public void setTimeLimitDays(int timeLimitDays) {
     this.timeLimitDays = timeLimitDays;
+  }
+
+  public int getTimeLimitHours() {
+    return this.timeLimitHours;
   }
 
   public void setTimeLimitHours(int timeLimitHours) {
     this.timeLimitHours = timeLimitHours;
   }
 
+  public int getTimeLimitMinutes() {
+    return this.timeLimitMinutes;
+  }
+
   public void setTimeLimitMinutes(int timeLimitMinutes) {
     this.timeLimitMinutes = timeLimitMinutes;
+  }
+
+  public int getTimeLimitSeconds() {
+    return this.timeLimitSeconds;
   }
 
   public void setTimeLimitSeconds(int timeLimitSeconds) {
     this.timeLimitSeconds = timeLimitSeconds;
   }
 
+  public int getBanTimeDays() {
+    return this.banTimeDays;
+  }
+
   public void setBanTimeDays(int banTimeDays) {
     this.banTimeDays = banTimeDays;
+  }
+
+  public int getBanTimeHours() {
+    return this.banTimeHours;
   }
 
   public void setBanTimeHours(int banTimeHours) {
     this.banTimeHours = banTimeHours;
   }
 
+  public int getBanTimeMinutes() {
+    return this.banTimeMinutes;
+  }
+
   public void setBanTimeMinutes(int banTimeMinutes) {
     this.banTimeMinutes = banTimeMinutes;
   }
 
+  public int getBanTimeSeconds() {
+    return this.banTimeSeconds;
+  }
+
   public void setBanTimeSeconds(int banTimeSeconds) {
     this.banTimeSeconds = banTimeSeconds;
+  }
+
+  public Set<String> getEnabledParameterNames() {
+    return this.enabledParameterNames;
   }
 
   public void setEnabledParameterNames(Set<String> enabledParameterNames) {
