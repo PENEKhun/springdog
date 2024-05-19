@@ -14,8 +14,18 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.shared.ratelimit;
+package org.easypeelsecurity.springdogtest;
 
-public class EndpointDiff {
+import org.easypeelsecurity.springdog.autoconfigure.applier.SpringDogEnable;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@SpringDogEnable
+@SpringBootApplication
+@SuppressWarnings("ALL")
+public class SpringdogTestApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(SpringdogTestApplication.class, args);
+  }
 }

@@ -1,7 +1,8 @@
-rootProject.name = 'springdog-build'
+rootProject.name = 'springdog'
 
+include 'springdog-project:springdog-agent'
 include 'springdog-project:springdog-starter'
 include 'springdog-project:springdog-autoconfigure'
-include 'springdog-project:springdog-agent'
 include 'springdog-project:springdog-manager'
 include 'springdog-project:springdog-shared'
+include 'springdog-project:springdog-test'

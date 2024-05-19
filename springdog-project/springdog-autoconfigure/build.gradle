@@ -3,6 +3,10 @@ plugins {
     id "io.github.goooler.shadow" version "${shadowVersion}"
 }
 
+shadowJar {
+    archiveClassifier.set("")
+}
+
 dependencies {
     implementation "com.squareup:javapoet:1.13.0"
     implementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
@@ -14,10 +18,8 @@ dependencies {
     implementation "org.apache.derby:derby:${derbyVersion}"
     implementation "org.apache.derby:derbytools:${derbyVersion}"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
-
-    testImplementation "com.google.testing.compile:compile-testing:${compileTestingVersion}"
-    api project(":springdog-project:springdog-agent")
-    api project(":springdog-project:springdog-manager")
+    compileOnly project(":springdog-project:springdog-agent")
+    compileOnly project(":springdog-project:springdog-manager")
     api project(":springdog-project:springdog-shared")
 }
 

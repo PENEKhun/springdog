@@ -6,6 +6,8 @@ plugins {
 dependencies {
     compileOnly "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
 }
 
 mavenPublishing {

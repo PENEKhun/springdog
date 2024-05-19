@@ -27,4 +27,6 @@
   <suppress checks="[a-zA-Z0-9]*" files="[\\/]resources\/before[\\/]"/>
   <!-- Suppress final Keyword related checks in non-main code. -->
   <suppress files="[\\/](examples|test)[\\/]" id="FinalLocalVariable"/>
+  <!-- Suppress all for springdog-test -->
+  <suppress checks="[a-zA-Z0-9]*" files="springdog-project/springdog-test/.*" />
 </suppressions>

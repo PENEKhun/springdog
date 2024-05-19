@@ -13,7 +13,7 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
     testImplementation "org.springframework.security:spring-security-test:${springVersion}"
 
-    api project(":springdog-project:springdog-manager")
+    implementation project(":springdog-project:springdog-manager")
 }
 
 mavenPublishing {

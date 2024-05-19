@@ -7,6 +7,15 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
     implementation "com.github.ben-manes.caffeine:caffeine:${caffeineVersion}"
     api project(":springdog-project:springdog-shared")
+
+//    testCompileClasspath project(":springdog-project:springdog-test")
+    testImplementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
+    testImplementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
+    testImplementation project(':springdog-project:springdog-test')
+    testImplementation project(':springdog-project:springdog-shared')
+    testCompileOnly project(':springdog-project:springdog-test')
+    testImplementation "com.github.ben-manes.caffeine:caffeine:${caffeineVersion}"
 }
 
 mavenPublishing {
