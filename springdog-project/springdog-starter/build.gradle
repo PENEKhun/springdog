@@ -4,20 +4,19 @@ plugins {
 }
 
 shadowJar {
-    archiveClassifier.set("")
     mergeGroovyExtensionModules() // https://github.com/ultraq/thymeleaf-layout-dialect/issues/223
 }
 
-tasks.named('shadowJar') {
-    dependsOn ':springdog-project:springdog-agent:shadowJar'
-    dependsOn ':springdog-project:springdog-autoconfigure:shadowJar'
+compileJava {
+    dependsOn ':springdog-project:springdog-agent:jar'
+    dependsOn ':springdog-project:springdog-autoconfigure:jar'
+    dependsOn ':springdog-project:springdog-manager:jar'
 }
 
 dependencies {
-    implementation project(":springdog-project:springdog-autoconfigure")
-    implementation project(":springdog-project:springdog-manager")
-    implementation "org.springframework.boot:spring-boot-starter-thymeleaf:${springbootVersion}"
-    implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}"
+    api project(path: ':springdog-project:springdog-manager', configuration: 'shadow')
+    api project(path: ':springdog-project:springdog-autoconfigure', configuration: 'shadow')
+    api project(path: ':springdog-project:springdog-agent', configuration: 'shadow')
 }
 
 mavenPublishing {

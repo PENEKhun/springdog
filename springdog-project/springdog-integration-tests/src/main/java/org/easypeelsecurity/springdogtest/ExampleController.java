@@ -18,25 +18,39 @@ package org.easypeelsecurity.springdogtest;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/api")
 public class ExampleController {
 
-  @GetMapping("/example")
-  public String example() {
+  @GetMapping("/get")
+  public String example(@RequestParam("param1") String param1) {
     return "example";
   }
 
-  @PostMapping("/example2")
+  @PostMapping("/post")
   public String example2() {
     return "example2";
   }
 
-  @DeleteMapping("/example3")
+  @DeleteMapping("/delete")
   public String example3() {
     return "example3";
   }
 
+  @PutMapping("/put")
+  public String example4() {
+    return "example4";
+  }
+
+  @GetMapping("/get/{id}")
+  public String example5(@PathVariable Integer id) {
+    return "example5";
+  }
 }

@@ -1,0 +1,24 @@
+plugins {
+	id "java"
+}
+
+compileJava {
+	dependsOn ':springdog-project:springdog-starter:jar'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	api project(':springdog-project:springdog-starter')
+	annotationProcessor project(':springdog-project:springdog-starter')
+	implementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
+
+	testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
