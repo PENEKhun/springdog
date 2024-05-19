@@ -7,6 +7,11 @@ group = rootPackageName
 version = springDogVersion
 apply from: "lint.gradle"
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 subprojects {
     repositories {
         mavenCentral()
@@ -16,6 +21,7 @@ subprojects {
     apply plugin: "jacoco"
 
     dependencies {
+        compileOnly "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"

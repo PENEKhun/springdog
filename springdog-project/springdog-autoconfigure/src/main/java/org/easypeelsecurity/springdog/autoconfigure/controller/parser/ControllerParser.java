@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointRepository;
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointVersionControlRepository;
 import org.easypeelsecurity.springdog.manager.ratelimit.VersionControlRepository;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
@@ -61,11 +60,9 @@ public class ControllerParser {
   private static final Set<EndpointDto> RESULT = new HashSet<>();
   private static final String SPRINGDOG_PACKAGE = "org.easypeelsecurity.springdog";
   private final RequestMappingHandlerMapping handlerMapping;
-  //  private final EndpointRepository endpointRepository;
   private final EndpointQuery endpointQuery;
   private final EndpointCommand endpointCommand;
   private final EndpointRepository endpointRepository;
-  private final EndpointVersionControlRepository endpointVersionControlRepository;
   private final VersionControlRepository versionControlRepository;
 
   /**
@@ -73,13 +70,11 @@ public class ControllerParser {
    */
   public ControllerParser(RequestMappingHandlerMapping handlerMapping, EndpointQuery endpointQuery,
       EndpointCommand endpointCommand, EndpointRepository endpointRepository,
-      EndpointVersionControlRepository endpointVersionControlRepository,
       VersionControlRepository versionControlRepository) {
     this.handlerMapping = handlerMapping;
     this.endpointQuery = endpointQuery;
     this.endpointCommand = endpointCommand;
     this.endpointRepository = endpointRepository;
-    this.endpointVersionControlRepository = endpointVersionControlRepository;
     this.versionControlRepository = versionControlRepository;
   }
 
@@ -149,7 +144,7 @@ public class ControllerParser {
       }
 
       EndpointDto api = getEndpointDto(method, endpoint, httpMethod, isPatternPath);
-      if (!api.getFqcn().startsWith(SPRINGDOG_PACKAGE)) {
+      if (!api.getFqcn().startsWith(SPRINGDOG_PACKAGE + ".")) {
         RESULT.add(api);
       }
     });
