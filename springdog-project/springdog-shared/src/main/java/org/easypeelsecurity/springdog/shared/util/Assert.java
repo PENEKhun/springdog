@@ -19,7 +19,7 @@ package org.easypeelsecurity.springdog.shared.util;
 /**
  * Assertion utility class that assists in validating arguments.
  */
-@SuppressWarnings("checkstyle:MissingJavadocMethod")
+@SuppressWarnings({"checkstyle:MissingJavadocMethod", "checkstyle:OverloadMethodsDeclarationOrder"})
 public abstract class Assert {
 
   public static void notNull(Object object, String message) {
@@ -99,5 +99,4 @@ public abstract class Assert {
       throw new IllegalArgumentException(String.format(message, args));
     }
   }
-
 }

@@ -59,7 +59,7 @@ import jakarta.transaction.Transactional;
 public class ControllerParser {
 
   private static final Set<EndpointDto> RESULT = new HashSet<>();
-  private final String SPRINGDOG_PACKAGE = "org.easypeelsecurity.springdog";
+  private static final String SPRINGDOG_PACKAGE = "org.easypeelsecurity.springdog";
   private final RequestMappingHandlerMapping handlerMapping;
   //  private final EndpointRepository endpointRepository;
   private final EndpointQuery endpointQuery;
@@ -82,10 +82,6 @@ public class ControllerParser {
     this.endpointVersionControlRepository = endpointVersionControlRepository;
     this.versionControlRepository = versionControlRepository;
   }
-  /*public ControllerParser(RequestMappingHandlerMapping handlerMapping, EndpointRepository endpointRepository) {
-    this.handlerMapping = handlerMapping;
-    this.endpointRepository = endpointRepository;
-  }*/
 
   private static EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod,
       boolean isPatternPath) {

@@ -29,6 +29,7 @@ import org.easypeelsecurity.springdog.shared.ratelimit.model.Ruleset;
  *
  * @author PENEKhun
  */
+@SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class EndpointConverter {
 
   /**

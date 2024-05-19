@@ -40,5 +40,4 @@ public interface EndpointHash {
    * @return hash string of endpoint parameters
    */
   String getParamHash(EndpointDto apiInfo, EndpointParameterDto... apiParams);
-
 }
