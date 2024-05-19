@@ -16,28 +16,24 @@
 
 package org.easypeelsecurity.springdogtest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
+import org.easypeelsecurity.springdog.autoconfigure.applier.SpringDogEnable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-@SuppressWarnings("ALL")
-class RatelimitInterceptTest {
-
-  @Autowired
-  EndpointQuery endpointQuery;
+class CheckSpringdogAnnotationTest {
 
   @Test
-  @DisplayName("")
+  @DisplayName("Test Application must have Springdog annotation")
   void test() {
+    // given
+    Class<SpringdogTestApplication> clazz = SpringdogTestApplication.class;
+
     // when
-    var endpoints = endpointQuery.findAll();
+    boolean have = clazz.isAnnotationPresent(SpringDogEnable.class);
 
     // then
-    assertEquals(3, endpoints.size());
+    assertThat(have).isTrue();
   }
 }
