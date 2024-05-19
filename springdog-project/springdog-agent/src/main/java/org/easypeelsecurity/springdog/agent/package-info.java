@@ -14,23 +14,7 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.shared.ratelimit.model;
-
 /**
- * Enum for endpoint change type for showing how changes.
+ * Agent package.
  */
-public enum EndpointChangeType {
-  API_DELETED("Can’t found endpoints that existed before."),
-  API_ADDED("New endpoint added."),
-  //  API_PARAMETER_DELETE("Endpoint parameter changed."),
-  //  API_PARAMETER_ADD("Endpoint parameter changed."),
-  ACTIVATED("Endpoint activated."),
-  DEACTIVATED("Endpoint deactivated."),
-  RULE_CHANGED("Endpoint rule changed.");
-
-  private String description;
-
-  EndpointChangeType(String description) {
-    this.description = description;
-  }
-}
+package org.easypeelsecurity.springdog.agent;

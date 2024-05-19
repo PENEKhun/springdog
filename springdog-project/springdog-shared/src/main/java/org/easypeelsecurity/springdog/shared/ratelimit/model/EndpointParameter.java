@@ -45,7 +45,7 @@ public class EndpointParameter {
   private String name;
   @Enumerated(EnumType.STRING)
   private ApiParameterType type;
-  private boolean enabled = false;
+  private boolean enabled;
 
   @ManyToOne
   private Endpoint endpoint;
