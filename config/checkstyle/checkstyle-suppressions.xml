@@ -25,8 +25,8 @@
   <suppress files="[\\/](examples|it|jmh|test)[\\/]" id="PreferReentrantShortLock"/>
   <!-- Suppress checks related with integration tests. -->
   <suppress checks="[a-zA-Z0-9]*" files="[\\/]resources\/before[\\/]"/>
-  <!-- Suppress final Keyword related checks in non-main code. -->
-  <suppress files="[\\/](examples|test)[\\/]" id="FinalLocalVariable"/>
+  <!-- Suppress checks final keyword. -->
+  <suppress checks="FinalLocalVariable" files=".*\.java"/>
   <!-- Suppress all for springdog-test -->
   <suppress checks="[a-zA-Z0-9]*" files="springdog-project/springdog-test/.*" />
 </suppressions>
