@@ -91,7 +91,7 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
   }
 
   private void springdogManagerApplier(String fullPackageName) {
-    TypeSpec managertApplier = TypeSpec.classBuilder("SpringdogManagerApplier")
+    TypeSpec managerApplier = TypeSpec.classBuilder("SpringdogManagerApplier")
         .addAnnotation(Configuration.class)
         .addAnnotation(AnnotationSpec.builder(ComponentScan.class)
             .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.manager")
@@ -100,7 +100,7 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
         .build();
 
     try {
-      JavaFile.builder(fullPackageName, managertApplier)
+      JavaFile.builder(fullPackageName, managerApplier)
           .build()
           .writeTo(processingEnv.getFiler());
     } catch (IOException e) {
