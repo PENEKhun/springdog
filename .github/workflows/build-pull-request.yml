@@ -31,9 +31,12 @@ jobs:
           path: '**/build/reports/'
       - name: Run checkstyle reporter
         uses: nikitasavinov/checkstyle-action@master
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.TOKEN }}
         with:
           github_token: ${{ secrets.TOKEN }}
           reporter: 'github-pr-check'
+          workdir: 'springdog-project/'
           checkstyle_config: 'config/checkstyle/checkstyle.xml'
           properties_file: 'config/checkstyle/checkstyle-git-action.properties'
           fail_on_error: true
