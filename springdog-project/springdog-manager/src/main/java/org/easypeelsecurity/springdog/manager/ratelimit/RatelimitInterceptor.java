@@ -23,7 +23,6 @@ import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
-import org.easypeelsecurity.springdog.shared.util.Assert;
 import org.easypeelsecurity.springdog.shared.util.IpAddressUtil;
 import org.easypeelsecurity.springdog.shared.util.TimeUtil;
 import org.springframework.http.HttpStatus;
@@ -64,7 +63,10 @@ public class RatelimitInterceptor implements HandlerInterceptor {
 
       EndpointDto endpoint = RuleCache.findEndpointByFqcn(fqcn)
           .orElseGet(() -> endpointQuery.getEndpointByFqcn(fqcn).orElse(null));
-      Assert.notNull(endpoint, "Endpoint not found");
+      if (endpoint == null) {
+        return true;
+      }
+
       RulesetDto rule = endpoint.getRuleset();
       if (rule == null) {
         return true;
