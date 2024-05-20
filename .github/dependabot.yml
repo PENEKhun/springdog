@@ -5,11 +5,11 @@ updates:
     schedule:
       interval: "weekly"
     labels:
-      - "type: dependency-upgrade"
+      - "dependency-upgrade"
 
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
       interval: "weekly"
     labels:
-      - "type: dependency-upgrade"
+      - "dependency-upgrade"

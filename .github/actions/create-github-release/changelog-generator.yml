@@ -3,22 +3,21 @@ changelog:
   sections:
     - title: ":star: New Features"
       labels:
-        - "type: new-feature"
+        - "new-feature"
     - title: ":lady_beetle: Bug Fixes"
       labels:
-        - "type: bug"
-        - "type: regression"
+        - "bug"
     - title: ":notebook_with_decorative_cover: Documentation"
       labels:
-        - "type: documentation"
+        - "documentation"
     - title: ":hammer: Dependency Upgrades"
       sort: "title"
       labels:
-        - "type: dependency-upgrade"
+        - "dependency-upgrade"
   contributors:
     exclude:
       names: ["dependabot"]
   issues:
     exclude:
       labels:
-        - "type: polishing"
+        - "polishing"
