@@ -1,0 +1,24 @@
+changelog:
+  repository: PENEKhun/springdog
+  sections:
+    - title: ":star: New Features"
+      labels:
+        - "type: new-feature"
+    - title: ":lady_beetle: Bug Fixes"
+      labels:
+        - "type: bug"
+        - "type: regression"
+    - title: ":notebook_with_decorative_cover: Documentation"
+      labels:
+        - "type: documentation"
+    - title: ":hammer: Dependency Upgrades"
+      sort: "title"
+      labels:
+        - "type: dependency-upgrade"
+  contributors:
+    exclude:
+      names: ["dependabot"]
+  issues:
+    exclude:
+      labels:
+        - "type: polishing"
