@@ -1,4 +1,4 @@
-# <img src="https://github.com/PENEKhun/springdog/assets/13290706/e6169c7a-1243-4366-b11b-3c983c449d40" align="right" width="100">Springdog
+# <img src="https://github.com/PENEKhun/springdog/assets/13290706/33c52782-f6b8-442a-9b6f-ae93b50376d4" align="right" width="100">Springdog
 
 [![Build Status](https://github.com/PENEKhun/springdog/actions/workflows/build-push-main.yml/badge.svg)](https://github.com/PENEKhun/springdog/actions/workflows/build-push-main.yml)
 [![Codecov](https://codecov.io/gh/PENEKhun/springdog/graph/badge.svg?token=AQ1A6SAJTY)](https://codecov.io/gh/PENEKhun/springdog)
