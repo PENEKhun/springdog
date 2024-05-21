@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Generated;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Modifier;
@@ -29,6 +30,8 @@ import javax.lang.model.element.TypeElement;
 import javax.sql.DataSource;
 import javax.tools.Diagnostic.Kind;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -38,15 +41,18 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 
 import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
+import jakarta.annotation.PostConstruct;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 
 /**
@@ -56,6 +62,15 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
 
   private static final String DATABASE_URL =
       "jdbc:derby:springdog-embedded-database;create=true;";
+  private static final Logger logger = LoggerFactory.getLogger(SpringDogEnableProcessor.class);
+  private static final String BANNER = """
+            \s
+            ███████ ██████  ██████  ██ ███    ██  ██████  ██████   ██████   ██████ \s
+            ██      ██   ██ ██   ██ ██ ████   ██ ██       ██   ██ ██    ██ ██      \s
+            ███████ ██████  ██████  ██ ██ ██  ██ ██   ███ ██   ██ ██    ██ ██   ███\s
+                 ██ ██      ██   ██ ██ ██  ██ ██ ██    ██ ██   ██ ██    ██ ██    ██\s
+            ███████ ██      ██   ██ ██ ██   ████  ██████  ██████   ██████   ██████ \s
+      """;
 
   /**
    * Registers support for the SpringDogEnable annotation.
@@ -81,13 +96,52 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
 
   private void generateConfigurations(RoundEnvironment roundEnv) {
     roundEnv.getElementsAnnotatedWith(SpringDogEnable.class).forEach(element -> {
+      logger.info("Springdog Autoconfiguration Processor started.");
       String fullPackageName = element.getEnclosingElement().toString();
+
       generateThymeleafConfig(fullPackageName);
       generateJPAConfig(fullPackageName);
       springdogAgentControllerApplier(fullPackageName);
       springdogManagerApplier(fullPackageName);
       autoconfigurationBeanApplier(fullPackageName);
+      startBannerPrinter(fullPackageName);
     });
+  }
+
+  private void startBannerPrinter(String fullPackageName) {
+    MethodSpec initMethod = MethodSpec.methodBuilder("init")
+        .addAnnotation(PostConstruct.class)
+        .addModifiers(Modifier.PUBLIC)
+        .addStatement("System.out.println(BANNER)")
+        .addStatement("logger.info(\"Springdog was fully loaded.\")")
+        .build();
+
+    TypeSpec bannerPrinter = TypeSpec.classBuilder("SpringdogBannerPrinter")
+        .addAnnotation(AnnotationSpec.builder(Component.class)
+            .addMember("value", "$S", "springdogBannerPrinter")
+            .build())
+        .addAnnotation(AnnotationSpec.builder(Generated.class)
+            .addMember("value", "$S", "org.easypeelsecurity.springdog")
+            .addMember("comments", "$S", "Springdog banner printer")
+            .build())
+        .addModifiers(Modifier.PUBLIC)
+        .addField(FieldSpec.builder(Logger.class, "logger", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+            .initializer("$T.getLogger($T.class)", LoggerFactory.class, SpringDogEnableProcessor.class)
+            .build())
+        .addField(FieldSpec.builder(String.class, "BANNER", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+            .initializer("$S", BANNER)
+            .build())
+        .addMethod(initMethod)
+        .build();
+
+    try {
+      JavaFile.builder(fullPackageName, bannerPrinter)
+          .build()
+          .writeTo(processingEnv.getFiler());
+    } catch (IOException e) {
+      processingEnv.getMessager()
+          .printMessage(Kind.ERROR, "Error writing SpringdogBannerPrinter: " + e.getMessage());
+    }
   }
 
   private void springdogManagerApplier(String fullPackageName) {
