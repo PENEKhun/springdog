@@ -3,10 +3,6 @@ plugins {
     id "io.github.goooler.shadow" version "${shadowVersion}"
 }
 
-shadowJar {
-    mergeGroovyExtensionModules() // https://github.com/ultraq/thymeleaf-layout-dialect/issues/223
-}
-
 compileJava {
     dependsOn ':springdog-project:springdog-agent:jar'
     dependsOn ':springdog-project:springdog-autoconfigure:jar'
