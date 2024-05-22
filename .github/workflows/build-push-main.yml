@@ -25,7 +25,7 @@ jobs:
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v3
         with:
-          arguments: build
+          arguments: build -xCheck
 
       - name: Upload build reports
         uses: actions/upload-artifact@v4
