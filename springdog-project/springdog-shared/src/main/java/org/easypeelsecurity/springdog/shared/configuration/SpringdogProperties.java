@@ -51,6 +51,19 @@ public class SpringdogProperties {
     return agentProperties.getBasePath();
   }
 
+  /**
+   * Take a relative path named 'path' and computes it as an absolute path.
+   * @param extraPath extra path
+   * @return absolute path
+   */
+  public String computeAbsolutePath(String extraPath) {
+    if (getAgentBasePath().startsWith("/")) {
+      return getAgentBasePath() + extraPath;
+    }
+
+    return "/" + getAgentBasePath() + extraPath;
+  }
+
   public String getAgentUsername() {
     return agentProperties.getUsername();
   }
