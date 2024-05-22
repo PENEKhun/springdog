@@ -1,0 +1,5 @@
+springdog:
+  agent:
+    basePath: custom-base-path
+    username: custom-username
+    password: custom-password

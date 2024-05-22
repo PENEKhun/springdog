@@ -30,6 +30,8 @@ import javax.lang.model.element.TypeElement;
 import javax.sql.DataSource;
 import javax.tools.Diagnostic.Kind;
 
+import org.easypeelsecurity.springdog.agent.SpringdogAgentView;
+import org.easypeelsecurity.springdog.autoconfigure.PropertiesLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +44,9 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 
@@ -62,7 +66,6 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
 
   private static final String DATABASE_URL =
       "jdbc:derby:springdog-embedded-database;create=true;";
-  private static final Logger logger = LoggerFactory.getLogger(SpringDogEnableProcessor.class);
   private static final String BANNER = """
             \s
             ███████ ██████  ██████  ██ ███    ██  ██████  ██████   ██████   ██████ \s
@@ -71,6 +74,7 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
                  ██ ██      ██   ██ ██ ██  ██ ██ ██    ██ ██   ██ ██    ██ ██    ██\s
             ███████ ██      ██   ██ ██ ██   ████  ██████  ██████   ██████   ██████ \s
       """;
+  private static final String ANNOTATION_DEFAULT_FIELD = "value";
 
   /**
    * Registers support for the SpringDogEnable annotation.
@@ -96,40 +100,61 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
 
   private void generateConfigurations(RoundEnvironment roundEnv) {
     roundEnv.getElementsAnnotatedWith(SpringDogEnable.class).forEach(element -> {
-      logger.info("Springdog Autoconfiguration Processor started.");
       String fullPackageName = element.getEnclosingElement().toString();
-
+      PropertiesLoader propertiesLoader = new PropertiesLoader(processingEnv);
+      String agentBasePath = propertiesLoader.getPropertyOrDefault("springdog.agent.basePath", "springdog");
+      agentApplier(fullPackageName, SpringdogAgentView.class, agentBasePath);
       generateThymeleafConfig(fullPackageName);
       generateJPAConfig(fullPackageName);
-      springdogAgentControllerApplier(fullPackageName);
       springdogManagerApplier(fullPackageName);
       autoconfigurationBeanApplier(fullPackageName);
       startBannerPrinter(fullPackageName);
     });
   }
 
+  private void agentApplier(String fullPackageName, Class controller, String basePath) {
+    TypeSpec agentPathModifier = TypeSpec.classBuilder("SpringdogAgentView")
+        .addAnnotation(Controller.class)
+        .addModifiers(Modifier.PUBLIC)
+        .superclass(controller)
+        .addAnnotation(AnnotationSpec.builder(Generated.class)
+            .addMember(ANNOTATION_DEFAULT_FIELD, "$S", "org.easypeelsecurity.springdog")
+            .addMember("comments", "$S", "Springdog agent path modifier")
+            .build())
+        .addAnnotation(AnnotationSpec.builder(RequestMapping.class)
+            .addMember(ANNOTATION_DEFAULT_FIELD, "$S", basePath)
+            .build())
+        .build();
+
+    try {
+      JavaFile.builder(fullPackageName, agentPathModifier)
+          .build()
+          .writeTo(processingEnv.getFiler());
+    } catch (IOException e) {
+      processingEnv.getMessager()
+          .printMessage(Kind.ERROR, "Error writing SpringdogAgentPathModifier: " + e.getMessage());
+    }
+  }
+
   private void startBannerPrinter(String fullPackageName) {
     MethodSpec initMethod = MethodSpec.methodBuilder("init")
         .addAnnotation(PostConstruct.class)
         .addModifiers(Modifier.PUBLIC)
-        .addStatement("System.out.println(BANNER)")
+        .addStatement("System.out.println($S)", BANNER)
         .addStatement("logger.info(\"Springdog was fully loaded.\")")
         .build();
 
     TypeSpec bannerPrinter = TypeSpec.classBuilder("SpringdogBannerPrinter")
         .addAnnotation(AnnotationSpec.builder(Component.class)
-            .addMember("value", "$S", "springdogBannerPrinter")
+            .addMember(ANNOTATION_DEFAULT_FIELD, "$S", "springdogBannerPrinter")
             .build())
         .addAnnotation(AnnotationSpec.builder(Generated.class)
-            .addMember("value", "$S", "org.easypeelsecurity.springdog")
+            .addMember(ANNOTATION_DEFAULT_FIELD, "$S", "org.easypeelsecurity.springdog")
             .addMember("comments", "$S", "Springdog banner printer")
             .build())
         .addModifiers(Modifier.PUBLIC)
         .addField(FieldSpec.builder(Logger.class, "logger", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
             .initializer("$T.getLogger($T.class)", LoggerFactory.class, SpringDogEnableProcessor.class)
-            .build())
-        .addField(FieldSpec.builder(String.class, "BANNER", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-            .initializer("$S", BANNER)
             .build())
         .addMethod(initMethod)
         .build();
@@ -269,25 +294,6 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
     } catch (IOException e) {
       processingEnv.getMessager()
           .printMessage(Kind.ERROR, "Error writing Thymeleaf configuration: " + e.getMessage());
-    }
-  }
-
-  private void springdogAgentControllerApplier(String fullPackageName) {
-    TypeSpec agentApplier = TypeSpec.classBuilder("SpringdogAgentControllerApplier")
-        .addAnnotation(Configuration.class)
-        .addAnnotation(AnnotationSpec.builder(ComponentScan.class)
-            .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.agent")
-            .build())
-        .addModifiers(Modifier.PUBLIC)
-        .build();
-
-    try {
-      JavaFile.builder(fullPackageName, agentApplier)
-          .build()
-          .writeTo(processingEnv.getFiler());
-    } catch (IOException e) {
-      processingEnv.getMessager()
-          .printMessage(Kind.ERROR, "Error writing SpringdogAgentControllerApplier: " + e.getMessage());
     }
   }
 
