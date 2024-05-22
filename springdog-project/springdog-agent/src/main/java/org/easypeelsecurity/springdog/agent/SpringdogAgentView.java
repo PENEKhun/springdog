@@ -42,14 +42,14 @@ public class SpringdogAgentView {
   @Autowired
   private EndpointCommand rateLimitCommand;
 
-  @GetMapping("/")
-  public String home() {
-    return "/templates/content/main.html";
-  }
-
   @GetMapping("/login")
   public String login() {
     return "/templates/content/login.html";
+  }
+
+  @GetMapping("/")
+  public String home() {
+    return "/templates/content/main.html";
   }
 
   @GetMapping("/rate-limit")

@@ -17,7 +17,12 @@
 package org.easypeelsecurity.springdogtest.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.junit.jupiter.api.DisplayName;
@@ -61,5 +66,23 @@ class ConfigurationTests {
 
     // then
     assertThat(status).isEqualTo(expectedStatus);
+  }
+
+  @Test
+  @DisplayName("should be able to login as set the username and password.")
+  void formLoginTest() throws Exception {
+    // given
+    String loginPath = "/".concat(properties.getAgentBasePath()).concat("/login");
+    String username = properties.getAgentUsername();
+    String password = properties.getAgentPassword();
+
+    // when & then
+    mockMvc.perform(post(loginPath)
+            .with(csrf())
+            .param("username", username)
+            .param("password", password))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/" + properties.getAgentBasePath() + "/"))
+        .andExpect(authenticated().withUsername(username));
   }
 }
