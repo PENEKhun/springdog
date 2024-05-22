@@ -24,7 +24,7 @@ import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,17 +34,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 /**
  * Controller for the agent's view.
  */
-@Controller
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
-public class View {
+public class SpringdogAgentView {
 
-  private final EndpointQuery rateLimitQuery;
-  private final EndpointCommand rateLimitCommand;
-
-  public View(EndpointQuery rateLimitQuery, EndpointCommand rateLimitCommand) {
-    this.rateLimitQuery = rateLimitQuery;
-    this.rateLimitCommand = rateLimitCommand;
-  }
+  @Autowired
+  private EndpointQuery rateLimitQuery;
+  @Autowired
+  private EndpointCommand rateLimitCommand;
 
   @GetMapping("/")
   public String home() {

@@ -6,14 +6,16 @@ plugins {
 dependencies {
     implementation "com.squareup:javapoet:1.13.0"
     compileOnly "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+  implementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
 
     compileOnly "org.springframework.boot:spring-boot-starter-thymeleaf:${springbootVersion}"
     compileOnly "org.springframework.boot:spring-boot-autoconfigure-processor:${springbootVersion}"
     compileOnly "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}"
 
-    implementation "org.apache.derby:derby:${derbyVersion}"
-    implementation "org.apache.derby:derbytools:${derbyVersion}"
-    implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
+  compileOnly "org.yaml:snakeyaml:${snakeyamlVersion}"
+  implementation "org.apache.derby:derby:${derbyVersion}"
+  implementation "org.apache.derby:derbytools:${derbyVersion}"
+  implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
 
     compileOnly project(":springdog-project:springdog-agent")
     compileOnly project(":springdog-project:springdog-manager")

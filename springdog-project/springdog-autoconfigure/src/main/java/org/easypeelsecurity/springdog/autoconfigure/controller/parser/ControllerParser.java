@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.easypeelsecurity.springdog.agent.SpringdogAgentView;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointRepository;
@@ -58,7 +59,7 @@ import jakarta.transaction.Transactional;
 public class ControllerParser {
 
   private static final Set<EndpointDto> RESULT = new HashSet<>();
-  private static final String SPRINGDOG_PACKAGE = "org.easypeelsecurity.springdog";
+  private static final String AGENT_CLASS_NAME = SpringdogAgentView.class.getSimpleName();
   private final RequestMappingHandlerMapping handlerMapping;
   private final EndpointQuery endpointQuery;
   private final EndpointCommand endpointCommand;
@@ -144,7 +145,7 @@ public class ControllerParser {
       }
 
       EndpointDto api = getEndpointDto(method, endpoint, httpMethod, isPatternPath);
-      if (!api.getFqcn().startsWith(SPRINGDOG_PACKAGE + ".")) {
+      if (!api.getFqcn().contains("." + AGENT_CLASS_NAME + ".")) {
         RESULT.add(api);
       }
     });
