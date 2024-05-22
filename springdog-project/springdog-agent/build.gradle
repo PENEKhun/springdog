@@ -9,9 +9,10 @@ shadowJar {
 
 dependencies {
     compileOnly "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
-//    TODO: enable spring security
-//    implementation "org.springframework.boot:spring-boot-starter-security"
-//    implementation "org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.2.RELEASE"
+    implementation "org.springframework.boot:spring-boot-starter-security:${springbootVersion}"
+    implementation "org.thymeleaf.extras:thymeleaf-extras-springsecurity${thymeleafSecurityVersion}"
+    implementation "org.springframework.boot:spring-boot-devtools:${springbootVersion}"
+
     implementation 'org.thymeleaf:thymeleaf-spring6:3.1.2.RELEASE'
     implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}"
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"

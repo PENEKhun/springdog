@@ -17,6 +17,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
+    testImplementation "org.springframework.security:spring-security-test:${springVersion}"
 }
 
 tasks.named('test') {

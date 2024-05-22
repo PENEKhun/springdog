@@ -107,6 +107,7 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
       generateThymeleafConfig(fullPackageName);
       generateJPAConfig(fullPackageName);
       springdogManagerApplier(fullPackageName);
+      springdogAgentSecurityApplier(fullPackageName);
       autoconfigurationBeanApplier(fullPackageName);
       startBannerPrinter(fullPackageName);
     });
@@ -185,6 +186,25 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
     } catch (IOException e) {
       processingEnv.getMessager()
           .printMessage(Kind.ERROR, "Error writing SpringdogManagerApplier: " + e.getMessage());
+    }
+  }
+
+  private void springdogAgentSecurityApplier(String fullPackageName) {
+    TypeSpec managerApplier = TypeSpec.classBuilder("SpringdogAgentSecurityApplier")
+        .addAnnotation(Configuration.class)
+        .addAnnotation(AnnotationSpec.builder(ComponentScan.class)
+            .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.agent.security")
+            .build())
+        .addModifiers(Modifier.PUBLIC)
+        .build();
+
+    try {
+      JavaFile.builder(fullPackageName, managerApplier)
+          .build()
+          .writeTo(processingEnv.getFiler());
+    } catch (IOException e) {
+      processingEnv.getMessager()
+          .printMessage(Kind.ERROR, "Error writing SpringdogAgentSecurityApplier: " + e.getMessage());
     }
   }
 
