@@ -16,7 +16,7 @@ changelog:
         - "dependency-upgrade"
   contributors:
     exclude:
-      names: ["dependabot"]
+      names: [ "dependabot" ]
   issues:
     exclude:
       labels:

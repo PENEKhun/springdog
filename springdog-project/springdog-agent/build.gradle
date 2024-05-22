@@ -4,7 +4,7 @@ plugins {
 }
 
 shadowJar {
-  mergeGroovyExtensionModules() // https://github.com/ultraq/thymeleaf-layout-dialect/issues/223
+    mergeGroovyExtensionModules() // https://github.com/ultraq/thymeleaf-layout-dialect/issues/223
 }
 
 dependencies {
