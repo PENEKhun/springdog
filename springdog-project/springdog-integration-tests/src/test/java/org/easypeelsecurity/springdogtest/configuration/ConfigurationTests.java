@@ -19,9 +19,11 @@ package org.easypeelsecurity.springdogtest.configuration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
@@ -84,5 +86,24 @@ class ConfigurationTests {
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/" + properties.getAgentBasePath() + "/"))
         .andExpect(authenticated().withUsername(username));
+  }
+
+  @Test
+  void logoutTest() throws Exception {
+    // given
+    String loginPath = "/".concat(properties.getAgentBasePath()).concat("/login");
+    String logoutPath = "/".concat(properties.getAgentBasePath()).concat("/logout");
+    String username = properties.getAgentUsername();
+    String password = properties.getAgentPassword();
+
+    // when & then
+    mockMvc.perform(post(loginPath)
+            .with(csrf())
+            .param("username", username)
+            .param("password", password))
+        .andDo(result -> mockMvc.perform(get(logoutPath))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrlPattern("**" + loginPath))
+            .andExpect(unauthenticated()));
   }
 }

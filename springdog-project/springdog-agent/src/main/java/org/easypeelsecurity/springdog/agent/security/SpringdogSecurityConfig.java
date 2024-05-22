@@ -50,21 +50,18 @@ public class SpringdogSecurityConfig {
     http
         .authorizeHttpRequests(authorizeRequests ->
             authorizeRequests
-                .requestMatchers(request -> request.getRequestURI().startsWith("/" + basePath + "/login"))
-                .permitAll()
-                .requestMatchers(request -> request.getRequestURI().startsWith("/" + basePath + "/logout"))
-                .permitAll()
                 .requestMatchers(request -> request.getRequestURI().startsWith("/" + basePath)).authenticated()
                 .anyRequest().permitAll()
         ).formLogin(formLogin -> formLogin
-            .loginPage("/" + basePath + "/login")
-            .failureUrl("/" + basePath + "/login?error")
-            .loginProcessingUrl("/" + basePath + "/login")
-            .defaultSuccessUrl("/" + basePath + "/")
+            .loginPage(springdogProperties.computeAbsolutePath("/login"))
+            .failureUrl(springdogProperties.computeAbsolutePath("/login?error"))
+            .loginProcessingUrl(springdogProperties.computeAbsolutePath("/login"))
+            .defaultSuccessUrl(springdogProperties.computeAbsolutePath("/"))
             .permitAll())
         .logout(logout -> logout
-            .logoutUrl("/" + basePath + "/logout")
-        );
+            .logoutUrl(springdogProperties.computeAbsolutePath("/logout"))
+            .logoutSuccessUrl(springdogProperties.computeAbsolutePath("/login?logout"))
+            .permitAll());
 
     return http.build();
   }
