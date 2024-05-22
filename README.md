@@ -6,7 +6,7 @@
 [![JavaDoc](https://javadoc.io/badge2/org.easypeelsecurity/springdog-starter/javadoc.svg)](https://javadoc.io/doc/org.easypeelsecurity/springdog-starter)
 [![License](https://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-Add security configuration to your Spring application effortlessly by simply adding a springdog. 
+Add security configuration to your Spring application effortlessly by simply adding a springdog.
 **No additional code configuration is required!**
 
 > Since it's still in beta, the software currently has limited features. If you're interested in
@@ -24,6 +24,7 @@ annotationProcessor "org.easypeelsecurity:springdog-starter:${springdogVersion}"
 ```
 
 ## Overview
+
 TODO: fill with screenshots.
 
 ## Contributing
