@@ -20,6 +20,23 @@ dependencies {
     testImplementation "org.springframework.security:spring-security-test:${springVersion}"
 }
 
+test {
+    doLast {
+        tasks.named("jacocoTestReport") {
+            it.sourceDirectories.from(
+                    project(":springdog-project:springdog-manager").sourceSets.main.java.srcDirs,
+                    project(":springdog-project:springdog-autoconfigure").sourceSets.main.java.srcDirs,
+                    project(":springdog-project:springdog-agent").sourceSets.main.java.srcDirs
+            )
+            it.classDirectories.from(
+                    project(":springdog-project:springdog-manager").sourceSets.main.output,
+                    project(":springdog-project:springdog-autoconfigure").sourceSets.main.output,
+                    project(":springdog-project:springdog-agent").sourceSets.main.output
+            )
+        }
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
