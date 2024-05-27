@@ -22,7 +22,7 @@ jobs:
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v3
         with:
-          arguments: build -xCheck
+          arguments: build -i -xCheck
       - name: Upload Build Reports
         uses: actions/upload-artifact@v4
         if: failure()
