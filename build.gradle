@@ -1,13 +1,14 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id "java-library"
+    id 'jacoco-report-aggregation'
 }
 
 group = rootPackageName
 version = springDogVersion
 apply from: "lint.gradle"
 
-subprojects {
+allprojects {
     java {
         toolchain {
             languageVersion = JavaLanguageVersion.of(17)
@@ -43,6 +44,41 @@ subprojects {
         dependsOn test // tests are required to run before generating the report
         reports {
             xml.required.set(true)
+            html.required.set(true)
         }
     }
+}
+
+subprojects {
+    apply plugin: 'jacoco'
+
+    test {
+        useJUnitPlatform()
+        finalizedBy jacocoTestReport
+    }
+
+    jacocoTestReport {
+        dependsOn test
+
+        reports {
+            xml.required.set(true)
+            html.required.set(true)
+        }
+    }
+}
+
+dependencies {
+    jacocoAggregation subprojects
+}
+
+tasks.register('jacocoRootReport', JacocoReport) {
+    dependsOn subprojects.test
+
+    additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
+    additionalClassDirs = files(subprojects.sourceSets.main.output)
+    executionData = files(subprojects.jacocoTestReport.executionData)
+}
+
+tasks.named('jacocoTestReport') {
+    dependsOn jacocoRootReport
 }
