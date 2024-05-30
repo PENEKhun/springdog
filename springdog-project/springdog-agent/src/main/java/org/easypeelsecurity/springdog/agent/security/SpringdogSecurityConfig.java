@@ -20,6 +20,7 @@ import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -62,7 +63,8 @@ public class SpringdogSecurityConfig {
         .logout(logout -> logout
             .logoutUrl(springdogProperties.computeAbsolutePath("/logout"))
             .logoutSuccessUrl(springdogProperties.computeAbsolutePath("/login?logout"))
-            .permitAll());
+            .permitAll())
+        .csrf(AbstractHttpConfigurer::disable);
 
     return http.build();
   }
