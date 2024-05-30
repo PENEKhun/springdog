@@ -60,7 +60,7 @@ class ConfigurationTests {
   void agentBasePathShouldBeChanged() throws Exception {
     // given
     String basePath = properties.getAgentBasePath();
-    String connectionPath = "/".concat(basePath).concat("/login");
+    String connectionPath = properties.computeAbsolutePath("/login");
     int expectedStatus = HttpStatus.OK.value();
 
     // when
@@ -74,7 +74,7 @@ class ConfigurationTests {
   @DisplayName("should be able to login as set the username and password.")
   void formLoginTest() throws Exception {
     // given
-    String loginPath = "/".concat(properties.getAgentBasePath()).concat("/login");
+    String loginPath = properties.computeAbsolutePath("/login");
     String username = properties.getAgentUsername();
     String password = properties.getAgentPassword();
 
@@ -91,8 +91,8 @@ class ConfigurationTests {
   @Test
   void logoutTest() throws Exception {
     // given
-    String loginPath = "/".concat(properties.getAgentBasePath()).concat("/login");
-    String logoutPath = "/".concat(properties.getAgentBasePath()).concat("/logout");
+    String loginPath = properties.computeAbsolutePath("/login");
+    String logoutPath = properties.computeAbsolutePath("/logout");
     String username = properties.getAgentUsername();
     String password = properties.getAgentPassword();
 
