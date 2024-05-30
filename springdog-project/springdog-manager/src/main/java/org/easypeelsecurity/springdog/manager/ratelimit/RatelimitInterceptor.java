@@ -19,6 +19,7 @@ package org.easypeelsecurity.springdog.manager.ratelimit;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 
+import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
@@ -40,12 +41,14 @@ import jakarta.servlet.http.HttpServletResponse;
 public class RatelimitInterceptor implements HandlerInterceptor {
 
   private final EndpointQuery endpointQuery;
+  private final SpringdogProperties springdogProperties;
 
   /**
    * Constructor.
    */
-  public RatelimitInterceptor(EndpointQuery endpointQuery) {
+  public RatelimitInterceptor(EndpointQuery endpointQuery, SpringdogProperties springdogProperties) {
     this.endpointQuery = endpointQuery;
+    this.springdogProperties = springdogProperties;
   }
 
   @Override
@@ -57,7 +60,12 @@ public class RatelimitInterceptor implements HandlerInterceptor {
       Class<?> controllerClass = controller.getClass();
       String functionName = handlerMethod.getMethod().getName();
       String fqcn = controllerClass.getName() + "." + functionName;
-      if (fqcn.startsWith("org.easypeelsecurity.springdog")) {
+      if (controllerClass.equals(
+          org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.class)) {
+        return true;
+      }
+      String requestPath = request.getRequestURI().substring(request.getContextPath().length());
+      if (requestPath.startsWith(springdogProperties.computeAbsolutePath(""))) {
         return true;
       }
 

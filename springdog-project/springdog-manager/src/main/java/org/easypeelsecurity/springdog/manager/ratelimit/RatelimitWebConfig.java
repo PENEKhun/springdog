@@ -16,6 +16,7 @@
 
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
+import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -27,16 +28,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class RatelimitWebConfig implements WebMvcConfigurer {
 
   private final EndpointQuery endpointQuery;
+  private final SpringdogProperties springdogProperties;
 
   /**
    * Constructor.
    */
-  public RatelimitWebConfig(EndpointQuery endpointQuery) {
+  public RatelimitWebConfig(EndpointQuery endpointQuery, SpringdogProperties springdogProperties) {
     this.endpointQuery = endpointQuery;
+    this.springdogProperties = springdogProperties;
   }
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(new RatelimitInterceptor(this.endpointQuery));
+    registry.addInterceptor(new RatelimitInterceptor(this.endpointQuery, this.springdogProperties));
   }
 }

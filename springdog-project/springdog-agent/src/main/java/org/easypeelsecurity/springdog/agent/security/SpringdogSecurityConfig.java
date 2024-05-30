@@ -46,11 +46,12 @@ public class SpringdogSecurityConfig {
    */
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    String basePath = springdogProperties.getAgentBasePath();
+    String baseAbsolutePath = springdogProperties.computeAbsolutePath("");
     http
         .authorizeHttpRequests(authorizeRequests ->
             authorizeRequests
-                .requestMatchers(request -> request.getRequestURI().startsWith("/" + basePath)).authenticated()
+                .requestMatchers(request -> request.getRequestURI().startsWith(baseAbsolutePath))
+                .authenticated()
                 .anyRequest().permitAll()
         ).formLogin(formLogin -> formLogin
             .loginPage(springdogProperties.computeAbsolutePath("/login"))
