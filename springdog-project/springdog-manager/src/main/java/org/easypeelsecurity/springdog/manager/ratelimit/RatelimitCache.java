@@ -36,7 +36,7 @@ public final class RatelimitCache {
    * @param requestHashed request information hashed
    * @param ldt           now time
    */
-  public static LocalDateTime[] addTimestamp(String requestHashed, LocalDateTime ldt) {
+  public static synchronized LocalDateTime[] addTimestamp(String requestHashed, LocalDateTime ldt) {
     LocalDateTime[] before = getAccessHistoryInstance().getIfPresent(requestHashed);
     LocalDateTime[] after;
     if (before != null) {
@@ -56,7 +56,7 @@ public final class RatelimitCache {
     getBanHistoryInstance().put(requestHashed, banUntil);
   }
 
-  public static boolean checkBan(String requestHashed, LocalDateTime now) {
+  public static synchronized boolean checkBan(String requestHashed, LocalDateTime now) {
     LocalDateTime banTime = getBanHistoryInstance().getIfPresent(requestHashed);
     if (banTime != null) {
       if (banTime.isBefore(now)) {
