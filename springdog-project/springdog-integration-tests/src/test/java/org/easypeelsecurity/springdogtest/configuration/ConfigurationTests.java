@@ -23,7 +23,6 @@ import static org.springframework.security.test.web.servlet.response.SecurityMoc
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
@@ -103,7 +102,7 @@ class ConfigurationTests {
             .param("password", password))
         .andDo(result -> mockMvc.perform(get(logoutPath))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrlPattern("**" + loginPath))
+            .andExpect(redirectedUrl(loginPath + "?logout"))
             .andExpect(unauthenticated()));
   }
 }
