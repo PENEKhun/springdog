@@ -6,7 +6,7 @@
 [![JavaDoc](https://javadoc.io/badge2/org.easypeelsecurity/springdog-starter/javadoc.svg)](https://javadoc.io/doc/org.easypeelsecurity/springdog-starter)
 [![License](https://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-Add security configuration to your Spring application effortlessly by simply adding a springdog.
+Add security configuration to your Spring application effortlessly by simply adding a Springdog.
 **No additional code configuration is required!**
 
 > Since it's still in beta, the software currently has limited features. If you're interested in
@@ -18,14 +18,37 @@ Add security configuration to your Spring application effortlessly by simply add
 
 ## Dependencies
 
-```groovy
+It hasn't been deployed yet, please be patient.
+
+<!-- ```groovy
 implementation "org.easypeelsecurity:springdog-starter:${springdogVersion}"
 annotationProcessor "org.easypeelsecurity:springdog-starter:${springdogVersion}"
-```
+``` -->
 
 ## Overview
 
 TODO: fill with screenshots.
+
+## Options
+
+Below is a list of keys/default values for all settings.
+
+```yaml
+springdog:
+  agent:
+    basePath: springdog
+    username: admin
+    password: admin
+    externalAccess: false
+```
+
+| Name                | Required | Description                                                                                                                                                                                                                           | Default   | Value Sets |
+|---------------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
+| **springdog.agent** | //////// | The Springdog agent configuration.                                                                                                                                                                                                    | ////////  | ////////   |
+| basePath            | x        | The base path for the agent. Used to access the springdog agent from a deployed server, such as `{{host}}/springdog`. The basePath used with this option should never be used as the controller mapping address for your application. | springdog |
+| username            | x        | The username for the Springdog agent. Empty fields are not allowed.                                                                                                                                                                   | admin     |
+| password            | x        | The password for the Springdog agent. Empty fields are not allowed.                                                                                                                                                                   | admin     |
+| externalAccess      | x        | Whether to allow external access to the Springdog agent. If `false`, access from external IPs is not allowed.                                                                                                                         | false     |
 
 ## Contributing
 
@@ -36,7 +59,7 @@ More information can be found in the [CONTRIBUTING.md] file.
 
 ## License
 
-This project is licensed under the terms of the [apache 2.0] license.
+This project is licensed under the terms of the [Apache 2.0] license.
 
 [apache 2.0]: LICENSE.txt
 
