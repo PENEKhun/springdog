@@ -19,6 +19,7 @@ package org.easypeelsecurity.springdogtest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,18 @@ class SpringDogEnableProcessorTest {
   void checkGeneratedClassAppliedAtSpringContainer(String targetBean) {
     // when
     boolean beanExist = applicationContext.containsBean(targetBean);
+
+    // then
+    assertThat(beanExist).isTrue();
+  }
+
+  @Test
+  void agentExternalAccessInterceptorBeanApply() {
+    // given
+    String beanName = "agentExternalAccessInterceptor";
+
+    // when
+    boolean beanExist = applicationContext.containsBean(beanName);
 
     // then
     assertThat(beanExist).isTrue();

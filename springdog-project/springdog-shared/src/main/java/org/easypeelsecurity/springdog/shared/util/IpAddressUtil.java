@@ -37,13 +37,23 @@ public abstract class IpAddressUtil {
    * Get client IP address.
    *
    * @param request HttpServletRequest for getting IP address
-   * @return IPv4 String
+   * @return IPv4 or IPv6 address
    */
-  public static String getClientIpv4(HttpServletRequest request) {
+  public static String getClientIp(HttpServletRequest request) {
     return Stream.of(HEADERS_TO_TRY)
         .map(request::getHeader)
         .filter(Objects::nonNull)
         .findFirst()
         .orElse(request.getRemoteAddr());
+  }
+
+  /**
+   * Check IP is local or not.
+   *
+   * @param ip IP address (IPv4 or IPv6)
+   * @return true if IP is local
+   */
+  public static boolean isLocal(String ip) {
+    return ip.startsWith("127.") || ip.startsWith("0:0:0:0:0:0:0:1") || ip.startsWith("::1");
   }
 }

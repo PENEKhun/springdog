@@ -25,9 +25,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
 class SpringdogAgentProperties {
 
-  String basePath = "springdog";
-  String username = "admin";
-  String password = "admin";
+  private String basePath = "springdog";
+  private String username = "admin";
+  private String password = "admin";
+  private boolean externalAccess;
 
   public void setBasePath(String basePath) {
     this.basePath = basePath;
@@ -51,5 +52,13 @@ class SpringdogAgentProperties {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public boolean isExternalAccess() {
+    return externalAccess;
+  }
+
+  public void setExternalAccess(boolean externalAccess) {
+    this.externalAccess = externalAccess;
   }
 }
