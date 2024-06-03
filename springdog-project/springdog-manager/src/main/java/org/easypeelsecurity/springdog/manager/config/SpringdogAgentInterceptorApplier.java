@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.manager.ratelimit;
+package org.easypeelsecurity.springdog.manager.config;
 
+import org.easypeelsecurity.springdog.manager.agent.AgentExternalAccessInterceptor;
+import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
+import org.easypeelsecurity.springdog.manager.ratelimit.RatelimitInterceptor;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -25,7 +28,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Applier for ratelimit interceptor.
  */
 @Configuration
-public class RatelimitWebConfig implements WebMvcConfigurer {
+public class SpringdogAgentInterceptorApplier implements WebMvcConfigurer {
 
   private final EndpointQuery endpointQuery;
   private final SpringdogProperties springdogProperties;
@@ -33,7 +36,8 @@ public class RatelimitWebConfig implements WebMvcConfigurer {
   /**
    * Constructor.
    */
-  public RatelimitWebConfig(EndpointQuery endpointQuery, SpringdogProperties springdogProperties) {
+  public SpringdogAgentInterceptorApplier(EndpointQuery endpointQuery,
+      SpringdogProperties springdogProperties) {
     this.endpointQuery = endpointQuery;
     this.springdogProperties = springdogProperties;
   }
@@ -41,5 +45,6 @@ public class RatelimitWebConfig implements WebMvcConfigurer {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new RatelimitInterceptor(this.endpointQuery, this.springdogProperties));
+    registry.addInterceptor(new AgentExternalAccessInterceptor(this.springdogProperties));
   }
 }

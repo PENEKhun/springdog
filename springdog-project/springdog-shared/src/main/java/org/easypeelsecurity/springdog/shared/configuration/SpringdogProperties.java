@@ -45,6 +45,7 @@ public class SpringdogProperties {
     logger.debug("Springdog Agent's base path was set by {}", agentProperties.getBasePath());
     logger.debug("Springdog Agent's username was set by {}", agentProperties.getUsername());
     logger.debug("Springdog Agent's password was set by {}", agentProperties.getPassword());
+    logger.debug("Springdog Agent's external access was set by {}", agentProperties.isExternalAccess());
   }
 
   public String getAgentBasePath() {
@@ -53,6 +54,7 @@ public class SpringdogProperties {
 
   /**
    * Take a relative path named 'path' and computes it as an absolute path.
+   * (e.g. '/health' -> /springdog-base-path/health).
    * @param extraPath extra path
    * @return absolute path
    */
@@ -70,5 +72,9 @@ public class SpringdogProperties {
 
   public String getAgentPassword() {
     return agentProperties.getPassword();
+  }
+
+  public boolean enableExternalAccess() {
+    return agentProperties.isExternalAccess();
   }
 }

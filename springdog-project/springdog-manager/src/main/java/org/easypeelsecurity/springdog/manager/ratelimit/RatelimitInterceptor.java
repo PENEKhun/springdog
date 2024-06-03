@@ -131,7 +131,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
     beforeHash.append(fqcn).append("\n");
 
     if (endpoint.getRuleset().isIpBased()) {
-      beforeHash.append(IpAddressUtil.getClientIpv4(request)).append("\n");
+      beforeHash.append(IpAddressUtil.getClientIp(request)).append("\n");
     }
 
     endpoint.getParameters().stream()

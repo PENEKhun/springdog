@@ -34,7 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
+@SpringBootTest(properties = "springdog.agent.externalAccess=true")
 @AutoConfigureMockMvc
 class ConfigurationTests {
 
@@ -52,21 +52,20 @@ class ConfigurationTests {
     assertThat(properties.getAgentBasePath()).isEqualTo("custom-base-path");
     assertThat(properties.getAgentUsername()).isEqualTo("custom-username");
     assertThat(properties.getAgentPassword()).isEqualTo("custom-password");
+    assertThat(properties.enableExternalAccess()).isTrue();
   }
 
   @Test
   @DisplayName("Agent's connection path should changes according to the set basePath.")
   void agentBasePathShouldBeChanged() throws Exception {
     // given
-    String basePath = properties.getAgentBasePath();
     String connectionPath = properties.computeAbsolutePath("/login");
-    int expectedStatus = HttpStatus.OK.value();
 
     // when
     int status = mockMvc.perform(get(connectionPath)).andReturn().getResponse().getStatus();
 
     // then
-    assertThat(status).isEqualTo(expectedStatus);
+    assertThat(status).isEqualTo(HttpStatus.OK.value());
   }
 
   @Test
