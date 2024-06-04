@@ -16,6 +16,7 @@
 
 package org.easypeelsecurity.springdog.autoconfigure.controller.parser;
 
+import java.io.IOException;
 import java.lang.reflect.Parameter;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -79,6 +80,12 @@ public class ControllerParser {
     this.versionControlRepository = versionControlRepository;
   }
 
+  private static EndpointParameterDto getEndpointParameterDto(Parameter parameter, String[] paramNames,
+      int index) {
+    String name = paramNames != null && index < paramNames.length ? paramNames[index] : parameter.getName();
+    return new EndpointParameterDto(name, ApiParameterType.resolve(parameter.getAnnotations()));
+  }
+
   private static EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod,
       boolean isPatternPath) {
     String fqcn = method.getBeanType().getPackageName() + "." + method.getBeanType().getSimpleName() + "." +
@@ -87,10 +94,18 @@ public class ControllerParser {
     EndpointDto api = new EndpointDto(endPoint, fqcn, httpMethod, isPatternPath);
     Set<EndpointParameterDto> parameters = new HashSet<>();
 
-    for (Parameter parameter : method.getMethod().getParameters()) {
-      EndpointParameterDto parameterItem =
-          new EndpointParameterDto(parameter.getName(), ApiParameterType.resolve(parameter.getAnnotations()));
-      parameters.add(parameterItem);
+    try {
+      String[] paramNames =
+          ParameterNameExtractor.getParameterNames(method.getBeanType(), method.getMethod().getName(),
+              method.getMethod().getParameterTypes());
+
+      Parameter[] methodParameters = method.getMethod().getParameters();
+      for (int i = 0; i < methodParameters.length; i++) {
+        EndpointParameterDto parameterItem = getEndpointParameterDto(methodParameters[i], paramNames, i);
+        parameters.add(parameterItem);
+      }
+    } catch (IOException | NoSuchMethodException e) {
+      e.printStackTrace();
     }
 
     api.addParameters(parameters);
