@@ -46,7 +46,6 @@ public class AgentExternalAccessInterceptor implements HandlerInterceptor {
     }
 
     if (properties.enableExternalAccess()) {
-      System.out.println("ENABLED JUST PASS".repeat(100));
       return true;
     }
 
