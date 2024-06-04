@@ -127,13 +127,25 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
             .build())
         .build();
 
+    // See comments gh-42
+    TypeSpec sharedApplier = TypeSpec.classBuilder("SpringdogSharedApplier")
+        .addAnnotation(Configuration.class)
+        .addAnnotation(AnnotationSpec.builder(ComponentScan.class)
+            .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.shared")
+            .build())
+        .addModifiers(Modifier.PUBLIC)
+        .build();
+
     try {
       JavaFile.builder(fullPackageName, agentPathModifier)
           .build()
           .writeTo(processingEnv.getFiler());
+      JavaFile.builder(fullPackageName, sharedApplier)
+          .build()
+          .writeTo(processingEnv.getFiler());
     } catch (IOException e) {
       processingEnv.getMessager()
-          .printMessage(Kind.ERROR, "Error writing SpringdogAgentPathModifier: " + e.getMessage());
+          .printMessage(Kind.ERROR, "Error writing SpringdogAgentEnabler: " + e.getMessage());
     }
   }
 
@@ -286,6 +298,7 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
             SpringTemplateEngine.class)
         .addStatement("templateEngine.setTemplateResolver(templateResolver())")
         .addStatement("templateEngine.addDialect(new $T())", LayoutDialect.class)
+        .addStatement("templateEngine.setEnableSpringELCompiler(true)")
         .addStatement("return templateEngine")
         .build();
 
