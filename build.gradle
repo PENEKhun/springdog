@@ -59,6 +59,11 @@ tasks.register('jacocoRootReport', JacocoReport) {
     additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
     additionalClassDirs = files(subprojects.sourceSets.main.output)
     executionData = files(subprojects.jacocoTestReport.executionData)
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
 }
 
 tasks.named('jacocoTestReport') {
