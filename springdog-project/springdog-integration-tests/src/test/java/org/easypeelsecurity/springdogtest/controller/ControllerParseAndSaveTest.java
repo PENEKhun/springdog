@@ -23,10 +23,15 @@ import static org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod.G
 import static org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod.POST;
 import static org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod.PUT;
 
+import java.util.Set;
+
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -63,5 +68,25 @@ class ControllerParseAndSaveTest {
                 "org.easypeelsecurity.springdogtest.ExampleController.example5",
                 true)
         );
+  }
+
+  @ParameterizedTest
+  @DisplayName("The controller's parameters should be parsed well.")
+  @CsvSource({
+      "org.easypeelsecurity.springdogtest.ExampleController.example, 1",
+      "org.easypeelsecurity.springdogtest.ExampleController.example2, 2",
+      "org.easypeelsecurity.springdogtest.ExampleController.example3, 1",
+      "org.easypeelsecurity.springdogtest.ExampleController.example4, 2",
+      "org.easypeelsecurity.springdogtest.ExampleController.example5, 1"
+  })
+  void parameterParsedWell(String fqcn, int parameterSize) {
+    // given
+    var endpoint = endpointQuery.getEndpointByFqcn(fqcn).get();
+
+    // when
+    Set<EndpointParameterDto> parameters = endpoint.getParameters();
+
+    // then
+    assertThat(parameters).hasSize(parameterSize);
   }
 }

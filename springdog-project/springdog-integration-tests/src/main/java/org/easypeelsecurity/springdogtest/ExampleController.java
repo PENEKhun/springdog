@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,17 +36,17 @@ public class ExampleController {
   }
 
   @PostMapping("/post")
-  public String example2() {
+  public String example2(@RequestBody String title, @RequestBody String content) {
     return "example2";
   }
 
-  @DeleteMapping("/delete")
-  public String example3() {
+  @DeleteMapping("/delete/{id}")
+  public String example3(@PathVariable Integer id) {
     return "example3";
   }
 
   @PutMapping("/put")
-  public String example4() {
+  public String example4(String newTitle, String newContent) {
     return "example4";
   }
 
