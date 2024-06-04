@@ -16,6 +16,7 @@
 
 package org.easypeelsecurity.springdog.shared.configuration;
 
+import org.easypeelsecurity.springdog.shared.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,11 @@ public class SpringdogProperties {
    * @return absolute path
    */
   public String computeAbsolutePath(String extraPath) {
+    Assert.notNull(extraPath, "extraPath must not be null");
+    if (extraPath.isEmpty()) {
+      extraPath = "/";
+    }
+
     if (getAgentBasePath().startsWith("/")) {
       return getAgentBasePath() + extraPath;
     }
