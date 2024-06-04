@@ -31,8 +31,10 @@
         <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
              id="rate-limits">
           <nav class="sb-sidenav-menu-nested nav">
-            <a class="nav-link" href="rate-limit">Manage</a>
-            <a class="nav-link" href="monitor">Monitor</a>
+            <a class="nav-link"
+               th:href="${@springdogProperties.computeAbsolutePath('/rate-limit')}">Manage</a>
+            <a class="nav-link"
+               th:href="${@springdogProperties.computeAbsolutePath('/rate-limit/monitor')}">Monitor</a>
           </nav>
         </div>
 
@@ -54,21 +56,23 @@
         <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
              id="errorTraces">
           <nav class="sb-sidenav-menu-nested nav">
-            <a class="nav-link" href="">Manage</a>
-            <a class="nav-link" href="">Monitor</a>
+            <a class="nav-link"
+               th:href="${@springdogProperties.computeAbsolutePath('/error-trace')}">Manage</a>
+            <a class="nav-link"
+               th:href="${@springdogProperties.computeAbsolutePath('/error-trace/monitor')}">Monitor</a>
           </nav>
         </div>
 
 
         <div class="sb-sidenav-menu-heading">Service Setting</div>
 
-        <a class="nav-link" th:href="@{/service/change-pw}">
+        <a class="nav-link" th:href="${@springdogProperties.computeAbsolutePath('/change-pw')}">
           <div class="sb-nav-link-icon">
           </div>
           Change Password
         </a>
 
-        <a class="nav-link" href="logout">
+        <a class="nav-link" th:href="${@springdogProperties.computeAbsolutePath('/logout')}">
           <div class="sb-nav-link-icon">
             <svg aria-hidden="true" class="svg-inline--fa fa-arrow-right-from-bracket"
                  data-fa-i2svg="" focusable="false" role="img"

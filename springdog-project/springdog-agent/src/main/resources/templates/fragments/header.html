@@ -45,7 +45,7 @@
         </svg>
       </a>
       <ul aria-labelledby="navbarDropdown" class="dropdown-menu dropdown-menu-end">
-        <li><a class="dropdown-item" href="logout">logout</a></li>
+        <li><a class="dropdown-item" th:href="${@springdogProperties.computeAbsolutePath('/logout')}">logout</a></li>
       </ul>
     </li>
   </ul>
