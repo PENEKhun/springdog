@@ -1,7 +1,7 @@
 <html lang="ko">
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark" th:fragment="headerFragment">
   <div class="navbar-brand ps-3">
-    <a class="logo-text" th:href="@{/}">
+    <a class="logo-text" th:href="${@springdogProperties.computeAbsolutePath('/')}">
       <img alt="SpringDog" class="logo" th:src="@{/assets/img/springdog-white.png}"/>
       SpringDog
     </a>
@@ -45,7 +45,8 @@
         </svg>
       </a>
       <ul aria-labelledby="navbarDropdown" class="dropdown-menu dropdown-menu-end">
-        <li><a class="dropdown-item" th:href="${@springdogProperties.computeAbsolutePath('/logout')}">logout</a></li>
+        <li><a class="dropdown-item"
+               th:href="${@springdogProperties.computeAbsolutePath('/logout')}">logout</a></li>
       </ul>
     </li>
   </ul>
