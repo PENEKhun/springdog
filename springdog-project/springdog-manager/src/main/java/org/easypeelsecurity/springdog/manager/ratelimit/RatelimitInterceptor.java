@@ -22,10 +22,8 @@ import java.util.Comparator;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
 import org.easypeelsecurity.springdog.shared.util.IpAddressUtil;
-import org.easypeelsecurity.springdog.shared.util.TimeUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.method.HandlerMethod;
@@ -75,12 +73,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
         return true;
       }
 
-      RulesetDto rule = endpoint.getRuleset();
-      if (rule == null) {
-        return true;
-      }
-
-      if (!RuleStatus.ACTIVE.equals(rule.getStatus())) {
+      if (!RuleStatus.ACTIVE.equals(endpoint.getRuleStatus())) {
         return true;
       }
 
@@ -88,15 +81,13 @@ public class RatelimitInterceptor implements HandlerInterceptor {
 
       LocalDateTime now = LocalDateTime.now();
       LocalDateTime[] timestamps = RatelimitCache.addTimestamp(requestHashed, now);
-      int timeFrameSeconds = TimeUtil.convertToSeconds(rule.getTimeLimitDays(), rule.getTimeLimitHours(),
-          rule.getTimeLimitMinutes(), rule.getTimeLimitSeconds());
+      int timeFrameSeconds = endpoint.getRuleTimeLimitInSeconds();
 
       if (RatelimitCache.checkBan(requestHashed, now)) {
         response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
         response.getWriter().write("Too many requests");
-        response.setHeader("Retry-After",
-            String.valueOf(TimeUtil.convertToSeconds(rule.getBanTimeDays(), rule.getBanTimeHours(),
-                rule.getBanTimeMinutes(), rule.getBanTimeSeconds())));
+        //TODO Edit
+        response.setHeader("Retry-After", "");
         response.setHeader("X-RateLimit-Remaining", "0");
         return false;
       }
@@ -108,10 +99,9 @@ public class RatelimitInterceptor implements HandlerInterceptor {
         }
       }
 
-      if (count > rule.getRequestLimitCount()) {
-        int banTimeSeconds = rule.isPermanentBan() ? Integer.MAX_VALUE
-            : TimeUtil.convertToSeconds(rule.getBanTimeDays(), rule.getBanTimeHours(), rule.getBanTimeMinutes(),
-                rule.getBanTimeSeconds());
+      if (count > endpoint.getRuleRequestLimitCount()) {
+        int banTimeSeconds =
+            endpoint.isRulePermanentBan() ? Integer.MAX_VALUE : endpoint.getRuleBanTimeInSeconds();
         response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
         response.getWriter().write("Too many requests");
         response.setHeader("Retry-After", String.valueOf(banTimeSeconds));
@@ -119,7 +109,8 @@ public class RatelimitInterceptor implements HandlerInterceptor {
         RatelimitCache.ban(requestHashed, now.plusSeconds(banTimeSeconds));
         return false;
       } else {
-        response.setHeader("X-RateLimit-Remaining", String.valueOf(rule.getRequestLimitCount() - count));
+        response.setHeader("X-RateLimit-Remaining",
+            String.valueOf(endpoint.getRuleRequestLimitCount() - count));
       }
     }
 
@@ -130,7 +121,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
     StringBuilder beforeHash = new StringBuilder();
     beforeHash.append(fqcn).append("\n");
 
-    if (endpoint.getRuleset().isIpBased()) {
+    if (endpoint.isRuleIpBased()) {
       beforeHash.append(IpAddressUtil.getClientIp(request)).append("\n");
     }
 

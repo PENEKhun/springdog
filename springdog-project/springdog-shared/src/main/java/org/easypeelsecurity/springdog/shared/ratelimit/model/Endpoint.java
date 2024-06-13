@@ -18,12 +18,12 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.easypeelsecurity.springdog.shared.util.Assert;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -52,12 +52,19 @@ public class Endpoint {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private HttpMethod httpMethod;
-  @OneToMany(cascade = {CascadeType.ALL})
+  @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
   private Set<EndpointParameter> parameters = new HashSet<>();
   private boolean isPatternPath;
 
-  @Embedded
-  private Ruleset ruleset;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private RuleStatus ruleStatus = RuleStatus.NOT_CONFIGURED;
+
+  private boolean ruleIpBased;
+  private boolean rulePermanentBan;
+  private int ruleRequestLimitCount;
+  private int ruleTimeLimitInSeconds;
+  private int ruleBanTimeInSeconds;
 
   /**
    * Constructor.
@@ -72,15 +79,22 @@ public class Endpoint {
   public Endpoint(String hash, String path, String fqcn, HttpMethod httpMethod,
       Set<EndpointParameter> parameters, boolean isPatternPath) {
     Assert.hasText(hash, "Hash must not be null or empty");
-
-    this.ruleset = new Ruleset();
     this.hash = hash;
     this.path = path;
     this.fqcn = fqcn;
     this.httpMethod = httpMethod;
-    parameters.forEach(parameter -> parameter.setEndpoint(this));
     this.parameters = parameters;
     this.isPatternPath = isPatternPath;
+
+    // rule
+    this.ruleStatus = RuleStatus.NOT_CONFIGURED;
+    this.ruleIpBased = false;
+    this.rulePermanentBan = false;
+    this.ruleRequestLimitCount = 0;
+    this.ruleTimeLimitInSeconds = 0;
+    this.ruleBanTimeInSeconds = 0;
+    parameters.forEach(param -> param.setEndpoint(this));
+    ruleValidate();
   }
 
   /**
@@ -147,6 +161,48 @@ public class Endpoint {
     return hash.equals(endpoint.hash);
   }
 
+  /**
+   * Getter.
+   */
+  public RuleStatus getRuleStatus() {
+    return ruleStatus;
+  }
+
+  /**
+   * Getter.
+   */
+  public boolean isRuleIpBased() {
+    return ruleIpBased;
+  }
+
+  /**
+   * Getter.
+   */
+  public boolean isRulePermanentBan() {
+    return rulePermanentBan;
+  }
+
+  /**
+   * Getter.
+   */
+  public int getRuleRequestLimitCount() {
+    return ruleRequestLimitCount;
+  }
+
+  /**
+   * Getter.
+   */
+  public int getRuleTimeLimitInSeconds() {
+    return ruleTimeLimitInSeconds;
+  }
+
+  /**
+   * Getter.
+   */
+  public int getRuleBanTimeInSeconds() {
+    return ruleBanTimeInSeconds;
+  }
+
   @Override
   public int hashCode() {
     return hash.hashCode();
@@ -161,21 +217,43 @@ public class Endpoint {
     return this.isPatternPath;
   }
 
-  /**
-   * Get ruleset.
-   *
-   * @return ruleset
-   */
-  public Ruleset getRuleset() {
-    return this.ruleset;
+  private void ruleValidate() {
+    if (RuleStatus.ACTIVE.equals(this.ruleStatus)) {
+      if (this.ruleRequestLimitCount < 0) {
+        throw new IllegalArgumentException("Request limit count must be greater than 0");
+      }
+      if (this.ruleTimeLimitInSeconds < 0) {
+        throw new IllegalArgumentException("Time limit must be greater than 0");
+      }
+      if (this.ruleBanTimeInSeconds < 0 && !this.rulePermanentBan) {
+        throw new IllegalArgumentException("Ban time must be greater than 0");
+      }
+      if (!this.ruleIpBased && this.parameters.stream().filter(EndpointParameter::isEnabled)
+          .collect(Collectors.toSet()).isEmpty()) {
+        throw new IllegalArgumentException("At least one combinations must be enabled");
+      }
+    }
   }
 
   /**
-   * Change ruleset.
+   * Update rule.
    *
-   * @param newRuleset new ruleset
+   * @param ruleStatus             rule status
+   * @param ruleIpBased            rule ip based
+   * @param rulePermanentBan       rule permanent ban
+   * @param ruleRequestLimitCount  rule request limit count
+   * @param ruleTimeLimitInSeconds rule time limit in seconds
+   * @param ruleBanTimeInSeconds   rule ban time in seconds
    */
-  public void changeRuleset(Ruleset newRuleset) {
-    this.ruleset = newRuleset;
+  public void updateRule(RuleStatus ruleStatus, boolean ruleIpBased, boolean rulePermanentBan,
+      int ruleRequestLimitCount, int ruleTimeLimitInSeconds, int ruleBanTimeInSeconds) {
+    Assert.isNotEqual(ruleStatus, RuleStatus.NOT_CONFIGURED, "Couldn't change ruleStatus to NOT_CONFIGURED");
+    this.ruleStatus = ruleStatus;
+    this.ruleIpBased = ruleIpBased;
+    this.rulePermanentBan = rulePermanentBan;
+    this.ruleRequestLimitCount = ruleRequestLimitCount;
+    this.ruleTimeLimitInSeconds = ruleTimeLimitInSeconds;
+    this.ruleBanTimeInSeconds = ruleBanTimeInSeconds;
+    ruleValidate();
   }
 }

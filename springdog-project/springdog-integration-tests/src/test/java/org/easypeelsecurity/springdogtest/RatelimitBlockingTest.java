@@ -58,7 +58,7 @@ class RatelimitBlockingTest {
   void testRateLimitBlockingWithConcurrency() throws Exception {
     // given
     Endpoint targetApi = endpointRepository.findByFqcn("org.easypeelsecurity.springdogtest.ExampleController.example").get();
-    int requestLimit = targetApi.getRuleset().getRequestLimitCount();
+    int requestLimit = targetApi.getRuleRequestLimitCount();
     ExecutorService executorService = Executors.newFixedThreadPool(requestLimit);
     CountDownLatch latch = new CountDownLatch(requestLimit);
 

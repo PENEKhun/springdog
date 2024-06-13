@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
 import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
@@ -27,6 +28,7 @@ import org.easypeelsecurity.springdog.shared.util.Assert;
  *
  * @author PENEKhun
  */
+@SuppressWarnings("checkstyle:MissingJavadocMethod")
 public class EndpointDto {
 
   private String hash;
@@ -34,23 +36,19 @@ public class EndpointDto {
   private String fqcn;
   private HttpMethod httpMethod;
   private Set<EndpointParameterDto> parameters = new HashSet<>();
+  private Set<String> parameterNamesToEnable = new HashSet<>();
   private boolean isPatternPath;
-  private RulesetDto ruleset;
+  private RuleStatus ruleStatus;
+  private boolean ruleIpBased;
+  private boolean rulePermanentBan;
+  private int ruleRequestLimitCount;
+  private int ruleTimeLimitInSeconds;
+  private int ruleBanTimeInSeconds;
 
-  /**
-   * All-arg constructor.
-   *
-   * @param hash          hash of the endpoint
-   * @param path          api path string (e.g. /api/v1/user)
-   * @param fqcn          fully qualified class name of the method (e.g.
-   *                      org.penekhun.controller.UserController.method1)
-   * @param httpMethod    HTTP request method (e.g. GET, POST, PUT, DELETE, PATCH)
-   * @param parameters    parameters of the endpoint
-   * @param isPatternPath is the path a pattern path
-   * @param ruleset       ruleset of the endpoint
-   */
   public EndpointDto(String hash, String path, String fqcn, HttpMethod httpMethod,
-      Set<EndpointParameterDto> parameters, boolean isPatternPath, RulesetDto ruleset) {
+      Set<EndpointParameterDto> parameters, boolean isPatternPath, RuleStatus ruleStatus, boolean ruleIpBased,
+      boolean rulePermanentBan, int ruleRequestLimitCount, int ruleTimeLimitInSeconds,
+      int ruleBanTimeInSeconds) {
     Assert.hasText(path, "Endpoint must not be null or empty");
     Assert.hasText(fqcn, "FQCN must not be null or empty");
     Assert.notNull(httpMethod, "HttpMethod must not be null");
@@ -59,33 +57,101 @@ public class EndpointDto {
     this.path = path;
     this.fqcn = fqcn;
     this.httpMethod = httpMethod;
-    this.isPatternPath = isPatternPath;
-    this.ruleset = ruleset;
-
     if (parameters != null && !parameters.isEmpty()) {
       this.parameters.addAll(parameters);
     }
-  }
-
-  /**
-   * Constructor.
-   */
-  public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath) {
-    this(null, path, fqcn, httpMethod, new HashSet<>(), isPatternPath, null);
-  }
-
-  /**
-   * Constructor.
-   */
-  public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath,
-      Set<EndpointParameterDto> parameters) {
-    this(null, path, fqcn, httpMethod, parameters, isPatternPath, null);
+    this.isPatternPath = isPatternPath;
+    this.ruleStatus = ruleStatus;
+    this.ruleIpBased = ruleIpBased;
+    this.rulePermanentBan = rulePermanentBan;
+    this.ruleRequestLimitCount = ruleRequestLimitCount;
+    this.ruleTimeLimitInSeconds = ruleTimeLimitInSeconds;
+    this.ruleBanTimeInSeconds = ruleBanTimeInSeconds;
   }
 
   /**
    * Constructor.
    */
   public EndpointDto() {
+  }
+
+  public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath) {
+    this.path = path;
+    this.fqcn = fqcn;
+    this.httpMethod = httpMethod;
+    this.isPatternPath = isPatternPath;
+  }
+
+  public void setRuleStatus(RuleStatus ruleStatus) {
+    this.ruleStatus = ruleStatus;
+  }
+
+  public void setRuleIpBased(boolean ruleIpBased) {
+    this.ruleIpBased = ruleIpBased;
+  }
+
+  public void setRuleRequestLimitCount(int ruleRequestLimitCount) {
+    this.ruleRequestLimitCount = ruleRequestLimitCount;
+  }
+
+  public Set<String> getParameterNamesToEnable() {
+    return parameterNamesToEnable;
+  }
+
+  public void setParameterNamesToEnable(Set<String> parameterNamesToEnable) {
+    this.parameterNamesToEnable = parameterNamesToEnable;
+  }
+
+  public RuleStatus getRuleStatus() {
+    return this.ruleStatus;
+  }
+
+  public int timeLimitDays() {
+    return this.ruleTimeLimitInSeconds / 86_400;
+  }
+
+  public int timeLimitHours() {
+    int remainSeconds = this.ruleTimeLimitInSeconds % 86_400;
+    return remainSeconds / 3_600;
+  }
+
+  public int timeLimitMinutes() {
+    int remainSeconds = this.ruleTimeLimitInSeconds % 86_400;
+    remainSeconds %= 3_600;
+    return remainSeconds / 60;
+  }
+
+  public int timeLimitSeconds() {
+    return this.ruleTimeLimitInSeconds % 60;
+  }
+
+  public int banTimeDays() {
+    return this.ruleBanTimeInSeconds / 86_400;
+  }
+
+  public int banTimeHours() {
+    int remainSeconds = this.ruleBanTimeInSeconds % 86_400;
+    return remainSeconds / 3_600;
+  }
+
+  public int banTimeMinutes() {
+    int remainSeconds = this.ruleBanTimeInSeconds % 86_400;
+    remainSeconds %= 3_600;
+    return remainSeconds / 60;
+  }
+
+  public int banTimeSeconds() {
+    int remainSeconds = this.ruleBanTimeInSeconds % 86_400;
+    remainSeconds %= 3_600;
+    return remainSeconds % 60;
+  }
+
+  public boolean isRuleIpBased() {
+    return this.ruleIpBased;
+  }
+
+  public int getRuleRequestLimitCount() {
+    return this.ruleRequestLimitCount;
   }
 
   @Override
@@ -186,14 +252,6 @@ public class EndpointDto {
   }
 
   /**
-   * Setter.
-   */
-  public void setParameters(
-      Set<EndpointParameterDto> parameters) {
-    this.parameters = parameters;
-  }
-
-  /**
    * Add a parameter to the metadata.
    *
    * @param parameters the parameters to add
@@ -213,26 +271,113 @@ public class EndpointDto {
     return this.isPatternPath;
   }
 
-  /**
-   * Setter.
-   */
   public void setPatternPath(boolean patternPath) {
     isPatternPath = patternPath;
   }
 
-  /**
-   * Get the ruleset.
-   *
-   * @return the ruleset
-   */
-  public RulesetDto getRuleset() {
-    return this.ruleset;
+  public boolean isRulePermanentBan() {
+    return rulePermanentBan;
   }
 
-  /**
-   * Setter.
-   */
-  public void setRuleset(RulesetDto ruleset) {
-    this.ruleset = ruleset;
+  public void setRulePermanentBan(boolean rulePermanentBan) {
+    this.rulePermanentBan = rulePermanentBan;
+  }
+
+  public int getRuleTimeLimitInSeconds() {
+    return ruleTimeLimitInSeconds;
+  }
+
+  public void setRuleTimeLimitInSeconds(int ruleTimeLimitInSeconds) {
+    this.ruleTimeLimitInSeconds = ruleTimeLimitInSeconds;
+  }
+
+  public int getRuleBanTimeInSeconds() {
+    return ruleBanTimeInSeconds;
+  }
+
+  public void setRuleBanTimeInSeconds(int ruleBanTimeInSeconds) {
+    this.ruleBanTimeInSeconds = ruleBanTimeInSeconds;
+  }
+
+  @SuppressWarnings({"checkstyle:MissingJavadocType", "checkstyle:MissingJavadocMethod"})
+  public static class Builder {
+
+    private String hash;
+    private String path;
+    private String fqcn;
+    private HttpMethod httpMethod;
+    private Set<EndpointParameterDto> parameters = new HashSet<>();
+    private boolean isPatternPath;
+    private RuleStatus ruleStatus;
+    private boolean ruleIpBased;
+    private boolean rulePermanentBan;
+    private int ruleRequestLimitCount;
+    private int ruleTimeLimitInSeconds;
+    private int ruleBanTimeInSeconds;
+
+    public Builder hash(String hash) {
+      this.hash = hash;
+      return this;
+    }
+
+    public Builder path(String path) {
+      this.path = path;
+      return this;
+    }
+
+    public Builder fqcn(String fqcn) {
+      this.fqcn = fqcn;
+      return this;
+    }
+
+    public Builder httpMethod(HttpMethod httpMethod) {
+      this.httpMethod = httpMethod;
+      return this;
+    }
+
+    public Builder parameters(Set<EndpointParameterDto> parameters) {
+      this.parameters = parameters;
+      return this;
+    }
+
+    public Builder isPatternPath(boolean isPatternPath) {
+      this.isPatternPath = isPatternPath;
+      return this;
+    }
+
+    public Builder ruleStatus(RuleStatus ruleStatus) {
+      this.ruleStatus = ruleStatus;
+      return this;
+    }
+
+    public Builder ruleIpBased(boolean ruleIpBased) {
+      this.ruleIpBased = ruleIpBased;
+      return this;
+    }
+
+    public Builder rulePermanentBan(boolean rulePermanentBan) {
+      this.rulePermanentBan = rulePermanentBan;
+      return this;
+    }
+
+    public Builder ruleRequestLimitCount(int ruleRequestLimitCount) {
+      this.ruleRequestLimitCount = ruleRequestLimitCount;
+      return this;
+    }
+
+    public Builder ruleTimeLimitInSeconds(int ruleTimeLimitInSeconds) {
+      this.ruleTimeLimitInSeconds = ruleTimeLimitInSeconds;
+      return this;
+    }
+
+    public Builder ruleBanTimeInSeconds(int ruleBanTimeInSeconds) {
+      this.ruleBanTimeInSeconds = ruleBanTimeInSeconds;
+      return this;
+    }
+
+    public EndpointDto build() {
+      return new EndpointDto(hash, path, fqcn, httpMethod, parameters, isPatternPath, ruleStatus, ruleIpBased,
+          rulePermanentBan, ruleRequestLimitCount, ruleTimeLimitInSeconds, ruleBanTimeInSeconds);
+    }
   }
 }

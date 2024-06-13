@@ -19,6 +19,7 @@ dependencies {
     testImplementation "org.springframework.security:spring-security-test:${springVersion}"
 
     implementation project(":springdog-project:springdog-manager")
+    implementation project(":springdog-project:springdog-shared")
 }
 
 mavenPublishing {

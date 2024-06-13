@@ -99,4 +99,16 @@ public abstract class Assert {
       throw new IllegalArgumentException(String.format(message, args));
     }
   }
+
+  public static void isNotEqual(Object object1, Object object2, String message) {
+    if (object1.equals(object2)) {
+      throw new IllegalArgumentException(message);
+    }
+  }
+
+  public static void isEqual(Object object1, Object object2, String message) {
+    if (!object1.equals(object2)) {
+      throw new IllegalArgumentException(message);
+    }
+  }
 }

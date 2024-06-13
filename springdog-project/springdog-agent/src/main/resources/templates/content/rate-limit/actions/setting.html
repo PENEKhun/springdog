@@ -38,6 +38,40 @@
         }
       });
 
+      for (let input of document.getElementById("timeFrameGroup").getElementsByTagName("input")) {
+        input.addEventListener("input", function () {
+          let timeFrameSeconds = document.getElementById("timeFrameSeconds");
+          let timeFrameMinutes = document.getElementById("timeFrameMinutes");
+          let timeFrameHours = document.getElementById("timeFrameHours");
+          let timeFrameDays = document.getElementById("timeFrameDays");
+
+          let seconds = parseInt(timeFrameSeconds.value) || 0;
+          let minutes = parseInt(timeFrameMinutes.value) || 0;
+          let hours = parseInt(timeFrameHours.value) || 0;
+          let days = parseInt(timeFrameDays.value) || 0;
+
+          document.querySelector("input[name='ruleTimeLimitInSeconds']").value = seconds + minutes
+              * 60 + hours * 3600 + days * 86400;
+        });
+      }
+
+      for (let input of document.getElementById("banDurationGroup").getElementsByTagName("input")) {
+        input.addEventListener("input", function () {
+          let banDurationSeconds = document.getElementById("banDurationSeconds");
+          let banDurationMinutes = document.getElementById("banDurationMinutes");
+          let banDurationHours = document.getElementById("banDurationHours");
+          let banDurationDays = document.getElementById("banDurationDays");
+
+          let seconds = parseInt(banDurationSeconds.value) || 0;
+          let minutes = parseInt(banDurationMinutes.value) || 0;
+          let hours = parseInt(banDurationHours.value) || 0;
+          let days = parseInt(banDurationDays.value) || 0;
+
+          document.querySelector("input[name='ruleBanTimeInSeconds']").value = seconds + minutes
+              * 60 + hours * 3600 + days * 86400;
+        });
+      }
+
       let requestControlCard = document.querySelector('[data-card-type="request-control"]');
 
       function toggleCardAvailability(isEnabled) {
@@ -70,7 +104,7 @@
 
       const paramHashesInput = document.createElement("input");
       paramHashesInput.type = "hidden";
-      paramHashesInput.name = "ruleset.enabledParameterNames";
+      paramHashesInput.name = "parameterNamesToEnable";
 
       const form = document.querySelector("form[name=editRule]");
       form.appendChild(paramHashesInput);
@@ -111,13 +145,13 @@
         <div class="form-check form-switch">
           <p class="card-text">
             <strong>RateLimit</strong>
-            <input id="statusValue" th:field="*{ruleset.status}" type="hidden"/>
+            <input id="statusValue" th:field="*{ruleStatus}" type="hidden"/>
             <input class="form-check-input" id="statusToggle" onchange="updateStatusValue(this)"
-                   th:checked="${api.ruleset.status == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE}"
+                   th:checked="${api.ruleStatus == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE}"
                    type="checkbox">
             will be
             <label class="form-check-label text-decoration-underline" for="statusToggle"
-                   th:text="${api.ruleset.status == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE ? 'enabled' : 'disabled'}"></label>
+                   th:text="${api.ruleStatus == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE ? 'enabled' : 'disabled'}"></label>
             on this API.
         </div>
       </div>
@@ -134,6 +168,7 @@
         <strong>Controller Class:</strong>
         <div class="alert alert-info" th:text="${api.fqcn}"></div>
         <input th:field="*{fqcn}" type="hidden"/>
+        <input th:field="*{hash}" type="hidden"/>
       </div>
     </div>
 
@@ -146,33 +181,34 @@
         <div class="mb-3">
           <label class="form-label" for="requestLimit">Request Limit</label>
           <input class="form-control" id="requestLimit" placeholder="Number of requests"
-                 th:field="*{ruleset.requestLimitCount}" type="number">
+                 th:field="*{ruleRequestLimitCount}" type="number">
         </div>
         <div class="mb-3">
           <label class="form-label">Time Frame</label>
           <div class="d-flex flex-row" id="timeFrameGroup">
             <div class="form-floating me-2 flex-fill">
               <input class="form-control" id="timeFrameDays" placeholder="Days"
-                     th:field="*{ruleset.timeLimitDays}"
+                     th:value="*{timeLimitDays}"
                      type="number">
               <label for="timeFrameDays">Days</label>
             </div>
             <div class="form-floating me-2 flex-fill">
               <input class="form-control" id="timeFrameHours" placeholder="Hours"
-                     th:field="*{ruleset.timeLimitHours}"
+                     th:value="*{timeLimitHours}"
                      type="number">
               <label for="timeFrameHours">Hours</label>
             </div>
             <div class="form-floating me-2 flex-fill">
               <input class="form-control" id="timeFrameMinutes" placeholder="Minutes"
-                     th:field="*{ruleset.timeLimitMinutes}" type="number">
+                     th:value="*{timeLimitMinutes}" type="number">
               <label for="timeFrameMinutes">Minutes</label>
             </div>
             <div class="form-floating flex-fill">
               <input class="form-control" id="timeFrameSeconds" placeholder="Seconds"
-                     th:field="*{ruleset.timeLimitSeconds}" type="number">
+                     th:value="*{timeLimitSeconds}" type="number">
               <label for="timeFrameSeconds">Seconds</label>
             </div>
+            <input type="hidden" th:field="*{ruleTimeLimitInSeconds}"/>
           </div>
         </div>
         <div class="mb-3">
@@ -180,26 +216,27 @@
           <div class="d-flex flex-row" id="banDurationGroup">
             <div class="form-floating me-2 flex-fill">
               <input class="form-control" id="banDurationDays" placeholder="Days"
-                     th:field="*{ruleset.banTimeDays}"
+                     th:value="*{banTimeDays}"
                      type="number">
               <label for="banDurationDays">Days</label>
             </div>
             <div class="form-floating me-2 flex-fill">
               <input class="form-control" id="banDurationHours" placeholder="Hours"
-                     th:field="*{ruleset.banTimeHours}"
+                     th:value="*{banTimeHours}"
                      type="number">
               <label for="banDurationHours">Hours</label>
             </div>
             <div class="form-floating me-2 flex-fill">
               <input class="form-control" id="banDurationMinutes" placeholder="Minutes"
-                     th:field="*{ruleset.banTimeMinutes}" type="number">
+                     th:value="*{banTimeMinutes}" type="number">
               <label for="banDurationMinutes">Minutes</label>
             </div>
             <div class="form-floating flex-fill">
               <input class="form-control" id="banDurationSeconds" placeholder="Seconds"
-                     th:field="*{ruleset.banTimeSeconds}" type="number">
+                     th:value="*{banTimeSeconds}" type="number">
               <label for="banDurationSeconds">Seconds</label>
             </div>
+            <input type="hidden" th:field="*{ruleBanTimeInSeconds}"/>
           </div>
         </div>
 
@@ -207,7 +244,7 @@
           <div class="align-checkbox">
             <input class="form-check-input" id="permanentBan" type="checkbox">
             <label class="form-check-label" for="permanentBan"
-                   th:field="*{ruleset.permanentBan}">Permanent Ban</label>
+                   th:field="*{rulePermanentBan}">Permanent Ban</label>
           </div>
         </div>
       </div>
@@ -230,7 +267,7 @@
         </div>
         <div class="form-check mb-3">
           <input class="form-check-input" id="ipBlock"
-                 th:field="*{ruleset.ipBased}"
+                 th:field="*{ruleIpBased}"
                  type="checkbox">
           <label class="form-check-label" for="ipBlock">Enable IP-based Blocking</label>
         </div>

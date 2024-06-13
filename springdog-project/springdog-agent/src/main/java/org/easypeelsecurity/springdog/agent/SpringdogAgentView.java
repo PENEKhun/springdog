@@ -24,7 +24,7 @@ import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.RulesetDto;
+import org.easypeelsecurity.springdog.shared.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -93,8 +93,8 @@ public class SpringdogAgentView {
   public String modifyRateLimit(@PathVariable(name = "apiHash") String apiHash,
       @ModelAttribute("api") EndpointDto endpointDto, Model model) {
     try {
-      RulesetDto changes = endpointDto.getRuleset();
-      rateLimitCommand.updateRule(endpointDto.getFqcn(), apiHash, changes);
+      Assert.isEqual(apiHash, endpointDto.getHash(), "Invalid request");
+      rateLimitCommand.updateRule(endpointDto);
     } catch (Exception e) {
       model.addAttribute("result", false);
       model.addAttribute("message", e.getMessage());

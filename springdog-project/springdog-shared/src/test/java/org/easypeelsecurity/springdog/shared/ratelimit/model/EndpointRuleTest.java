@@ -17,81 +17,111 @@
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashSet;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class RulesetTest {
+class EndpointRuleTest {
 
   @Test
-  @DisplayName("Should set default values when created with default constructor")
-  void default_constructor() {
+  @DisplayName("Should set default values in field about the rules when endpoint was created")
+  void ruleDefaultValue() {
     // given
-    Ruleset ruleset = new Ruleset();
+    Endpoint endpoint = new Endpoint(
+        "hash",
+        "path",
+        "fqcn",
+        HttpMethod.GET,
+        new HashSet<>(),
+        false);
 
     // when & then
     assertAll(
-        () -> Assertions.assertEquals(RuleStatus.NOT_CONFIGURED, ruleset.getStatus()),
-        () -> Assertions.assertFalse(ruleset.isIpBased()),
-        () -> Assertions.assertFalse(ruleset.isPermanentBan()),
-        () -> Assertions.assertEquals(0, ruleset.getRequestLimitCount()),
-        () -> Assertions.assertEquals(0, ruleset.getTimeLimitInSeconds()),
-        () -> Assertions.assertEquals(0, ruleset.getBanTimeInSeconds())
+        () -> assertEquals(RuleStatus.NOT_CONFIGURED, endpoint.getRuleStatus()),
+        () -> assertEquals(0, endpoint.getRuleRequestLimitCount()),
+        () -> assertEquals(0, endpoint.getRuleTimeLimitInSeconds()),
+        () -> assertEquals(0, endpoint.getRuleBanTimeInSeconds()),
+        () -> assertFalse(endpoint.isRulePermanentBan())
     );
   }
 
   @Test
   @DisplayName("Time limit must be greater than 0")
   void mustBePositiveValue1() {
+    // given
+    var endpoint = new Endpoint(
+        "hash",
+        "path",
+        "fqcn",
+        HttpMethod.GET,
+        new HashSet<>(),
+        false);
+
     // when & then
     assertThrows(
         IllegalArgumentException.class,
-        () -> new Ruleset(
+        () -> endpoint.updateRule(
             RuleStatus.ACTIVE,
             true,
             false,
             10,
-            -1, // negative number
-            0,
-            new HashSet<>()),
+            -10,  // negative number
+            10),
         "Time limit must be greater than 0");
   }
 
   @Test
   @DisplayName("Request limit count must be greater than 0")
   void mustBePositiveValue2() {
+    // given
+    var endpoint = new Endpoint(
+        "hash",
+        "path",
+        "fqcn",
+        HttpMethod.GET,
+        new HashSet<>(),
+        false);
+
     // when & then
     assertThrows(
         IllegalArgumentException.class,
-        () -> new Ruleset(
+        () -> endpoint.updateRule(
             RuleStatus.ACTIVE,
             true,
             false,
-            -1, // negative number
+            -10, // negative number
             10,
-            0,
-            new HashSet<>()),
+            10),
         "Request limit count must be greater than 0");
   }
 
   @Test
   @DisplayName("Ban time must be greater than 0")
   void mustBePositiveValue3() {
+    // given
+    var endpoint = new Endpoint(
+        "hash",
+        "path",
+        "fqcn",
+        HttpMethod.GET,
+        new HashSet<>(),
+        false);
+
     // when & then
     assertThrows(
         IllegalArgumentException.class,
-        () -> new Ruleset(
+        () -> endpoint.updateRule(
             RuleStatus.ACTIVE,
             true,
             false,
-            3,
             10,
-            -10, // negative number
-            new HashSet<>()),
+            10,
+            -10), // negative number
         "Ban time must be greater than 0");
   }
 }

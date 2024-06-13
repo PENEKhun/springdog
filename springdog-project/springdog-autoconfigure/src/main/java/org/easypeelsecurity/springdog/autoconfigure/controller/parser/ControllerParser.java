@@ -91,7 +91,11 @@ public class ControllerParser {
     String fqcn = method.getBeanType().getPackageName() + "." + method.getBeanType().getSimpleName() + "." +
         method.getMethod().getName();
 
-    EndpointDto api = new EndpointDto(endPoint, fqcn, httpMethod, isPatternPath);
+    EndpointDto api = new EndpointDto.Builder()
+        .fqcn(fqcn)
+        .path(endPoint)
+        .httpMethod(httpMethod)
+        .isPatternPath(isPatternPath).build();
     Set<EndpointParameterDto> parameters = new HashSet<>();
 
     try {

@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointParameter;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.Ruleset;
 
 /**
  * Converter for rate limit. between DTO and Entity.
@@ -41,7 +40,8 @@ public class EndpointConverter {
   public static Endpoint toEntity(EndpointHash hashProvider, EndpointDto endpointDto) {
     Set<EndpointParameter> parameters = new HashSet<>();
     for (EndpointParameterDto param : endpointDto.getParameters()) {
-      parameters.add(toEntity(hashProvider, endpointDto, param));
+      EndpointParameter parameter = toEntity(hashProvider, endpointDto, param);
+      parameters.add(parameter);
     }
 
     String hash = hashProvider.getHash(endpointDto);
@@ -49,13 +49,7 @@ public class EndpointConverter {
         endpointDto.getHttpMethod(), parameters, endpointDto.isPatternPath());
   }
 
-  /**
-   * Resolve a given DTO {@code EndpointParameterDto} as Entity {@code EndpointParameter}.
-   *
-   * @param endpointParameterDto target DTO instance to transform to Entity
-   * @return entity object
-   */
-  public static EndpointParameter toEntity(EndpointHash hashProvider, EndpointDto apiInfo,
+  private static EndpointParameter toEntity(EndpointHash hashProvider, EndpointDto apiInfo,
       EndpointParameterDto endpointParameterDto) {
     return new EndpointParameter(hashProvider.getParamHash(apiInfo, endpointParameterDto),
         endpointParameterDto.getName(),
@@ -69,11 +63,21 @@ public class EndpointConverter {
    * @return dto object
    */
   public static EndpointDto toDto(Endpoint endpointEntity) {
-    return new EndpointDto(endpointEntity.getHash(), endpointEntity.getPath(), endpointEntity.getFqcn(),
-        endpointEntity.getHttpMethod(),
-        endpointEntity.getParameters().stream().map(EndpointConverter::toDto).collect(Collectors.toSet()),
-        endpointEntity.isPatternPath(),
-        toDto(endpointEntity.getRuleset()));
+    return new EndpointDto.Builder()
+        .hash(endpointEntity.getHash())
+        .path(endpointEntity.getPath())
+        .fqcn(endpointEntity.getFqcn())
+        .httpMethod(endpointEntity.getHttpMethod())
+        .parameters(
+            endpointEntity.getParameters().stream().map(EndpointConverter::toDto).collect(Collectors.toSet()))
+        .isPatternPath(endpointEntity.isPatternPath())
+        .ruleStatus(endpointEntity.getRuleStatus())
+        .ruleIpBased(endpointEntity.isRuleIpBased())
+        .rulePermanentBan(endpointEntity.isRulePermanentBan())
+        .ruleRequestLimitCount(endpointEntity.getRuleRequestLimitCount())
+        .ruleTimeLimitInSeconds(endpointEntity.getRuleTimeLimitInSeconds())
+        .ruleBanTimeInSeconds(endpointEntity.getRuleBanTimeInSeconds())
+        .build();
   }
 
   /**
@@ -87,27 +91,7 @@ public class EndpointConverter {
         endpointParameterEntity.getType(), endpointParameterEntity.isEnabled());
   }
 
-  /**
-   * Resolve a given Entity {@code Ruleset} as DTO {@code RulesetDto}.
-   *
-   * @param ruleset target Entity instance to transform to DTO
-   * @return dto object
-   */
-  public static RulesetDto toDto(Ruleset ruleset) {
-    return new RulesetDto(ruleset.getStatus(), ruleset.isIpBased(),
-        ruleset.isPermanentBan(), ruleset.getRequestLimitCount(), ruleset.getTimeLimitInSeconds(),
-        ruleset.getBanTimeInSeconds(),
-        ruleset.getEnabledParameters().stream().map(EndpointParameter::getName)
-            .collect(Collectors.toSet()));
-  }
-
-  /**
-   * Like {@link #toDto(EndpointParameter)}, but for a set of Entity {@code EndpointParameter}.
-   *
-   * @param endpointParameters set of Entity instances to transform as DTO
-   * @return dao object
-   */
-  public static Set<EndpointParameterDto> toDto(Set<EndpointParameter> endpointParameters) {
+  private static Set<EndpointParameterDto> toDto(Set<EndpointParameter> endpointParameters) {
     return endpointParameters
         .stream()
         .map(EndpointConverter::toDto)
