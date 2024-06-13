@@ -25,11 +25,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.easypeelsecurity.springdog.agent.SpringdogAgentView;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointRepository;
 import org.easypeelsecurity.springdog.manager.ratelimit.VersionControlRepository;
+import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointHash;
@@ -60,24 +60,25 @@ import jakarta.transaction.Transactional;
 public class ControllerParser {
 
   private static final Set<EndpointDto> RESULT = new HashSet<>();
-  private static final String AGENT_CLASS_NAME = SpringdogAgentView.class.getSimpleName();
   private final RequestMappingHandlerMapping handlerMapping;
   private final EndpointQuery endpointQuery;
   private final EndpointCommand endpointCommand;
   private final EndpointRepository endpointRepository;
   private final VersionControlRepository versionControlRepository;
+  private final SpringdogProperties properties;
 
   /**
    * Constructor.
    */
   public ControllerParser(RequestMappingHandlerMapping handlerMapping, EndpointQuery endpointQuery,
       EndpointCommand endpointCommand, EndpointRepository endpointRepository,
-      VersionControlRepository versionControlRepository) {
+      VersionControlRepository versionControlRepository, SpringdogProperties properties) {
     this.handlerMapping = handlerMapping;
     this.endpointQuery = endpointQuery;
     this.endpointCommand = endpointCommand;
     this.endpointRepository = endpointRepository;
     this.versionControlRepository = versionControlRepository;
+    this.properties = properties;
   }
 
   private static EndpointParameterDto getEndpointParameterDto(Parameter parameter, String[] paramNames,
@@ -149,7 +150,7 @@ public class ControllerParser {
         endpoint = info.getPatternValues().iterator().next();
       }
 
-      if (endpoint == null) {
+      if (endpoint == null || endpoint.startsWith(properties.computeAbsolutePath("/"))) {
         return;
       }
 
@@ -164,9 +165,7 @@ public class ControllerParser {
       }
 
       EndpointDto api = getEndpointDto(method, endpoint, httpMethod, isPatternPath);
-      if (!api.getFqcn().contains("." + AGENT_CLASS_NAME + ".")) {
-        RESULT.add(api);
-      }
+      RESULT.add(api);
     });
 
     EndpointHash hashProvider = new EndpointHashProvider();
