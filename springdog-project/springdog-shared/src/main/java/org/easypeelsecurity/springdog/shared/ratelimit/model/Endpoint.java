@@ -219,13 +219,13 @@ public class Endpoint {
 
   private void ruleValidate() {
     if (RuleStatus.ACTIVE.equals(this.ruleStatus)) {
-      if (this.ruleRequestLimitCount < 0) {
+      if (this.ruleRequestLimitCount <= 0) {
         throw new IllegalArgumentException("Request limit count must be greater than 0");
       }
-      if (this.ruleTimeLimitInSeconds < 0) {
+      if (this.ruleTimeLimitInSeconds <= 0) {
         throw new IllegalArgumentException("Time limit must be greater than 0");
       }
-      if (this.ruleBanTimeInSeconds < 0 && !this.rulePermanentBan) {
+      if (this.ruleBanTimeInSeconds <= 0 && !this.rulePermanentBan) {
         throw new IllegalArgumentException("Ban time must be greater than 0");
       }
       if (!this.ruleIpBased && this.parameters.stream().filter(EndpointParameter::isEnabled)
