@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -29,6 +30,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Extracts parameter names from a method with the help of ASM. This class helps you get the name of a parameter
@@ -45,7 +47,7 @@ abstract class ParameterNameExtractor {
    * @return a map where the keys are method descriptors and the values are arrays of parameter names
    * @throws IOException if an I/O error occurs while reading the class bytecode
    */
-  public static Map<String, String[]> getMethodParameterNames(Class<?> clazz) throws IOException {
+  private static Map<String, String[]> getMethodParameterNames(Class<?> clazz) throws IOException {
     Map<String, String[]> methodParamNames = new HashMap<>();
     ClassReader classReader = new ClassReader(clazz.getName());
     ClassNode classNode = new ClassNode();
@@ -57,10 +59,25 @@ abstract class ParameterNameExtractor {
       methodParamNames.put(method.name + method.desc, paramNames);
       method.accept(new MethodVisitor(Opcodes.ASM9) {
         @Override
+        public AnnotationVisitor visitParameterAnnotation(int parameter, String descriptor, boolean visible) {
+          if (descriptor.equals(Type.getDescriptor(RequestParam.class))) {
+            return new AnnotationVisitor(Opcodes.ASM9) {
+              @Override
+              public void visit(String name, Object value) {
+                if ("value".equals(name)) {
+                  paramNames[parameter] = (String) value;
+                }
+              }
+            };
+          }
+          return super.visitParameterAnnotation(parameter, descriptor, visible);
+        }
+
+        @Override
         public void visitLocalVariable(String name, String desc, String signature, Label start, Label end,
             int index) {
-          int paramIndex = index - 1; // Skip 'this' reference
-          if (paramIndex >= 0 && paramIndex < paramNames.length) {
+          int paramIndex = index - 1; // Skip 'this' reference for non-static methods
+          if (paramIndex >= 0 && paramIndex < paramNames.length && paramNames[paramIndex] == null) {
             paramNames[paramIndex] = name;
           }
         }
