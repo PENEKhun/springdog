@@ -1,30 +1,392 @@
-<!--
-  ~ Copyright 2024 the original author or authors.
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~    http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <!DOCTYPE html>
 <html layout:decorate="~{/templates/layout/default_layout.html}"
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
->
+      lang="en">
+
+<head>
+  <title>Dashboard</title>
+  <script th:src="@{/js/chart.js}"></script>
+  <style>
+    .chart-container {
+      position: relative;
+      height: 250px;
+    }
+
+    @media (min-width: 1200px) {
+      .chart-container {
+        height: 300px;
+      }
+    }
+
+    .card {
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+    }
+
+    .card-text {
+      font-size: 0.9rem;
+    }
+
+    .table th, .table td {
+      vertical-align: middle;
+    }
+
+    .badge {
+      font-size: 0.8rem;
+    }
+
+    .method-icon {
+      display: inline-block;
+      width: 60px;
+      height: 25px;
+      line-height: 25px;
+      text-align: center;
+      border-radius: 5px;
+      color: white;
+      margin-right: 10px;
+    }
+
+    .method-get {
+      background-color: #28a745; /* Green */
+    }
+
+    .method-post {
+      background-color: #007bff; /* Blue */
+    }
+
+    .method-put {
+      background-color: #ffc107; /* Yellow */
+    }
+
+    .method-delete {
+      background-color: #dc3545; /* Red */
+    }
+  </style>
+  <script>
+    window.onload = function () {
+      const ctx1 = document.getElementById('errorRateChart').getContext('2d');
+      const errorRateChart = new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [
+            {
+              label: 'Ratelimit Error Rate (%)',
+              data: [0, 10, 5, 2, 20, 30, 45],
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Total Traffic',
+              data: [1000, 2000, 1500, 3000, 5000, 4500, 7000],
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1,
+              yAxisID: 'y1'
+            },
+            {
+              label: 'Average API Response Time (ms)',
+              data: [120, 150, 140, 160, 200, 180, 210],
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1,
+              yAxisID: 'y2'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: 'linear',
+              position: 'left',
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Ratelimit Error Rate (%)'
+              }
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Total Traffic'
+              },
+              grid: {
+                drawOnChartArea: false
+              }
+            },
+            y2: {
+              type: 'linear',
+              position: 'right',
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Average API Response Time (ms)'
+              },
+              grid: {
+                drawOnChartArea: false
+              }
+            }
+          }
+        }
+      });
+
+      const ctx2 = document.getElementById('systemUsageChart').getContext('2d');
+      const systemUsageChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+          labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+          datasets: [
+            {
+              label: 'CPU Usage (%)',
+              data: [30, 45, 50, 60, 70, 55, 50, 40],
+              backgroundColor: 'rgba(255, 206, 86, 0.2)',
+              borderColor: 'rgba(255, 206, 86, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Memory Usage (%)',
+              data: [40, 50, 55, 65, 75, 60, 55, 50],
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Disk Usage (%)',
+              data: [20, 30, 40, 45, 55, 50, 45, 35],
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Usage (%)'
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</head>
 
 <div class="content" layout:fragment="content">
-  <h1 class="mt-4">Main</h1>
-  <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item active">Main Layout</li>
-  </ol>
+  <div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h4">Dashboard</h1>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 col-xl-3 mb-3">
+        <div class="card text-center shadow-sm" style="border-radius: 1rem;">
+          <div class="card-body">
+            <h6 class="card-title">Total Endpoints</h6>
+            <i class="bi bi-diagram-3 fs-2" style="color: #6c757d;"></i>
+            <p class="card-text fs-5">150</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3 mb-3">
+        <div class="card text-center shadow-sm" style="border-radius: 1rem;">
+          <div class="card-body">
+            <h6 class="card-title">Endpoints with Active Ratelimits</h6>
+            <i class="bi bi-shield-check fs-2" style="color: #28a745;"></i>
+            <p class="card-text fs-5">85</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3 mb-3">
+        <div class="card text-center shadow-sm" style="border-radius: 1rem;">
+          <div class="card-body">
+            <h6 class="card-title">Endpoints without Ratelimits</h6>
+            <i class="bi bi-shield-x fs-2" style="color: #dc3545;"></i>
+            <p class="card-text fs-5">65</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3 mb-3">
+        <div class="card text-center shadow-sm" style="border-radius: 1rem;">
+          <div class="card-body">
+            <h6 class="card-title">High Traffic APIs</h6>
+            <i class="bi bi-graph-up fs-2" style="color: #007bff;"></i>
+            <p class="card-text fs-5">5</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12 col-lg-8 mb-3">
+        <div class="card shadow-sm" style="border-radius: 1rem;">
+          <div class="card-header">
+            <h6 class="my-0 fw-normal">API Metrics</h6>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="errorRateChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 col-lg-4 mb-3">
+        <div class="card shadow-sm" style="border-radius: 1rem;">
+          <div class="card-header">
+            <h6 class="my-0 fw-normal">System Usage Over Time</h6>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="systemUsageChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card shadow-sm" style="border-radius: 1rem;">
+          <div class="card-header">
+            <h6 class="my-0 fw-normal">Top Ratelimit Error APIs</h6>
+          </div>
+          <div class="card-body">
+            <ul class="list-group">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="method-icon method-get">GET</span>/api/users
+                <span class="badge bg-danger rounded-pill">25%</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="method-icon method-post">POST</span>/api/orders
+                <span class="badge bg-danger rounded-pill">20%</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="method-icon method-get">GET</span>/api/products
+                <span class="badge bg-danger rounded-pill">15%</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card shadow-sm" style="border-radius: 1rem;">
+          <div class="card-header">
+            <h6 class="my-0 fw-normal">Top Traffic APIs</h6>
+          </div>
+          <div class="card-body">
+            <ul class="list-group">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="method-icon method-get">GET</span>/api/books
+                <span class="badge bg-primary rounded-pill">5000</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="method-icon method-get">GET</span>/api/authors
+                <span class="badge bg-primary rounded-pill">4000</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="method-icon method-get">GET</span>/api/reviews
+                <span class="badge bg-primary rounded-pill">3500</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card shadow-sm" style="border-radius: 1rem;">
+          <div class="card-header">
+            <h6 class="my-0 fw-normal">Slowest APIs</h6>
+          </div>
+          <div class="card-body">
+            <ul class="list-group">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="method-icon method-get">GET</span>/api/orders
+                <span class="badge bg-warning rounded-pill">250ms</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="method-icon method-post">POST</span>/api/users
+                <span class="badge bg-warning rounded-pill">200ms</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="method-icon method-get">GET</span>/api/products
+                <span class="badge bg-warning rounded-pill">180ms</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 mb-3">
+        <div class="card shadow-sm" style="border-radius: 1rem;">
+          <div class="card-header">
+            <h6 class="my-0 fw-normal">Ratelimit Issues</h6>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Path</th>
+                <th>Issue</th>
+                <th>Action</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>1</td>
+                <td>2024-06-14</td>
+                <td><span class="method-icon method-get">GET</span>/api/books</td>
+                <td>Endpoints with Ratelimit enabled are no longer found in the code.</td>
+                <td>
+                  <button type="button" class="btn btn-sm btn-success">Mark as resolved</button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>2024-06-13</td>
+                <td><span class="method-icon method-get">GET</span>/api/books</td>
+                <td>With Endpoint Ratelimit enabled, one of the applied parameters was deleted or
+                  changed in the code.
+                </td>
+                <td>
+                  <button type="button" class="btn btn-sm btn-success">Mark as resolved</button>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>2024-06-12</td>
+                <td><span class="method-icon method-get">GET</span>/api/books</td>
+                <td>Endpoints with Ratelimit enabled are no longer found in the code.</td>
+                <td>
+                  <button type="button" class="btn btn-sm btn-success">Mark as resolved</button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 </html>
