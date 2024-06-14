@@ -185,6 +185,14 @@
         }
       });
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var tooltipTriggerList = [].slice.call(
+          document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    });
   </script>
 </head>
 
@@ -344,40 +352,27 @@
               <thead>
               <tr>
                 <th>#</th>
-                <th>Date</th>
-                <th>Path</th>
-                <th>Issue</th>
+                <th>Endpoint</th>
+                <th>Issue Type</th>
+                <th>Detail</th>
                 <th>Action</th>
               </tr>
               </thead>
               <tbody>
-              <tr>
-                <td>1</td>
-                <td>2024-06-14</td>
-                <td><span class="method-icon method-get">GET</span>/api/books</td>
-                <td>Endpoints with Ratelimit enabled are no longer found in the code.</td>
+              <!--/*@thymesVar id="endpointChangeLog" type="org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeLog"*/-->
+              <tr th:each="changeLog : ${endpointChangeLog}">
+                <td th:text="${changeLog.id}"></td>
                 <td>
-                  <button type="button" class="btn btn-sm btn-success">Mark as resolved</button>
+                  [<span th:text="${changeLog.targetMethod}"></span>]&nbsp;
+                  <span th:text="${changeLog.targetPath}"></span>
                 </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>2024-06-13</td>
-                <td><span class="method-icon method-get">GET</span>/api/books</td>
-                <td>With Endpoint Ratelimit enabled, one of the applied parameters was deleted or
-                  changed in the code.
-                </td>
+                <td th:text="${changeLog.changeType.name}" data-bs-toggle="tooltip"
+                    th:data-bs-title="${changeLog.changeType.description}"></td>
+                <td th:text="${changeLog.detailString}"></td>
                 <td>
-                  <button type="button" class="btn btn-sm btn-success">Mark as resolved</button>
-                </td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>2024-06-12</td>
-                <td><span class="method-icon method-get">GET</span>/api/books</td>
-                <td>Endpoints with Ratelimit enabled are no longer found in the code.</td>
-                <td>
-                  <button type="button" class="btn btn-sm btn-success">Mark as resolved</button>
+                  <th:block th:if="${changeLog.isResolved != true}">
+                    <button type="button" class="btn btn-sm btn-success">Mark as resolved</button>
+                  </th:block>
                 </td>
               </tr>
               </tbody>

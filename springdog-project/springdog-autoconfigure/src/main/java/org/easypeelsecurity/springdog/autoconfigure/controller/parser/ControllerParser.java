@@ -16,12 +16,16 @@
 
 package org.easypeelsecurity.springdog.autoconfigure.controller.parser;
 
+import static org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeType.ENABLED_ENDPOINT_WAS_DELETED;
+import static org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeType.ENABLED_PARAMETER_WAS_DELETED;
+
 import java.io.IOException;
 import java.lang.reflect.Parameter;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,13 +39,15 @@ import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointHash;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointHashProvider;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.VersionCompare;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.ApiParameterType;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeLog;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeType;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
+import org.easypeelsecurity.springdog.shared.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
@@ -59,20 +65,20 @@ import jakarta.transaction.Transactional;
 @Component("springdogControllerParserComponent")
 public class ControllerParser {
 
-  private static final Set<EndpointDto> RESULT = new HashSet<>();
+  private final Logger logger = LoggerFactory.getLogger(ControllerParser.class);
   private final RequestMappingHandlerMapping handlerMapping;
   private final EndpointQuery endpointQuery;
   private final EndpointCommand endpointCommand;
   private final EndpointRepository endpointRepository;
-  private final VersionControlRepository versionControlRepository;
   private final SpringdogProperties properties;
+  private final VersionControlRepository versionControlRepository;
 
   /**
    * Constructor.
    */
   public ControllerParser(RequestMappingHandlerMapping handlerMapping, EndpointQuery endpointQuery,
-      EndpointCommand endpointCommand, EndpointRepository endpointRepository,
-      VersionControlRepository versionControlRepository, SpringdogProperties properties) {
+      EndpointCommand endpointCommand, EndpointRepository endpointRepository, SpringdogProperties properties,
+      VersionControlRepository versionControlRepository) {
     this.handlerMapping = handlerMapping;
     this.endpointQuery = endpointQuery;
     this.endpointCommand = endpointCommand;
@@ -123,99 +129,129 @@ public class ControllerParser {
   @Transactional
   @PostConstruct
   public void listEndpointsAndParameters() {
-    Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
-    handlerMethods.forEach((info, method) -> {
-      // TODO : handle multiple paths
-      String endpoint = null;
-      boolean isPatternPath = false;
-      // path condition or directPaths
-      if (!info.getDirectPaths().isEmpty()) {
-        if (info.getDirectPaths().size() > 1) {
-          System.out.println(
-              "Multiple paths found for " + method.getMethod().getName() + " in " + method.getBeanType() +
-                  ". but not supported yet.");
-          return;
-        }
+    Assert.notNull(handlerMapping, "RequestMappingHandlerMapping is required.");
+    Assert.notNull(properties, "SpringdogProperties is required.");
 
-        endpoint = info.getDirectPaths().iterator().next();
-      } else if (!info.getPatternValues().isEmpty()) {
-        if (info.getPatternValues().size() > 1) {
-          System.out.println(
-              "Multiple paths found for " + method.getMethod().getName() + " in " + method.getBeanType() +
-                  ". but not supported yet.");
-          return;
-        }
-
-        isPatternPath = true;
-        endpoint = info.getPatternValues().iterator().next();
-      }
-
-      if (endpoint == null || endpoint.startsWith(properties.computeAbsolutePath("/"))) {
-        return;
-      }
-
-      Set<RequestMethod> methods = info.getMethodsCondition().getMethods();
-      HttpMethod httpMethod = null;
-      if (!methods.isEmpty()) {
-        httpMethod = HttpMethod.resolve(methods.iterator().next().asHttpMethod());
-      }
-
-      if (httpMethod == null) {
-        return;
-      }
-
-      EndpointDto api = getEndpointDto(method, endpoint, httpMethod, isPatternPath);
-      RESULT.add(api);
-    });
+    Set<EndpointDto> parsedEndpointFromController =
+        parseController(handlerMapping.getHandlerMethods(), properties.computeAbsolutePath("/"));
 
     EndpointHash hashProvider = new EndpointHashProvider();
-
-    LocalDateTime now = LocalDateTime.now();
-    String nowFullHash = hashProvider.getHash(RESULT.toArray(EndpointDto[]::new));
-    EndpointVersionControl vc = new EndpointVersionControl(now, nowFullHash);
-    // 일단 기존 최신 버전 hash와 비교.
-    VersionCompare nowVersion = endpointQuery.compareToLatestVersion(nowFullHash);
-
-    switch (nowVersion) {
-      case SAME:
-        System.out.println("Same version. Skip.");
-        break;
-      case FIRST_RUN:
-        // 그냥 등록
-        System.out.println("First run. Save all.");
-        List<Endpoint> endpointList = RESULT.stream()
+    String nowFullHash = hashProvider.getHash(parsedEndpointFromController.toArray(EndpointDto[]::new));
+    EndpointVersionControl newVersion = new EndpointVersionControl(LocalDateTime.now(), nowFullHash);
+    switch (endpointQuery.compareToLatestVersion(nowFullHash,
+        versionControlRepository.findTopByOrderByDateOfVersionDesc())) {
+      case SAME -> logger.info("No changes found.");
+      case FIRST_RUN -> {
+        logger.info("First run. Registering all endpoints.");
+        List<Endpoint> endpointList = parsedEndpointFromController.stream()
             .map(item -> EndpointConverter.toEntity(hashProvider, item))
             .toList();
 
         endpointRepository.saveAll(endpointList);
-
-        versionControlRepository.save(
-            new EndpointVersionControl(now, nowFullHash)
-        );
-
-        break;
-      case DIFFERENT:
-        Set<EndpointDto> db = endpointQuery.findAll();
-
-        // db에만 있는 것 (삭제된 것)
-        Set<EndpointDto> dbOnly = db.stream()
-            .filter(dbItem -> !RESULT.contains(dbItem))
+      }
+      case DIFFERENT -> {
+        logger.info("Changes found. Applying changes.");
+        Set<EndpointDto> endpointsOnDatabase = endpointQuery.findAll();
+        Set<EndpointParameterDto> parametersOnDatabase = endpointQuery.findAllParameters();
+        Set<EndpointDto> disappearedEndpoints = endpointsOnDatabase.stream()
+            .filter(dbItem -> !parsedEndpointFromController.contains(dbItem))
             .collect(Collectors.toSet());
 
-        // RESULT에만 있는 것 (추가된 것)
-        Set<EndpointDto> nowOnly = RESULT.stream()
-            .filter(localItem -> !db.contains(localItem))
+        disappearedEndpoints.stream()
+            .filter(dbItem -> dbItem.getRuleStatus().equals(RuleStatus.ACTIVE))
+            .forEach(disappearedActiveEndpoint ->
+                newVersion.addChangeLog(
+                    new EndpointChangeLog(
+                        disappearedActiveEndpoint.getPath(),
+                        disappearedActiveEndpoint.getHttpMethod(),
+                        disappearedActiveEndpoint.getFqcn(),
+                        ENABLED_ENDPOINT_WAS_DELETED,
+                        "The associated Ratelimit setting was automatically cancelled.",
+                        false)));
+
+        Set<EndpointParameterDto> parametersOnParsed = parsedEndpointFromController.stream()
+            .map(EndpointDto::getParameters)
+            .flatMap(Set::stream)
             .collect(Collectors.toSet());
-        // TODO: PARAMETER 비교도 포함
 
-        dbOnly.forEach(item -> vc.addChangeLog(new EndpointChangeLog(vc, EndpointChangeType.API_DELETED,
-            "[" + item.getHttpMethod() + "] " + item.getPath() + " was deleted")));
-        nowOnly.forEach(item -> vc.addChangeLog(new EndpointChangeLog(vc, EndpointChangeType.API_ADDED,
-            "[" + item.getHttpMethod() + "] " + item.getPath() + " was added")));
+        parametersOnDatabase.stream()
+            .filter(item -> !parametersOnParsed.contains(item))
+            .filter(EndpointParameterDto::isEnabled)
+            .forEach(disappearedParameter -> {
+              EndpointDto endpoint = endpointsOnDatabase.stream()
+                  .filter(item -> item.getParameters().contains(disappearedParameter))
+                  .findFirst()
+                  .orElseThrow();
 
-        endpointCommand.applyChanges(hashProvider, nowOnly, dbOnly);
-        versionControlRepository.save(vc);
-        break;
+              newVersion.addChangeLog(new EndpointChangeLog(
+                  endpoint.getPath(),
+                  endpoint.getHttpMethod(),
+                  endpoint.getFqcn(),
+                  ENABLED_PARAMETER_WAS_DELETED,
+                  ("The Ratelimit operation associated with this endpoint" +
+                      " was terminated because no enabled parameter '%s (%s)' was found.")
+                      .formatted(disappearedParameter.getName(), disappearedParameter.getType()),
+                  false));
+            });
+
+        Set<EndpointDto> added = parsedEndpointFromController.stream()
+            .filter(localItem -> !endpointsOnDatabase.contains(localItem))
+            .collect(Collectors.toSet());
+        endpointCommand.applyChanges(hashProvider, added, disappearedEndpoints);
+        versionControlRepository.save(newVersion);
+      }
     }
+  }
+
+  private Set<EndpointDto> parseController(Map<RequestMappingInfo, HandlerMethod> handlerMethods,
+      String excludePathPrefix) {
+    Set<EndpointDto> result = new HashSet<>();
+    for (Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethods.entrySet()) {
+      RequestMappingInfo info = entry.getKey();
+      HandlerMethod method = entry.getValue();
+
+      String endpoint = extractEndpointPath(info, method);
+      if (endpoint == null || endpoint.startsWith(excludePathPrefix)) {
+        continue;
+      }
+      HttpMethod httpMethod = extractHttpMethod(info);
+      if (httpMethod == null) {
+        continue;
+      }
+
+      boolean isPatternPath = info.getDirectPaths().isEmpty();
+      // Create and add EndpointDto
+      result.add(getEndpointDto(method, endpoint, httpMethod, isPatternPath));
+    }
+    return result;
+  }
+
+  private String extractEndpointPath(RequestMappingInfo info, HandlerMethod method) {
+    if (!info.getDirectPaths().isEmpty()) {
+      if (info.getDirectPaths().size() > 1) {
+        logger.warn("Multiple paths found for {} in {} (directPath). but not supported yet.",
+            method.getMethod().getName(),
+            method.getBeanType());
+        return null;
+      }
+      return info.getDirectPaths().iterator().next();
+    } else if (!info.getPatternValues().isEmpty()) {
+      if (info.getPatternValues().size() > 1) {
+        logger.warn("Multiple paths found for {} in {} (patternUrl). but not supported yet.",
+            method.getMethod().getName(),
+            method.getBeanType());
+        return null;
+      }
+      return info.getPatternValues().iterator().next();
+    }
+    return null;
+  }
+
+  private HttpMethod extractHttpMethod(RequestMappingInfo info) {
+    Set<RequestMethod> methods = info.getMethodsCondition().getMethods();
+    if (!methods.isEmpty()) {
+      return HttpMethod.resolve(methods.iterator().next().asHttpMethod());
+    }
+    return null;
   }
 }

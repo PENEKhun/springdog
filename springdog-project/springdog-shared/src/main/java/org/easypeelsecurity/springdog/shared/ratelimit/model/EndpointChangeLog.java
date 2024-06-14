@@ -16,6 +16,7 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -35,46 +36,39 @@ public class EndpointChangeLog {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne
+  private String targetPath;
+  private HttpMethod targetMethod;
+  private String targetFqcn;
+
+  @ManyToOne(cascade = CascadeType.PERSIST, optional = false)
   @JoinColumn(referencedColumnName = "dateOfVersion")
   private EndpointVersionControl version;
 
   @Enumerated(EnumType.STRING)
   private EndpointChangeType changeType;
 
-  private String changeHistory;
+  private String detailString;
   private boolean isResolved;
 
   /**
    * Constructor.
    *
-   * @param version       version control
-   * @param changeType    change type
-   * @param changeHistory change history
-   * @param isResolved    is resolved
+   * @param changeType   change type
+   * @param detailString change history
+   * @param isResolved   is resolved
    */
-  public EndpointChangeLog(EndpointVersionControl version, EndpointChangeType changeType,
-      String changeHistory, boolean isResolved) {
-    this.version = version;
-    this.changeHistory = changeHistory;
+  public EndpointChangeLog(String targetPath, HttpMethod targetMethod, String targetFqcn,
+      EndpointChangeType changeType, String detailString, boolean isResolved) {
+    this.targetPath = targetPath;
+    this.targetMethod = targetMethod;
+    this.targetFqcn = targetFqcn;
     this.changeType = changeType;
+    this.detailString = detailString;
     this.isResolved = isResolved;
   }
 
   /**
-   * Constructor.
-   *
-   * @param version       version control
-   * @param changeType    change type
-   * @param changeHistory change history
-   */
-  public EndpointChangeLog(EndpointVersionControl version, EndpointChangeType changeType,
-      String changeHistory) {
-    this(version, changeType, changeHistory, false);
-  }
-
-  /**
-   * Constructor.
+   * No-arg constructor.
    */
   public EndpointChangeLog() {
   }
@@ -91,8 +85,8 @@ public class EndpointChangeLog {
   /**
    * Getter.
    */
-  public String getChangeHistory() {
-    return changeHistory;
+  public String getDetailString() {
+    return detailString;
   }
 
   /**
@@ -100,5 +94,33 @@ public class EndpointChangeLog {
    */
   public EndpointChangeType getChangeType() {
     return changeType;
+  }
+
+  /**
+   * Getter.
+   */
+  public boolean isResolved() {
+    return isResolved;
+  }
+
+  /**
+   * Getter.
+   */
+  public Long getId() {
+    return id;
+  }
+
+  /**
+   * Getter.
+   */
+  public String getTargetPath() {
+    return targetPath;
+  }
+
+  /**
+   * Getter.
+   */
+  public HttpMethod getTargetMethod() {
+    return targetMethod;
   }
 }

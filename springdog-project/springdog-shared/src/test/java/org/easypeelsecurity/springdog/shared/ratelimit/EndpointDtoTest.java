@@ -16,6 +16,7 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashSet;
@@ -232,5 +233,93 @@ class EndpointDtoTest {
 
     // then
     assertEquals(35, actual);
+  }
+
+  @Test
+  void equalsTrueWhenAllInformationAreSame() {
+    // given
+    EndpointDto endpoint1 = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {})
+        .build();
+    EndpointDto endpoint2 = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {})
+        .build();
+
+    // when & then
+    assertThat(endpoint1).isEqualTo(endpoint2);
+  }
+
+  @Test
+  void pathAffectEqual() {
+    // given
+    EndpointDto endpoint1 = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books1") // diff
+        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {})
+        .build();
+    EndpointDto endpoint2 = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books2") // diff
+        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {})
+        .build();
+
+    // when & then
+    assertThat(endpoint1).isNotEqualTo(endpoint2);
+  }
+
+  @Test
+  void fqcnAffectEqual() {
+    // given
+    EndpointDto endpoint1 = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example1") // diff
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {})
+        .build();
+    EndpointDto endpoint2 = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example2") // diff
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {})
+        .build();
+
+    // when & then
+    assertThat(endpoint1).isNotEqualTo(endpoint2);
+  }
+
+  @Test
+  void httpMethodAffectEqual() {
+    // given
+    EndpointDto endpoint1 = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {})
+        .build();
+    EndpointDto endpoint2 = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .httpMethod(HttpMethod.POST) // diff
+        .parameters(new HashSet<>() {})
+        .build();
+
+    // when & then
+    assertThat(endpoint1).isNotEqualTo(endpoint2);
   }
 }

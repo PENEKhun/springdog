@@ -34,7 +34,7 @@ import jakarta.persistence.OneToMany;
 @Entity
 public class EndpointVersionControl {
 
-  @OneToMany(cascade = CascadeType.PERSIST)
+  @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "version")
   private final List<EndpointChangeLog> changeLogs = new ArrayList<>();
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

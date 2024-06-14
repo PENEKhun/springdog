@@ -17,6 +17,7 @@
 package org.easypeelsecurity.springdog.shared.ratelimit;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
@@ -155,26 +156,25 @@ public class EndpointDto {
   }
 
   @Override
-  public boolean equals(Object object) {
-    if (this == object) {
+  public final boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    if (object == null || getClass() != object.getClass()) {
+    if (!(o instanceof EndpointDto that)) {
       return false;
     }
 
-    EndpointDto that = (EndpointDto) object;
-
-    if (!this.path.equals(that.path)) {
-      return false;
-    }
-    return this.httpMethod == that.httpMethod;
+    return path.equals(that.path) &&
+        fqcn.equals(that.fqcn) && httpMethod == that.httpMethod &&
+        Objects.equals(parameters, that.parameters);
   }
 
   @Override
   public int hashCode() {
-    int result = this.path.hashCode();
-    result = 31 * result + this.httpMethod.hashCode();
+    int result = path.hashCode();
+    result = 31 * result + fqcn.hashCode();
+    result = 31 * result + httpMethod.hashCode();
+    result = 31 * result + Objects.hashCode(parameters);
     return result;
   }
 

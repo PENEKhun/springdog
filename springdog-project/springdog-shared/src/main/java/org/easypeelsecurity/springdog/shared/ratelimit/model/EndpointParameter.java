@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import org.easypeelsecurity.springdog.shared.util.Assert;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -47,7 +48,7 @@ public class EndpointParameter {
   private ApiParameterType type;
   private boolean enabled;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.ALL)
   private Endpoint endpoint;
 
   /**
