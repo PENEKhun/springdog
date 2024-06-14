@@ -91,4 +91,23 @@ public class EndpointParameterDto {
   public boolean isEnabled() {
     return enabled;
   }
+
+  @Override
+  public final boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof EndpointParameterDto that)) {
+      return false;
+    }
+
+    return name.equals(that.name) && type == that.type;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = name.hashCode();
+    result = 31 * result + type.hashCode();
+    return result;
+  }
 }

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.VersionCompare;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
@@ -38,15 +39,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class EndpointQuery {
 
   private final EndpointRepository endpointRepository;
-  private final EndpointVersionControlRepository endpointVersionControlRepository;
+  private final VersionControlRepository versionControlRepository;
 
   /**
    * Constructor.
    */
   public EndpointQuery(EndpointRepository endpointRepository,
-      EndpointVersionControlRepository endpointVersionControlRepository) {
+      VersionControlRepository versionControlRepository) {
     this.endpointRepository = endpointRepository;
-    this.endpointVersionControlRepository = endpointVersionControlRepository;
+    this.versionControlRepository = versionControlRepository;
   }
 
   /**
@@ -62,19 +63,22 @@ public class EndpointQuery {
   }
 
   /**
-   * Compare hash to latest version.
+   * Compares the provided hashes.
    *
-   * @param compareWith hash to compare
-   * @return version compare
+   * @param compareWith The hash string to be compared.
+   * @param compareTo   An {@code Optional} containing the latest {@code EndpointVersionControl} instance, which
+   *                    holds the version to compare against. If empty, it indicates that there is no existing
+   *                    version.
+   * @return A {@code VersionCompare} indicating the result of the comparison. {@code VersionCompare.FIRST_RUN}
+   *         is returned if {@code compareTo} is empty, suggesting that this is the initial version check.
    */
-  public VersionCompare compareToLatestVersion(String compareWith) {
-    Optional<EndpointVersionControl> latest =
-        endpointVersionControlRepository.findTopByOrderByDateOfVersionDesc();
-    if (latest.isEmpty()) {
+  public VersionCompare compareToLatestVersion(String compareWith,
+      Optional<EndpointVersionControl> compareTo) {
+    if (compareTo.isEmpty()) {
       return VersionCompare.FIRST_RUN;
     }
 
-    String latestVersionHash = latest.get().getFullHashOfEndpoints();
+    String latestVersionHash = compareTo.get().getFullHashOfEndpoints();
     return latestVersionHash.equals(compareWith) ? VersionCompare.SAME : VersionCompare.DIFFERENT;
   }
 
@@ -100,5 +104,18 @@ public class EndpointQuery {
   public Optional<EndpointDto> getEndpointByFqcn(String fqcn) {
     Optional<Endpoint> found = endpointRepository.findByFqcn(fqcn);
     return found.map(EndpointConverter::toDto);
+  }
+
+  /**
+   * Find all parameters.
+   *
+   * @return set of endpoint parameter DTOs
+   */
+  public Set<EndpointParameterDto> findAllParameters() {
+    return endpointRepository.findAll()
+        .stream()
+        .flatMap(endpoint -> endpoint.getParameters().stream())
+        .map(EndpointConverter::toDto)
+        .collect(Collectors.toSet());
   }
 }

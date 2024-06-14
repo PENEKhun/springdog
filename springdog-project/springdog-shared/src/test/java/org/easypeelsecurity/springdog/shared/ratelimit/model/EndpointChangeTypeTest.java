@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.manager.ratelimit;
+package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.junit.jupiter.api.Test;
 
-/**
- * Repository for {@link EndpointVersionControl}.
- */
-@SuppressWarnings("checkstyle:MissingJavadocMethod")
-public interface VersionControlRepository extends JpaRepository<EndpointVersionControl, LocalDateTime> {
+class EndpointChangeTypeTest {
 
-  Optional<EndpointVersionControl> findTopByOrderByDateOfVersionDesc();
+  @Test
+  void getDescription() {
+    // given
+    EndpointChangeType endpointChangeType = EndpointChangeType.ENABLED_ENDPOINT_WAS_DELETED;
+    String expected = "Endpoints with Ratelimit enabled are no longer found in the code.";
+
+    // when
+    String actual = endpointChangeType.getDescription();
+
+    // then
+    assertThat(expected).isEqualTo(actual);
+  }
 }

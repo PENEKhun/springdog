@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
+import org.easypeelsecurity.springdog.manager.ratelimit.VersionControlQuery;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.util.Assert;
@@ -50,6 +51,8 @@ public class SpringdogAgentView {
   SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
   @Autowired
   private SpringdogProperties properties;
+  @Autowired
+  private VersionControlQuery versionControlQuery;
 
   @GetMapping("/login")
   public String login() {
@@ -67,7 +70,9 @@ public class SpringdogAgentView {
   }
 
   @GetMapping("/")
-  public String home() {
+  public String home(Model model) {
+    model.addAttribute("endpointChangeLog",
+        versionControlQuery.getAllChangeLogsNotResolved());
     return "/templates/content/main.html";
   }
 
