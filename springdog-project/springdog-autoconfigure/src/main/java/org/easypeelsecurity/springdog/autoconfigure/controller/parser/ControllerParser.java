@@ -87,13 +87,13 @@ public class ControllerParser {
     this.properties = properties;
   }
 
-  private static EndpointParameterDto getEndpointParameterDto(Parameter parameter, String[] paramNames,
+  private EndpointParameterDto getEndpointParameterDto(Parameter parameter, String[] paramNames,
       int index) {
     String name = paramNames != null && index < paramNames.length ? paramNames[index] : parameter.getName();
     return new EndpointParameterDto(name, ApiParameterType.resolve(parameter.getAnnotations()));
   }
 
-  private static EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod,
+  private EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod,
       boolean isPatternPath) {
     String fqcn = method.getBeanType().getPackageName() + "." + method.getBeanType().getSimpleName() + "." +
         method.getMethod().getName();
@@ -203,7 +203,7 @@ public class ControllerParser {
     }
   }
 
-  private Set<EndpointDto> parseController(Map<RequestMappingInfo, HandlerMethod> handlerMethods,
+  Set<EndpointDto> parseController(Map<RequestMappingInfo, HandlerMethod> handlerMethods,
       String excludePathPrefix) {
     Set<EndpointDto> result = new HashSet<>();
     for (Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethods.entrySet()) {
