@@ -6,7 +6,7 @@ plugins {
 dependencies {
     implementation "com.squareup:javapoet:1.13.0"
     implementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
-
+    testImplementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter-thymeleaf:${springbootVersion}"
     compileOnly "org.springframework.boot:spring-boot-autoconfigure-processor:${springbootVersion}"
     compileOnly "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}"
@@ -22,6 +22,8 @@ dependencies {
     compileOnly project(":springdog-project:springdog-agent")
     compileOnly project(":springdog-project:springdog-manager")
     implementation project(":springdog-project:springdog-shared")
+    testImplementation project(":springdog-project:springdog-shared")
+    testImplementation project(":springdog-project:springdog-manager")
 }
 
 mavenPublishing {
