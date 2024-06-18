@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 class ParameterNameExtractorTest {
 
-  private static class ControllerStub {
+  private static final class ControllerStub {
 
     public void simpleMethod(String param1, int param2) {
       // Simple method with basic parameters
