@@ -27,6 +27,6 @@
   <suppress checks="[a-zA-Z0-9]*" files="[\\/]resources\/before[\\/]"/>
   <!-- Suppress checks final keyword. -->
   <suppress checks="FinalLocalVariable" files=".*\.java"/>
-  <!-- Suppress all warning for springdog integration tests -->
-  <suppress checks="[a-zA-Z0-9]*" files="springdog-project/springdog-integration-tests/.*"/>
+  <!-- Suppress all warning for springdog tests -->
+  <suppress checks="[a-zA-Z0-9]*" files="springdog-project/springdog-tests/.*"/>
 </suppressions>
