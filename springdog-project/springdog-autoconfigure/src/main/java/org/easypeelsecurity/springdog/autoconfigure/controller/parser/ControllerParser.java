@@ -148,6 +148,7 @@ public class ControllerParser {
             .toList();
 
         endpointRepository.saveAll(endpointList);
+        versionControlRepository.save(newVersion);
       }
       case DIFFERENT -> {
         logger.info("Changes found. Applying changes.");

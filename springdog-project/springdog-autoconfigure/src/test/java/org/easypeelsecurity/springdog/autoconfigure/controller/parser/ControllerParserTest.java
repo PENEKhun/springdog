@@ -18,6 +18,8 @@ package org.easypeelsecurity.springdog.autoconfigure.controller.parser;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -117,7 +119,8 @@ class ControllerParserTest {
     controllerParser.listEndpointsAndParameters();
 
     // then
-    verify(endpointRepository, Mockito.only()).saveAll(ArgumentMatchers.anyList());
+    verify(endpointRepository, only()).saveAll(ArgumentMatchers.anyList());
+    verify(versionControlRepository).save(any(EndpointVersionControl.class));
   }
 
   @Test
@@ -132,7 +135,7 @@ class ControllerParserTest {
     controllerParser.listEndpointsAndParameters();
 
     // then
-    verify(endpointCommand, Mockito.only()).applyChanges(ArgumentMatchers.any(), ArgumentMatchers.any(),
+    verify(endpointCommand, only()).applyChanges(ArgumentMatchers.any(), ArgumentMatchers.any(),
         ArgumentMatchers.any());
   }
 
