@@ -37,6 +37,16 @@ test {
     }
 }
 
+tasks.register('deleteEmbeddedDatabase', Delete) {
+    def dir = file("${projectDir}/springdog-embedded-database")
+    if (dir.exists() && dir.isDirectory()) {
+        println "Deleting directory and its contents: $dir"
+        delete dir.listFiles()
+        delete dir
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
+    dependsOn('deleteEmbeddedDatabase')
 }
