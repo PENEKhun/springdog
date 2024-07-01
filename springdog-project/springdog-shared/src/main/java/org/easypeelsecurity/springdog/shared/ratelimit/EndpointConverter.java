@@ -16,12 +16,15 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.cayenne.ObjectContext;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.ApiParameterType;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointParameter;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
 
 /**
  * Converter for rate limit. between DTO and Entity.
@@ -37,23 +40,35 @@ public class EndpointConverter {
    * @param endpointDto target DTO instance to transform to Entity
    * @return entity object
    */
-  public static Endpoint toEntity(EndpointHash hashProvider, EndpointDto endpointDto) {
-    Set<EndpointParameter> parameters = new HashSet<>();
-    for (EndpointParameterDto param : endpointDto.getParameters()) {
-      EndpointParameter parameter = toEntity(hashProvider, endpointDto, param);
-      parameters.add(parameter);
-    }
+  public static Endpoint toEntity(ObjectContext context, EndpointHash hashProvider, EndpointDto endpointDto) {
+    Endpoint endpoint = context.newObject(Endpoint.class);
+    endpoint.setHash(hashProvider.getHash(endpointDto));
+    endpoint.setPath(endpointDto.getPath());
+    endpoint.setFqcn(endpointDto.getFqcn());
+    endpoint.setHttpMethod(endpointDto.getHttpMethod().name());
+    endpoint.setIsPatternPath(endpointDto.isPatternPath());
+    endpoint.setRuleStatus(endpointDto.getRuleStatus() != null ? endpointDto.getRuleStatus().name()
+        : RuleStatus.NOT_CONFIGURED.name());
+    endpoint.setRuleIpBased(endpointDto.isRuleIpBased());
+    endpoint.setRulePermanentBan(endpointDto.isRulePermanentBan());
+    endpoint.setRuleRequestLimitCount(endpointDto.getRuleRequestLimitCount());
+    endpoint.setRuleTimeLimitInSeconds(endpointDto.getRuleTimeLimitInSeconds());
+    endpoint.setRuleBanTimeInSeconds(endpointDto.getRuleBanTimeInSeconds());
 
-    String hash = hashProvider.getHash(endpointDto);
-    return new Endpoint(hash, endpointDto.getPath(), endpointDto.getFqcn(),
-        endpointDto.getHttpMethod(), parameters, endpointDto.isPatternPath());
+    for (EndpointParameterDto param : endpointDto.getParameters()) {
+      EndpointParameter parameter = toEntity(context, hashProvider, endpointDto, param);
+      endpoint.addToEndpointparameters(parameter);
+    }
+    return new Endpoint();
   }
 
-  private static EndpointParameter toEntity(EndpointHash hashProvider, EndpointDto apiInfo,
-      EndpointParameterDto endpointParameterDto) {
-    return new EndpointParameter(hashProvider.getParamHash(apiInfo, endpointParameterDto),
-        endpointParameterDto.getName(),
-        endpointParameterDto.getType());
+  private static EndpointParameter toEntity(ObjectContext context, EndpointHash hashProvider,
+      EndpointDto apiInfo, EndpointParameterDto endpointParameterDto) {
+    EndpointParameter endpointParameter = context.newObject(EndpointParameter.class);
+    endpointParameter.setHash(hashProvider.getParamHash(apiInfo, endpointParameterDto));
+    endpointParameter.setName(endpointParameterDto.getName());
+    endpointParameter.setType(endpointParameterDto.getType().name());
+    return endpointParameter;
   }
 
   /**
@@ -67,11 +82,11 @@ public class EndpointConverter {
         .hash(endpointEntity.getHash())
         .path(endpointEntity.getPath())
         .fqcn(endpointEntity.getFqcn())
-        .httpMethod(endpointEntity.getHttpMethod())
-        .parameters(
-            endpointEntity.getParameters().stream().map(EndpointConverter::toDto).collect(Collectors.toSet()))
-        .isPatternPath(endpointEntity.isPatternPath())
-        .ruleStatus(endpointEntity.getRuleStatus())
+        .httpMethod(HttpMethod.valueOf(endpointEntity.getHttpMethod()))
+        .parameters(endpointEntity.getEndpointparameters().stream().map(EndpointConverter::toDto)
+            .collect(Collectors.toSet()))
+        .isPatternPath(endpointEntity.isIsPatternPath())
+        .ruleStatus(RuleStatus.of(endpointEntity.getRuleStatus()))
         .ruleIpBased(endpointEntity.isRuleIpBased())
         .rulePermanentBan(endpointEntity.isRulePermanentBan())
         .ruleRequestLimitCount(endpointEntity.getRuleRequestLimitCount())
@@ -87,8 +102,8 @@ public class EndpointConverter {
    * @return dto object
    */
   public static EndpointParameterDto toDto(EndpointParameter endpointParameterEntity) {
-    return new EndpointParameterDto(endpointParameterEntity.getParamHash(), endpointParameterEntity.getName(),
-        endpointParameterEntity.getType(), endpointParameterEntity.isEnabled());
+    return new EndpointParameterDto(endpointParameterEntity.getHash(), endpointParameterEntity.getName(),
+        ApiParameterType.valueOf(endpointParameterEntity.getType()), endpointParameterEntity.isEnabled());
   }
 
   private static Set<EndpointParameterDto> toDto(Set<EndpointParameter> endpointParameters) {

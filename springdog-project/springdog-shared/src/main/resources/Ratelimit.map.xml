@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2024 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<data-map xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  project-version="10"
+  xmlns="http://cayenne.apache.org/schema/10/modelMap"
+  xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap https://cayenne.apache.org/schema/10/modelMap.xsd">
+  <cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
+    <client>false</client>
+    <createPKProperties>false</createPKProperties>
+    <createPropertyNames>false</createPropertyNames>
+    <destDir>../java</destDir>
+    <embeddableSuperTemplate>templates/v4_1/embeddable-superclass.vm</embeddableSuperTemplate>
+    <embeddableTemplate>templates/v4_1/embeddable-subclass.vm</embeddableTemplate>
+    <makePairs>true</makePairs>
+    <mode>entity</mode>
+    <outputPattern>*.java</outputPattern>
+    <overwrite>false</overwrite>
+    <querySuperTemplate>templates/v4_1/datamap-superclass.vm</querySuperTemplate>
+    <queryTemplate>templates/v4_1/datamap-subclass.vm</queryTemplate>
+    <superTemplate>templates/v4_1/superclass.vm</superTemplate>
+    <template>templates/v4_1/subclass.vm</template>
+    <usePkgPath>true</usePkgPath>
+  </cgen>
+  <db-entity name="ENDPOINT" schema="APP">
+    <db-attribute isMandatory="true" length="255" name="FQCN" type="VARCHAR"/>
+    <db-attribute isMandatory="true" length="64" name="HASH" type="VARCHAR"/>
+    <db-attribute isMandatory="true" length="10" name="HTTPMETHOD" type="VARCHAR"/>
+    <db-attribute isMandatory="true" isPrimaryKey="true" length="19" name="ID" type="BIGINT"/>
+    <db-attribute isMandatory="true" length="1" name="ISPATTERNPATH" type="BOOLEAN"/>
+    <db-attribute isMandatory="true" length="255" name="PATH" type="VARCHAR"/>
+    <db-attribute isMandatory="true" name="RULEBANTIMEINSECONDS" type="INTEGER"/>
+    <db-attribute isMandatory="true" length="1" name="RULEIPBASED" type="BOOLEAN"/>
+    <db-attribute isMandatory="true" length="1" name="RULEPERMANENTBAN" type="BOOLEAN"/>
+    <db-attribute isMandatory="true" name="RULEREQUESTLIMITCOUNT" type="INTEGER"/>
+    <db-attribute isMandatory="true" length="255" name="RULESTATUS" type="VARCHAR"/>
+    <db-attribute isMandatory="true" length="10" name="RULETIMELIMITINSECONDS" type="INTEGER"/>
+  </db-entity>
+  <db-entity name="ENDPOINTCHANGELOG" schema="APP">
+    <db-attribute isMandatory="true" length="255" name="CHANGETYPE" type="VARCHAR"/>
+    <db-attribute length="255" name="DETAILSTRING" type="VARCHAR"/>
+    <db-attribute isGenerated="true" isMandatory="true" isPrimaryKey="true" length="19" name="ID"
+      type="BIGINT"/>
+    <db-attribute isMandatory="true" length="1" name="ISRESOLVED" type="BOOLEAN"/>
+    <db-attribute isMandatory="true" length="255" name="TARGETFQCN" type="VARCHAR"/>
+    <db-attribute isMandatory="true" length="30" name="TARGETMETHOD" type="VARCHAR"/>
+    <db-attribute isMandatory="true" length="255" name="TARGETPATH" type="VARCHAR"/>
+    <db-attribute isMandatory="true" length="29" name="VERSION_DATEOFVERSION" type="TIMESTAMP"/>
+  </db-entity>
+  <db-entity name="ENDPOINTPARAMETER" schema="APP">
+    <db-attribute isMandatory="true" length="1" name="ENABLED" type="BOOLEAN"/>
+    <db-attribute length="19" name="ENDPOINT_ID" type="BIGINT"/>
+    <db-attribute isGenerated="true" isMandatory="true" isPrimaryKey="true" length="19" name="ID"
+      type="BIGINT"/>
+    <db-attribute isMandatory="true" length="255" name="NAME" type="VARCHAR"/>
+    <db-attribute isMandatory="true" length="255" name="PARAMHASH" type="VARCHAR"/>
+    <db-attribute isMandatory="true" length="255" name="TYPE" type="VARCHAR"/>
+  </db-entity>
+  <db-entity name="ENDPOINTVERSIONCONTROL" schema="APP">
+    <db-attribute isMandatory="true" length="29" name="DATEOFVERSION" type="TIMESTAMP"/>
+    <db-attribute isMandatory="true" length="64" name="FULLHASHOFENDPOINTS" type="VARCHAR"/>
+    <db-attribute isGenerated="true" isMandatory="true" isPrimaryKey="true" length="19" name="ID"
+      type="BIGINT"/>
+  </db-entity>
+  <db-entity name="ENDPOINT_ENDPOINTPARAMETER" schema="APP">
+    <db-attribute isMandatory="true" isPrimaryKey="true" length="19" name="ENDPOINT_ID"
+      type="BIGINT"/>
+    <db-attribute isMandatory="true" isPrimaryKey="true" length="19" name="PARAMETERS_ID"
+      type="BIGINT"/>
+  </db-entity>
+  <db-relationship name="endpointparameters" source="ENDPOINT" target="ENDPOINTPARAMETER"
+    toMany="true">
+    <db-attribute-pair source="ID" target="ENDPOINT_ID"/>
+  </db-relationship>
+  <db-relationship name="endpointversioncontrol" source="ENDPOINTCHANGELOG"
+    target="ENDPOINTVERSIONCONTROL">
+    <db-attribute-pair source="VERSION_DATEOFVERSION" target="DATEOFVERSION"/>
+  </db-relationship>
+  <db-relationship name="endpoint" source="ENDPOINTPARAMETER" target="ENDPOINT">
+    <db-attribute-pair source="ENDPOINT_ID" target="ID"/>
+  </db-relationship>
+  <db-relationship name="parameters" source="ENDPOINTPARAMETER" target="ENDPOINT_ENDPOINTPARAMETER"
+    toDependentPK="true" toMany="true">
+    <db-attribute-pair source="ID" target="PARAMETERS_ID"/>
+  </db-relationship>
+  <db-relationship name="endpointchangelogs" source="ENDPOINTVERSIONCONTROL"
+    target="ENDPOINTCHANGELOG" toMany="true">
+    <db-attribute-pair source="DATEOFVERSION" target="VERSION_DATEOFVERSION"/>
+  </db-relationship>
+  <db-relationship name="endpoint" source="ENDPOINT_ENDPOINTPARAMETER" target="ENDPOINT">
+    <db-attribute-pair source="ENDPOINT_ID" target="ID"/>
+  </db-relationship>
+  <db-relationship name="parameters" source="ENDPOINT_ENDPOINTPARAMETER" target="ENDPOINTPARAMETER">
+    <db-attribute-pair source="PARAMETERS_ID" target="ID"/>
+  </db-relationship>
+  <dbImport xmlns="http://cayenne.apache.org/schema/10/dbimport">
+    <forceDataMapCatalog>false</forceDataMapCatalog>
+    <forceDataMapSchema>false</forceDataMapSchema>
+    <namingStrategy>org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator</namingStrategy>
+    <skipPrimaryKeyLoading>false</skipPrimaryKeyLoading>
+    <skipRelationshipsLoading>false</skipRelationshipsLoading>
+    <tableTypes>
+      <tableType>TABLE</tableType>
+      <tableType>VIEW</tableType>
+    </tableTypes>
+    <useJava7Types>false</useJava7Types>
+    <usePrimitives>true</usePrimitives>
+  </dbImport>
+  <obj-entity className="org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint"
+    dbEntityName="ENDPOINT"
+    name="Endpoint">
+    <obj-attribute db-attribute-path="FQCN" name="fqcn" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="HASH" name="hash" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="HTTPMETHOD" name="httpMethod" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="ISPATTERNPATH" name="isPatternPath" type="boolean"/>
+    <obj-attribute db-attribute-path="PATH" name="path" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="RULEBANTIMEINSECONDS" name="ruleBanTimeInSeconds" type="int"/>
+    <obj-attribute db-attribute-path="RULEIPBASED" name="ruleIpBased" type="boolean"/>
+    <obj-attribute db-attribute-path="RULEPERMANENTBAN" name="rulePermanentBan" type="boolean"/>
+    <obj-attribute db-attribute-path="RULEREQUESTLIMITCOUNT" name="ruleRequestLimitCount"
+      type="int"/>
+    <obj-attribute db-attribute-path="RULESTATUS" name="ruleStatus" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="RULETIMELIMITINSECONDS" name="ruleTimeLimitInSeconds"
+      type="int"/>
+  </obj-entity>
+  <obj-entity className="org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangelog"
+    dbEntityName="ENDPOINTCHANGELOG"
+    name="EndpointChangelog">
+    <obj-attribute db-attribute-path="CHANGETYPE" name="changeType" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="DETAILSTRING" name="detailString" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="ISRESOLVED" name="isResolved" type="boolean"/>
+    <obj-attribute db-attribute-path="TARGETFQCN" name="targetFqcn" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="TARGETMETHOD" name="targetMethod" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="TARGETPATH" name="targetPath" type="java.lang.String"/>
+  </obj-entity>
+  <obj-entity className="org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointParameter"
+    dbEntityName="ENDPOINTPARAMETER"
+    name="EndpointParameter">
+    <obj-attribute db-attribute-path="ENABLED" name="enabled" type="boolean"/>
+    <obj-attribute db-attribute-path="PARAMHASH" name="hash" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="NAME" name="name" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="TYPE" name="type" type="java.lang.String"/>
+  </obj-entity>
+  <obj-entity className="org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl"
+    dbEntityName="ENDPOINTVERSIONCONTROL"
+    name="EndpointVersionControl">
+    <obj-attribute db-attribute-path="DATEOFVERSION" name="dateOfVersion"
+      type="java.time.LocalDateTime"/>
+    <obj-attribute db-attribute-path="FULLHASHOFENDPOINTS" name="fullHashOfEndpoints"
+      type="java.lang.String"/>
+    <pre-persist method-name="onPrePersist"/>
+  </obj-entity>
+  <obj-relationship db-relationship-path="endpointparameters" deleteRule="Cascade" name="endpointparameters"
+    source="Endpoint" target="EndpointParameter"/>
+  <obj-relationship db-relationship-path="endpointversioncontrol" deleteRule="Nullify"
+    name="endpointversioncontrol" source="EndpointChangelog"
+    target="EndpointVersionControl"/>
+  <obj-relationship db-relationship-path="endpoint" deleteRule="Nullify" name="endpoint"
+    source="EndpointParameter" target="Endpoint"/>
+  <obj-relationship db-relationship-path="parameters.endpoint" name="endpoints" source="EndpointParameter"
+    target="Endpoint"/>
+  <obj-relationship db-relationship-path="endpointchangelogs" deleteRule="Cascade"
+    name="endpointchangelogs" source="EndpointVersionControl" target="EndpointChangelog"/>
+  <property name="defaultPackage" value="org.easypeelsecurity.springdog.shared.ratelimit.model"/>
+  <property name="defaultSchema" value="APP"/>
+</data-map>

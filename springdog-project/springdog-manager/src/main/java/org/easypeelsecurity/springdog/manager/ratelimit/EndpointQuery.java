@@ -20,14 +20,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.configuration.CayenneRuntime;
+import org.apache.cayenne.query.ObjectSelect;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.VersionCompare;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Endpoint query service.
@@ -35,19 +38,15 @@ import org.springframework.transaction.annotation.Transactional;
  * @author PENEKhun
  */
 @Service
-@Transactional(readOnly = true)
 public class EndpointQuery {
 
-  private final EndpointRepository endpointRepository;
-  private final VersionControlRepository versionControlRepository;
+  private final CayenneRuntime springdogRepository;
 
   /**
    * Constructor.
    */
-  public EndpointQuery(EndpointRepository endpointRepository,
-      VersionControlRepository versionControlRepository) {
-    this.endpointRepository = endpointRepository;
-    this.versionControlRepository = versionControlRepository;
+  public EndpointQuery(@Qualifier("springdogRepository") CayenneRuntime springdogRepository) {
+    this.springdogRepository = springdogRepository;
   }
 
   /**
@@ -56,7 +55,9 @@ public class EndpointQuery {
    * @return set of endpoint DTOs
    */
   public Set<EndpointDto> findAll() {
-    return endpointRepository.findAll()
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(Endpoint.class)
+        .select(context)
         .stream()
         .map(EndpointConverter::toDto)
         .collect(Collectors.toSet());
@@ -70,7 +71,7 @@ public class EndpointQuery {
    *                    holds the version to compare against. If empty, it indicates that there is no existing
    *                    version.
    * @return A {@code VersionCompare} indicating the result of the comparison. {@code VersionCompare.FIRST_RUN}
-   *         is returned if {@code compareTo} is empty, suggesting that this is the initial version check.
+   * is returned if {@code compareTo} is empty, suggesting that this is the initial version check.
    */
   public VersionCompare compareToLatestVersion(String compareWith,
       Optional<EndpointVersionControl> compareTo) {
@@ -90,8 +91,13 @@ public class EndpointQuery {
    * @throws IllegalArgumentException if endpoint not found
    */
   public EndpointDto findApi(String apiHash) {
-    return endpointRepository.findByHash(apiHash)
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(Endpoint.class)
+        .where(Endpoint.HASH.eq(apiHash))
+        .select(context)
+        .stream()
         .map(EndpointConverter::toDto)
+        .findFirst()
         .orElseThrow(() -> new IllegalArgumentException("Endpoint not found"));
   }
 
@@ -102,8 +108,13 @@ public class EndpointQuery {
    * @return Optional EndpointDto
    */
   public Optional<EndpointDto> getEndpointByFqcn(String fqcn) {
-    Optional<Endpoint> found = endpointRepository.findByFqcn(fqcn);
-    return found.map(EndpointConverter::toDto);
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(Endpoint.class)
+        .where(Endpoint.FQCN.eq(fqcn))
+        .select(context)
+        .stream()
+        .map(EndpointConverter::toDto)
+        .findFirst();
   }
 
   /**
@@ -112,9 +123,11 @@ public class EndpointQuery {
    * @return set of endpoint parameter DTOs
    */
   public Set<EndpointParameterDto> findAllParameters() {
-    return endpointRepository.findAll()
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(Endpoint.class)
+        .select(context)
         .stream()
-        .flatMap(endpoint -> endpoint.getParameters().stream())
+        .flatMap(endpoint -> endpoint.getEndpointparameters().stream())
         .map(EndpointConverter::toDto)
         .collect(Collectors.toSet());
   }

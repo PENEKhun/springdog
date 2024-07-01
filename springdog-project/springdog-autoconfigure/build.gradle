@@ -14,7 +14,9 @@ dependencies {
     compileOnly "org.yaml:snakeyaml:${snakeyamlVersion}"
     implementation "org.apache.derby:derby:${derbyVersion}"
     implementation "org.apache.derby:derbytools:${derbyVersion}"
-    implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
+    implementation("org.apache.cayenne:cayenne-server:${cayenneVersion}") {
+        exclude group: 'org.slf4j', module: 'slf4j'
+    }
 
     implementation "org.ow2.asm:asm:${asmVersion}"
     implementation "org.ow2.asm:asm-commons:${asmVersion}"

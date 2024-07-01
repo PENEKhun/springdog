@@ -18,8 +18,6 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.util.HashSet;
-
 import org.junit.jupiter.api.Test;
 
 class EndpointTest {
@@ -27,8 +25,10 @@ class EndpointTest {
   @Test
   void equalsTrueSameHash() {
     // given
-    Endpoint endpoint1 = new Endpoint("hash", "path", "fqcn", HttpMethod.GET, new HashSet<>(), false);
-    Endpoint endpoint2 = new Endpoint("hash", "path", "fqcn", HttpMethod.GET, new HashSet<>(), false);
+    Endpoint endpoint1 = new Endpoint();
+    endpoint1.setHash("same-hash");
+    Endpoint endpoint2 = new Endpoint();
+    endpoint2.setHash("same-hash");
 
     // when & then
     assertThat(endpoint1).isEqualTo(endpoint2);
@@ -37,8 +37,10 @@ class EndpointTest {
   @Test
   void equalsFalseDifferentHash() {
     // given
-    Endpoint endpoint1 = new Endpoint("hash1", "path", "fqcn", HttpMethod.GET, new HashSet<>(), false);
-    Endpoint endpoint2 = new Endpoint("hash2", "path", "fqcn", HttpMethod.GET, new HashSet<>(), false);
+    Endpoint endpoint1 = new Endpoint();
+    endpoint1.setHash("hash");
+    Endpoint endpoint2 = new Endpoint();
+    endpoint2.setHash("different-hash");
 
     // when & then
     assertThat(endpoint1).isNotEqualTo(endpoint2);
