@@ -18,30 +18,37 @@ package org.easypeelsecurity.springdog.manager.ratelimit;
 
 import java.util.List;
 
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeLog;
+import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.configuration.CayenneRuntime;
+import org.apache.cayenne.query.ObjectSelect;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangelog;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
 @SuppressWarnings({"checkstyle:MissingJavadocMethod", "checkstyle:MissingJavadocType"})
 public class VersionControlQuery {
 
-  private final VersionControlRepository versionControlRepository;
+  private final CayenneRuntime springdogRepository;
 
-  public VersionControlQuery(VersionControlRepository versionControlRepository) {
-    this.versionControlRepository = versionControlRepository;
+  public VersionControlQuery(@Qualifier("springdogRepository") CayenneRuntime springdogRepository) {
+    this.springdogRepository = springdogRepository;
   }
 
   /**
    * Gather all unresolved change logs and fetch them.
+   *
    * @return list of unresolved change logs
    */
-  public List<EndpointChangeLog> getAllChangeLogsNotResolved() {
-    return versionControlRepository.findAll()
+  public List<EndpointChangelog> getAllChangeLogsNotResolved() {
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(EndpointVersionControl.class)
+        .select(context)
         .stream()
-        .map(EndpointVersionControl::getChangeLogs)
+        .map(EndpointVersionControl::getEndpointchangelogs)
         .flatMap(List::stream)
-        .filter(changeLog -> !changeLog.isResolved())
+        .filter(changeLog -> !changeLog.isIsResolved())
         .toList();
   }
 }
