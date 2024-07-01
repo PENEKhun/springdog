@@ -16,8 +16,10 @@
 
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.Optional;
 
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
@@ -58,71 +60,71 @@ public class RatelimitInterceptor implements HandlerInterceptor {
       Class<?> controllerClass = controller.getClass();
       String functionName = handlerMethod.getMethod().getName();
       String fqcn = controllerClass.getName() + "." + functionName;
-      if (controllerClass.equals(
-          org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.class)) {
-        return true;
-      }
-      String requestPath = request.getRequestURI().substring(request.getContextPath().length());
-      if (requestPath.startsWith(springdogProperties.computeAbsolutePath(""))) {
+      if (shouldSkipRequest(request, controllerClass)) {
         return true;
       }
 
-      EndpointDto endpoint = RuleCache.findEndpointByFqcn(fqcn)
-          .orElseGet(() -> endpointQuery.getEndpointByFqcn(fqcn).orElse(null));
-      if (endpoint == null) {
-        return true;
-      }
-
+      EndpointDto endpoint = getEndpoint(fqcn)
+          .orElseThrow(() -> new IllegalStateException("Endpoint not found"));
       if (!RuleStatus.ACTIVE.equals(endpoint.getRuleStatus())) {
         return true;
       }
 
-      String requestHashed = generateRequestHash(request, fqcn, endpoint);
-
-      LocalDateTime now = LocalDateTime.now();
-      LocalDateTime[] timestamps = RatelimitCache.addTimestamp(requestHashed, now);
-      int timeFrameSeconds = endpoint.getRuleTimeLimitInSeconds();
-
-      if (RatelimitCache.checkBan(requestHashed, now)) {
-        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-        response.getWriter().write("Too many requests");
-        //TODO Edit
-        response.setHeader("Retry-After", "");
-        response.setHeader("X-RateLimit-Remaining", "0");
-        return false;
-      }
-
-      int count = 0;
-      for (LocalDateTime timestamp : timestamps) {
-        if (timestamp.isAfter(now.minusSeconds(timeFrameSeconds))) {
-          count++;
-        }
-      }
-
-      if (count > endpoint.getRuleRequestLimitCount()) {
+      String requestHashed = generateRequestHash(request, endpoint);
+      if (RatelimitCache.isBannedRequest(requestHashed, endpoint, LocalDateTime.now())) {
         int banTimeSeconds =
             endpoint.isRulePermanentBan() ? Integer.MAX_VALUE : endpoint.getRuleBanTimeInSeconds();
-        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-        response.getWriter().write("Too many requests");
-        response.setHeader("Retry-After", String.valueOf(banTimeSeconds));
-        response.setHeader("X-RateLimit-Remaining", "0");
-        RatelimitCache.ban(requestHashed, now.plusSeconds(banTimeSeconds));
+        applyRatelimitResponse(response, String.valueOf(banTimeSeconds));
         return false;
-      } else {
-        response.setHeader("X-RateLimit-Remaining",
-            String.valueOf(endpoint.getRuleRequestLimitCount() - count));
       }
+
+      // TODO: set retry after
+      response.setHeader("X-RateLimit-Remaining", "");
     }
 
     return true;
   }
 
-  private String generateRequestHash(HttpServletRequest request, String fqcn, EndpointDto endpoint) {
-    StringBuilder beforeHash = new StringBuilder();
-    beforeHash.append(fqcn).append("\n");
+  private Optional<EndpointDto> getEndpoint(String fqcn) {
+    EndpointDto endpoint = RuleCache.findEndpointByFqcn(fqcn)
+        .orElseGet(() -> {
+          Optional<EndpointDto> item = endpointQuery.getEndpointByFqcn(fqcn);
+          if (item.isEmpty()) {
+            return null;
+          } else {
+            RuleCache.cachingRule(item.get());
+            return item.get();
+          }
+        });
+    return Optional.ofNullable(endpoint);
+  }
+
+  private boolean shouldSkipRequest(HttpServletRequest request, Class<?> controllerClass) {
+    if (controllerClass.equals(
+        org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.class)) {
+      return true;
+    }
+    String requestPath = request.getRequestURI().substring(request.getContextPath().length());
+    if (requestPath.startsWith(springdogProperties.computeAbsolutePath(""))) {
+      return true;
+    }
+    return false;
+  }
+
+  private void applyRatelimitResponse(HttpServletResponse response, String retryAfter)
+      throws IOException {
+    response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+    response.getWriter().write("Too many requests");
+    response.setHeader("Retry-After", retryAfter);
+    response.setHeader("X-RateLimit-Remaining", "0");
+  }
+
+  private String generateRequestHash(HttpServletRequest request, EndpointDto endpoint) {
+    StringBuilder result = new StringBuilder();
+    result.append(endpoint.getFqcn()).append("\n");
 
     if (endpoint.isRuleIpBased()) {
-      beforeHash.append(IpAddressUtil.getClientIp(request)).append("\n");
+      result.append(IpAddressUtil.getClientIp(request)).append("\n");
     }
 
     endpoint.getParameters().stream()
@@ -131,9 +133,11 @@ public class RatelimitInterceptor implements HandlerInterceptor {
         .forEach(param -> {
           String value = request.getParameter(param.getName());
           if (value != null) {
-            beforeHash.append(param.getName()).append("=").append(value).append("\n");
+            result.append(param.getName()).append("=").append(value).append("\n");
           }
         });
-    return beforeHash.toString();
+
+    // TODO: REAL HASHlize
+    return result.toString();
   }
 }
