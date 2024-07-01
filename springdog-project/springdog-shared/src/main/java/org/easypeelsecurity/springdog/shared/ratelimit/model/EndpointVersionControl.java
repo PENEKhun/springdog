@@ -17,76 +17,21 @@
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.auto._EndpointVersionControl;
 
-/**
- * Entity for endpoint version control.
- */
-@Entity
-public class EndpointVersionControl {
+@SuppressWarnings("all")
+public class EndpointVersionControl extends _EndpointVersionControl {
 
-  @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "version")
-  private final List<EndpointChangeLog> changeLogs = new ArrayList<>();
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-  @Column(unique = true)
-  private LocalDateTime dateOfVersion;
-  @Column(length = 64)
-  private String fullHashOfEndpoints;
+  private static final long serialVersionUID = 1L;
 
-  /**
-   * All-arg constructor.
-   *
-   * @param dateOfVersion       version name (Date)
-   * @param fullHashOfEndpoints apis hash like SHA-256 (not means single api hash)
-   */
-  public EndpointVersionControl(LocalDateTime dateOfVersion, String fullHashOfEndpoints) {
-    this.dateOfVersion = dateOfVersion;
-    this.fullHashOfEndpoints = fullHashOfEndpoints;
-  }
-
-  /**
-   * No-arg constructor.
-   */
   public EndpointVersionControl() {
+    super();
+    setDateOfVersion(LocalDateTime.now());
   }
 
-  /**
-   * Getter.
-   */
-  public String getFullHashOfEndpoints() {
-    return this.fullHashOfEndpoints;
-  }
-
-  /**
-   * Getter.
-   */
-  public LocalDateTime getDateOfVersion() {
-    return this.dateOfVersion;
-  }
-
-  /**
-   * Getter.
-   */
-  public List<EndpointChangeLog> getChangeLogs() {
-    return this.changeLogs;
-  }
-
-  /**
-   * Add changelog.
-   */
-  public void addChangeLog(EndpointChangeLog changeLog) {
-    this.changeLogs.add(changeLog);
-    changeLog.setVersion(this);
+  @Override
+  protected void onPrePersist() {
+    setDateOfVersion(LocalDateTime.now());
   }
 }

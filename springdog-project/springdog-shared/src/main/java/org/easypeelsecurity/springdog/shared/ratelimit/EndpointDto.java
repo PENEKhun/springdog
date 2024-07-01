@@ -36,7 +36,7 @@ public class EndpointDto {
   private String path;
   private String fqcn;
   private HttpMethod httpMethod;
-  private Set<EndpointParameterDto> parameters = new HashSet<>();
+  private final Set<EndpointParameterDto> parameters = new HashSet<>();
   private Set<String> parameterNamesToEnable = new HashSet<>();
   private boolean isPatternPath;
   private RuleStatus ruleStatus;
@@ -83,18 +83,6 @@ public class EndpointDto {
     this.isPatternPath = isPatternPath;
   }
 
-  public void setRuleStatus(RuleStatus ruleStatus) {
-    this.ruleStatus = ruleStatus;
-  }
-
-  public void setRuleIpBased(boolean ruleIpBased) {
-    this.ruleIpBased = ruleIpBased;
-  }
-
-  public void setRuleRequestLimitCount(int ruleRequestLimitCount) {
-    this.ruleRequestLimitCount = ruleRequestLimitCount;
-  }
-
   public Set<String> getParameterNamesToEnable() {
     return parameterNamesToEnable;
   }
@@ -105,6 +93,10 @@ public class EndpointDto {
 
   public RuleStatus getRuleStatus() {
     return this.ruleStatus;
+  }
+
+  public void setRuleStatus(RuleStatus ruleStatus) {
+    this.ruleStatus = ruleStatus;
   }
 
   public int timeLimitDays() {
@@ -151,8 +143,16 @@ public class EndpointDto {
     return this.ruleIpBased;
   }
 
+  public void setRuleIpBased(boolean ruleIpBased) {
+    this.ruleIpBased = ruleIpBased;
+  }
+
   public int getRuleRequestLimitCount() {
     return this.ruleRequestLimitCount;
+  }
+
+  public void setRuleRequestLimitCount(int ruleRequestLimitCount) {
+    this.ruleRequestLimitCount = ruleRequestLimitCount;
   }
 
   @Override
@@ -308,7 +308,7 @@ public class EndpointDto {
     private HttpMethod httpMethod;
     private Set<EndpointParameterDto> parameters = new HashSet<>();
     private boolean isPatternPath;
-    private RuleStatus ruleStatus;
+    private RuleStatus ruleStatus = RuleStatus.NOT_CONFIGURED;
     private boolean ruleIpBased;
     private boolean rulePermanentBan;
     private int ruleRequestLimitCount;

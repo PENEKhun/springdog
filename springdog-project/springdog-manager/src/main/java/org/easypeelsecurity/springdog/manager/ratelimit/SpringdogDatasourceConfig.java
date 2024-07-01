@@ -16,22 +16,19 @@
 
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
-import java.util.List;
+import org.apache.cayenne.configuration.server.ServerRuntime;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointParameter;
-import org.springframework.data.jpa.repository.JpaRepository;
+@Configuration
+public class SpringdogDatasourceConfig {
 
-/**
- * Repository for endpoint parameter.
- */
-public interface EndpointParameterRepository extends JpaRepository<EndpointParameter, Long> {
-
-  /**
-   * Find all parameters in endpoint.
-   *
-   * @param endpoint endpoint
-   * @return list of endpoint parameters
-   */
-  List<EndpointParameter> findAllByEndpoint(Endpoint endpoint);
+  @Bean(name = "springdogRepository")
+  public ServerRuntime springdogRepository() {
+    return ServerRuntime.builder()
+        .jdbcDriver("org.apache.derby.jdbc.EmbeddedDriver")
+        .url("jdbc:derby:springdog-embedded-database;create=true")
+        .addConfig("cayenne-springdog.xml")
+        .build();
+  }
 }

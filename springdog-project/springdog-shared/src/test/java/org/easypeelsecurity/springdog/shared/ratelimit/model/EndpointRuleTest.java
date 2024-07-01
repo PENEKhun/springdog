@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 
@@ -32,35 +33,23 @@ class EndpointRuleTest {
   @DisplayName("Should set default values in field about the rules when endpoint was created")
   void ruleDefaultValue() {
     // given
-    Endpoint endpoint = new Endpoint(
-        "hash",
-        "path",
-        "fqcn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false);
-
+    Endpoint endpoint = new Endpoint();
     // when & then
     assertAll(
-        () -> assertEquals(RuleStatus.NOT_CONFIGURED, endpoint.getRuleStatus()),
+        () -> assertEquals(RuleStatus.NOT_CONFIGURED.name(), endpoint.getRuleStatus()),
         () -> assertEquals(0, endpoint.getRuleRequestLimitCount()),
         () -> assertEquals(0, endpoint.getRuleTimeLimitInSeconds()),
         () -> assertEquals(0, endpoint.getRuleBanTimeInSeconds()),
-        () -> assertFalse(endpoint.isRulePermanentBan())
-    );
+        () -> assertFalse(endpoint.isRulePermanentBan()),
+        () -> assertFalse(endpoint.isRuleIpBased()),
+        () -> assertTrue(endpoint.getEndpointparameters().isEmpty()));
   }
 
   @Test
   @DisplayName("Time limit must be greater than 0")
   void mustBePositiveValue1() {
     // given
-    var endpoint = new Endpoint(
-        "hash",
-        "path",
-        "fqcn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false);
+    var endpoint = new Endpoint();
 
     // when & then
     assertThrows(
@@ -71,7 +60,8 @@ class EndpointRuleTest {
             false,
             10,
             -10,  // negative number
-            10),
+            10,
+            new HashSet<>()),
         "Time limit must be greater than 0");
   }
 
@@ -79,13 +69,7 @@ class EndpointRuleTest {
   @DisplayName("Request limit count must be greater than 0")
   void mustBePositiveValue2() {
     // given
-    var endpoint = new Endpoint(
-        "hash",
-        "path",
-        "fqcn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false);
+    var endpoint = new Endpoint();
 
     // when & then
     assertThrows(
@@ -96,7 +80,8 @@ class EndpointRuleTest {
             false,
             -10, // negative number
             10,
-            10),
+            10,
+            new HashSet<>()),
         "Request limit count must be greater than 0");
   }
 
@@ -104,13 +89,7 @@ class EndpointRuleTest {
   @DisplayName("Ban time must be greater than 0")
   void mustBePositiveValue3() {
     // given
-    var endpoint = new Endpoint(
-        "hash",
-        "path",
-        "fqcn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false);
+    var endpoint = new Endpoint();
 
     // when & then
     assertThrows(
@@ -121,7 +100,8 @@ class EndpointRuleTest {
             false,
             10,
             10,
-            -10), // negative number
+            -10,
+            new HashSet<>()), // negative number
         "Ban time must be greater than 0");
   }
 }

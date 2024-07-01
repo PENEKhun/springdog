@@ -18,7 +18,6 @@ package org.easypeelsecurity.springdog.manager.ratelimit;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.VersionCompare;
@@ -32,7 +31,7 @@ class EndpointQueryTest {
   @DisplayName("Returns FIRST_RUN if the latest version does not exist.")
   void firstRunTest() {
     // given
-    EndpointQuery endpointQuery = new EndpointQuery(null, null);
+    EndpointQuery endpointQuery = new EndpointQuery(null);
     Optional<EndpointVersionControl> latestVersion = Optional.empty();
 
     // when
@@ -46,7 +45,7 @@ class EndpointQueryTest {
   @DisplayName("Returns FIRST_RUN if the latest version does not exist.")
   void returnFirstR() {
     // given
-    EndpointQuery endpointQuery = new EndpointQuery(null, null);
+    EndpointQuery endpointQuery = new EndpointQuery(null);
     Optional<EndpointVersionControl> latestVersion = Optional.empty();
 
     // when
@@ -60,9 +59,10 @@ class EndpointQueryTest {
   @DisplayName("Returns DIFFERENT if it is different from the latest version hash that exists.")
   void returnDifferent() {
     // given
-    EndpointQuery endpointQuery = new EndpointQuery(null, null);
-    Optional<EndpointVersionControl> latestVersion =
-        Optional.of(new EndpointVersionControl(LocalDateTime.now(), "exist-hash"));
+    EndpointQuery endpointQuery = new EndpointQuery(null);
+    EndpointVersionControl temp = new EndpointVersionControl();
+    temp.setFullHashOfEndpoints("exist-hash");
+    Optional<EndpointVersionControl> latestVersion = Optional.of(temp);
     String newHash = "new-hash";
 
     // when
@@ -76,9 +76,10 @@ class EndpointQueryTest {
   @DisplayName("Returns SAME if it is the same as the latest version hash that exists.")
   void returnSame() {
     // given
-    EndpointQuery endpointQuery = new EndpointQuery(null, null);
-    Optional<EndpointVersionControl> latestVersion =
-        Optional.of(new EndpointVersionControl(LocalDateTime.now(), "same-hash"));
+    EndpointQuery endpointQuery = new EndpointQuery(null);
+    EndpointVersionControl temp = new EndpointVersionControl();
+    temp.setFullHashOfEndpoints("same-hash");
+    Optional<EndpointVersionControl> latestVersion = Optional.of(temp);
     String newHash = "same-hash";
 
     // when

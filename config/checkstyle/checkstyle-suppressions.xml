@@ -27,6 +27,8 @@
   <suppress checks="[a-zA-Z0-9]*" files="[\\/]resources\/before[\\/]"/>
   <!-- Suppress checks final keyword. -->
   <suppress checks="FinalLocalVariable" files=".*\.java"/>
+  <!-- Suppress all warning for generated entity by Cayenne -->
+  <suppress checks=".*" files=".*\/auto\/_.*\.java"/>
   <!-- Suppress all warning for springdog tests -->
   <suppress checks="[a-zA-Z0-9]*" files="springdog-project/springdog-tests/.*"/>
 </suppressions>

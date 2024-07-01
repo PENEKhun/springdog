@@ -4,11 +4,12 @@ plugins {
 }
 
 dependencies {
-    implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
     implementation "com.github.ben-manes.caffeine:caffeine:${caffeineVersion}"
     api project(":springdog-project:springdog-shared")
+    compileOnly("org.apache.cayenne:cayenne-server:${cayenneVersion}") {
+        exclude group: 'org.slf4j', module: 'slf4j'
+    }
 
-    testImplementation "org.springframework.boot:spring-boot-starter-data-jpa:${springbootVersion}"
     testImplementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
 }
 

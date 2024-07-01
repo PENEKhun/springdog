@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.manager.ratelimit;
+package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
-import java.util.Optional;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.auto._EndpointChangelog;
 
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
-import org.springframework.data.jpa.repository.JpaRepository;
+@SuppressWarnings("all")
+public class EndpointChangelog extends _EndpointChangelog {
 
-/**
- * Repository for {@link EndpointVersionControl}.
- */
-public interface EndpointVersionControlRepository extends JpaRepository<EndpointVersionControl, Long> {
-
-  /**
-   * Find latest version object in the database.
-   *
-   * @return endpoint version control
-   */
-  Optional<EndpointVersionControl> findTopByOrderByDateOfVersionDesc();
+  private static final long serialVersionUID = 1L;
 }

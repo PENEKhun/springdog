@@ -18,6 +18,7 @@ dependencies {
 
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
     testImplementation "org.springframework.security:spring-security-test:${springVersion}"
+    testImplementation "org.apache.cayenne:cayenne-server:${cayenneVersion}"
 }
 
 test {
