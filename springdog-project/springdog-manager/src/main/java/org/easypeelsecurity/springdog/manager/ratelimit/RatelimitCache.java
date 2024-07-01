@@ -18,6 +18,8 @@ package org.easypeelsecurity.springdog.manager.ratelimit;
 
 import java.time.LocalDateTime;
 
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
@@ -31,20 +33,21 @@ public final class RatelimitCache {
   }
 
   /**
-   * Call when access pages.
+   * Add timestamp(access time) at the local database. and return the recent access histories.
    *
    * @param requestHashed request information hashed
-   * @param ldt           now time
+   * @param nowTime       now time
+   * @return access histories
    */
-  public static synchronized LocalDateTime[] addTimestamp(String requestHashed, LocalDateTime ldt) {
+  private static LocalDateTime[] addTimestamp(String requestHashed, LocalDateTime nowTime) {
     LocalDateTime[] before = getAccessHistoryInstance().getIfPresent(requestHashed);
     LocalDateTime[] after;
     if (before != null) {
       after = new LocalDateTime[before.length + 1];
       System.arraycopy(before, 0, after, 0, before.length);
-      after[before.length] = ldt;
+      after[before.length] = nowTime;
     } else {
-      after = new LocalDateTime[] {ldt};
+      after = new LocalDateTime[] {nowTime};
     }
 
     getAccessHistoryInstance().put(requestHashed, after);
@@ -56,10 +59,44 @@ public final class RatelimitCache {
     getBanHistoryInstance().put(requestHashed, banUntil);
   }
 
-  public static synchronized boolean checkBan(String requestHashed, LocalDateTime now) {
-    LocalDateTime banTime = getBanHistoryInstance().getIfPresent(requestHashed);
-    if (banTime != null) {
-      if (banTime.isBefore(now)) {
+  /**
+   * When this method called, add access timestamp to the local database. and check if the request is banned or
+   * not by the ratelimit rule.
+   *
+   * @param requestHashed request information hashed
+   * @param endpoint      endpoint information
+   * @param nowTime       now time
+   * @return true if the request is banned, false otherwise
+   */
+  public static synchronized boolean isBannedRequest(String requestHashed, EndpointDto endpoint,
+      LocalDateTime nowTime) {
+    if (checkAlreadyBanned(requestHashed, nowTime)) {
+      return true;
+    }
+
+    LocalDateTime[] timestamps = RatelimitCache.addTimestamp(requestHashed, nowTime);
+    int count = 0;
+    int timeFrameSeconds = endpoint.getRuleTimeLimitInSeconds();
+    for (LocalDateTime timestamp : timestamps) {
+      if (timestamp.isAfter(nowTime.minusSeconds(timeFrameSeconds))) {
+        count++;
+      }
+    }
+
+    if (count > endpoint.getRuleRequestLimitCount()) {
+      int banTimeSeconds =
+          endpoint.isRulePermanentBan() ? Integer.MAX_VALUE : endpoint.getRuleBanTimeInSeconds();
+      RatelimitCache.ban(requestHashed, nowTime.plusSeconds(banTimeSeconds));
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private static boolean checkAlreadyBanned(String requestHashed, LocalDateTime nowTime) {
+    LocalDateTime banExpireDateTime = getBanHistoryInstance().getIfPresent(requestHashed);
+    if (banExpireDateTime != null) {
+      if (banExpireDateTime.isBefore(nowTime)) {
         getBanHistoryInstance().invalidate(requestHashed);
         return false;
       }
