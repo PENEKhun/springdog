@@ -20,9 +20,17 @@ import org.apache.cayenne.configuration.server.ServerRuntime;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuration for Springdog datasource.
+ */
 @Configuration
 public class SpringdogDatasourceConfig {
 
+  /**
+   * Bean for accessing Springdog datasource.
+   *
+   * @return ServerRuntime for Springdog datasource.
+   */
   @Bean(name = "springdogRepository")
   public ServerRuntime springdogRepository() {
     return ServerRuntime.builder()
