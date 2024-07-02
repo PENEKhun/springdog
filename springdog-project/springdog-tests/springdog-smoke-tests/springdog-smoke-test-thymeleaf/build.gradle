@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.1'
+    id 'io.spring.dependency-management' version '1.1.5'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':springdog-project:springdog-starter')
+    annotationProcessor project(':springdog-project:springdog-starter')
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.register('deleteEmbeddedDatabase', Delete) {
+    def dir = file("${projectDir}/springdog-embedded-database")
+    if (dir.exists() && dir.isDirectory()) {
+        println "Deleting directory and its contents: $dir"
+        delete dir.listFiles()
+        delete dir
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    dependsOn('deleteEmbeddedDatabase')
+}
