@@ -70,8 +70,9 @@ public class EndpointQuery {
    * @param compareTo   An {@code Optional} containing the latest {@code EndpointVersionControl} instance, which
    *                    holds the version to compare against. If empty, it indicates that there is no existing
    *                    version.
-   * @return A {@code VersionCompare} indicating the result of the comparison. {@code VersionCompare.FIRST_RUN}
-   * is returned if {@code compareTo} is empty, suggesting that this is the initial version check.
+   * @return A {@code VersionCompare} indicating the result of the comparison.
+   *     {@code VersionCompare.FIRST_RUN}is returned if {@code compareTo} is empty, suggesting that this is the
+   *     initial version check.
    */
   public VersionCompare compareToLatestVersion(String compareWith,
       Optional<EndpointVersionControl> compareTo) {

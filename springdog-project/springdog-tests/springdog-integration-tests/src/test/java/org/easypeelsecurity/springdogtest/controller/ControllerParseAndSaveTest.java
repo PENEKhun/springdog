@@ -31,6 +31,9 @@ import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.converter.ArgumentConversionException;
+import org.junit.jupiter.params.converter.ConvertWith;
+import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -73,20 +76,31 @@ class ControllerParseAndSaveTest {
   @ParameterizedTest
   @DisplayName("The controller's parameters should be parsed well.")
   @CsvSource({
-      "org.easypeelsecurity.springdogtest.ExampleController.example, 1",
-      "org.easypeelsecurity.springdogtest.ExampleController.example2, 2",
-      "org.easypeelsecurity.springdogtest.ExampleController.example3, 1",
-      "org.easypeelsecurity.springdogtest.ExampleController.example4, 2",
-      "org.easypeelsecurity.springdogtest.ExampleController.example5, 1"
+      "org.easypeelsecurity.springdogtest.ExampleController.example, param1",
+      "org.easypeelsecurity.springdogtest.ExampleController.example2, postRequest",
+      "org.easypeelsecurity.springdogtest.ExampleController.example3, id",
+      "org.easypeelsecurity.springdogtest.ExampleController.example4, newTitle&newContent",
+      "org.easypeelsecurity.springdogtest.ExampleController.example5, id"
   })
-  void parameterParsedWell(String fqcn, int parameterSize) {
+  void parameterParsedWell(String fqcn, @ConvertWith(StringToArrayConverter.class) String[] params) {
     // given
     var endpoint = endpointQuery.getEndpointByFqcn(fqcn).get();
-
-    // when
     Set<EndpointParameterDto> parameters = endpoint.getParameters();
 
-    // then
-    assertThat(parameters).hasSize(parameterSize);
+    // when & then
+    assertThat(parameters)
+        .extracting(EndpointParameterDto::getName)
+        .containsExactlyInAnyOrder(params);
+  }
+
+  static final class StringToArrayConverter extends SimpleArgumentConverter {
+
+    @Override
+    protected Object convert(Object source, Class<?> targetType) throws ArgumentConversionException {
+      if (source instanceof String && targetType == String[].class) {
+        return ((String) source).split("&");
+      }
+      throw new ArgumentConversionException("Conversion failed. Expected an array.");
+    }
   }
 }

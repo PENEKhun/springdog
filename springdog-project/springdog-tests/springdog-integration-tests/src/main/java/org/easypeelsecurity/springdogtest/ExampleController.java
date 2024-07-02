@@ -36,7 +36,7 @@ public class ExampleController {
   }
 
   @PostMapping("/post")
-  public String example2(@RequestBody String title, @RequestBody String content) {
+  public String example2(@RequestBody PostRequest postRequest) {
     return "example2";
   }
 
@@ -53,5 +53,27 @@ public class ExampleController {
   @GetMapping("/get/{id}")
   public String example5(@PathVariable Integer id) {
     return "example5";
+  }
+
+  static class PostRequest {
+
+    private String title;
+    private String content;
+
+    public String getTitle() {
+      return title;
+    }
+
+    public void setTitle(String title) {
+      this.title = title;
+    }
+
+    public String getContent() {
+      return content;
+    }
+
+    public void setContent(String content) {
+      this.content = content;
+    }
   }
 }
