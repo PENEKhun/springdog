@@ -1,0 +1,6 @@
+spring:
+  thymeleaf:
+    prefix: classpath:templates/anstjdgns/
+    suffix: .html
+    mode: HTML
+    cache: false
