@@ -18,10 +18,6 @@ package org.easypeelsecurity.springdog.autoconfigure.controller.parser;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.only;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
@@ -30,19 +26,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.cayenne.configuration.CayenneRuntime;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointRepository;
-import org.easypeelsecurity.springdog.manager.ratelimit.VersionControlRepository;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.VersionCompare;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -53,27 +45,23 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
 
 class ControllerParserTest {
 
   @Mock
-  private RequestMappingHandlerMapping handlerMapping;
+  RequestMappingHandlerMapping handlerMapping;
 
   @Mock
-  private EndpointQuery endpointQuery;
+  EndpointQuery endpointQuery;
 
   @Mock
-  private EndpointCommand endpointCommand;
+  EndpointCommand endpointCommand;
 
   @Mock
-  private EndpointRepository endpointRepository;
+  CayenneRuntime springdogRepository;
 
   @Mock
-  private VersionControlRepository versionControlRepository;
-
-  @Mock
-  private SpringdogProperties properties;
+  SpringdogProperties properties;
 
   private ControllerParser controllerParser;
 
@@ -81,62 +69,13 @@ class ControllerParserTest {
   void setUp() {
     MockitoAnnotations.openMocks(this);
     controllerParser =
-        new ControllerParser(handlerMapping, endpointQuery, endpointCommand, endpointRepository, properties,
-            versionControlRepository);
+        new ControllerParser(handlerMapping, endpointQuery, endpointCommand, springdogRepository, properties);
   }
 
   private final class MockHandlerMethod {
 
     public void method() {
     }
-  }
-
-  @Test
-  void testListEndpointsAndParameters_NoChanges() {
-    // given
-    when(handlerMapping.getHandlerMethods()).thenReturn(new HashMap<>());
-    when(properties.computeAbsolutePath("/")).thenReturn("/");
-    when(endpointQuery.compareToLatestVersion(ArgumentMatchers.anyString(), ArgumentMatchers.any())).thenReturn(
-        VersionCompare.SAME);
-
-    // when
-    controllerParser.listEndpointsAndParameters();
-
-    // then
-    verify(versionControlRepository, Mockito.never()).save(ArgumentMatchers.any(EndpointVersionControl.class));
-    verifyNoInteractions(endpointRepository, endpointCommand);
-  }
-
-  @Test
-  void testListEndpointsAndParameters_FirstRun() {
-    // given
-    when(handlerMapping.getHandlerMethods()).thenReturn(new HashMap<>());
-    when(properties.computeAbsolutePath("/")).thenReturn("/");
-    when(endpointQuery.compareToLatestVersion(ArgumentMatchers.anyString(), ArgumentMatchers.any())).thenReturn(
-        VersionCompare.FIRST_RUN);
-
-    // when
-    controllerParser.listEndpointsAndParameters();
-
-    // then
-    verify(endpointRepository, only()).saveAll(ArgumentMatchers.anyList());
-    verify(versionControlRepository).save(any(EndpointVersionControl.class));
-  }
-
-  @Test
-  void testListEndpointsAndParameters_Different() {
-    // given
-    when(handlerMapping.getHandlerMethods()).thenReturn(new HashMap<>());
-    when(properties.computeAbsolutePath("/")).thenReturn("/");
-    when(endpointQuery.compareToLatestVersion(ArgumentMatchers.anyString(), ArgumentMatchers.any())).thenReturn(
-        VersionCompare.DIFFERENT);
-
-    // when
-    controllerParser.listEndpointsAndParameters();
-
-    // then
-    verify(endpointCommand, only()).applyChanges(ArgumentMatchers.any(), ArgumentMatchers.any(),
-        ArgumentMatchers.any());
   }
 
   @Test
@@ -190,20 +129,6 @@ class ControllerParserTest {
 
     // when
     boolean isAnnotationPresent = method.isAnnotationPresent(PostConstruct.class);
-
-    // then
-    assertThat(isAnnotationPresent).isTrue();
-  }
-
-  @Test
-  @DisplayName("Should have Transactional annotation at listEndpointsAndParameters()")
-  void transactionalTest() throws NoSuchMethodException {
-    // given
-    Class<ControllerParser> clazz = ControllerParser.class;
-    Method method = clazz.getDeclaredMethod("listEndpointsAndParameters");
-
-    // when
-    boolean isAnnotationPresent = method.isAnnotationPresent(Transactional.class);
 
     // then
     assertThat(isAnnotationPresent).isTrue();
