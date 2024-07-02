@@ -32,14 +32,19 @@ import org.easypeelsecurity.springdog.agent.SpringdogAgentView;
 import org.easypeelsecurity.springdog.autoconfigure.PropertiesLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
+import org.thymeleaf.templatemode.TemplateMode;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
@@ -48,7 +53,6 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 import jakarta.annotation.PostConstruct;
-import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 
 /**
  * Processes the SpringDogEnable annotation to enable configurations necessary for SpringDog functionalities.
@@ -211,43 +215,47 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
   }
 
   private void generateThymeleafConfig(String fullPackageName) {
-    MethodSpec templateEngineMethod = MethodSpec.methodBuilder("templateEngine")
-        .addAnnotation(Bean.class)
-        .returns(SpringTemplateEngine.class)
+    MethodSpec initMethod = MethodSpec.methodBuilder("init")
+        .addAnnotation(EventListener.class)
+        .addAnnotation(AnnotationSpec.builder(Order.class).addMember(ANNOTATION_DEFAULT_FIELD, "$L", 1).build())
+        .addParameter(ContextRefreshedEvent.class, "event")
         .addModifiers(Modifier.PUBLIC)
-        .addStatement("$T templateEngine = new $T()", SpringTemplateEngine.class,
-            SpringTemplateEngine.class)
-        .addStatement("templateEngine.setTemplateResolver(templateResolver())")
-        .addStatement("templateEngine.addDialect(new $T())", LayoutDialect.class)
-        .addStatement("templateEngine.setEnableSpringELCompiler(true)")
-        .addStatement("return templateEngine")
-        .build();
-
-    MethodSpec templateResolverMethod = MethodSpec.methodBuilder("templateResolver")
-        .addAnnotation(Bean.class)
-        .returns(SpringResourceTemplateResolver.class)
-        .addModifiers(Modifier.PUBLIC)
-        .addStatement("$T templateResolver = new $T()", SpringResourceTemplateResolver.class,
-            SpringResourceTemplateResolver.class)
+        .addStatement("$T templateResolver = new $T()",
+            SpringResourceTemplateResolver.class, SpringResourceTemplateResolver.class)
         .addStatement("templateResolver.setPrefix(\"classpath:\")")
-        .addStatement("templateResolver.setTemplateMode(\"HTML\")")
-        .addStatement("return templateResolver")
+        .addStatement("templateResolver.setSuffix(\".html\")")
+        .addStatement("templateResolver.setTemplateMode($T.HTML)", TemplateMode.class)
+        .addStatement("templateResolver.setCharacterEncoding(\"UTF-8\")")
+        .addStatement("templateResolver.setOrder($T.MAX_VALUE - 1)", Integer.class)
+        .addStatement("templateResolver.setCheckExistence(true)")
+        .addStatement("templateResolver.setApplicationContext(applicationContext)")
+        .addStatement("templateEngine.addTemplateResolver(templateResolver)")
         .build();
 
-    TypeSpec agentEnabler = TypeSpec.classBuilder("SpringDogAgentEnabler")
+    TypeSpec springDogDynamicTemplateResolver = TypeSpec.classBuilder("SpringDogDynamicTemplateResolver")
         .addAnnotation(Configuration.class)
+        .addAnnotation(AnnotationSpec.builder(Generated.class)
+            .addMember(ANNOTATION_DEFAULT_FIELD, "$S",
+                "org.easypeelsecurity.springdog.autoconfigure.applier.SpringDogEnableProcessor")
+            .build())
         .addModifiers(Modifier.PUBLIC)
-        .addMethod(templateEngineMethod)
-        .addMethod(templateResolverMethod)
+        .addField(FieldSpec.builder(SpringTemplateEngine.class, "templateEngine", Modifier.PRIVATE)
+            .addAnnotation(Autowired.class)
+            .build())
+        .addField(FieldSpec.builder(ApplicationContext.class, "applicationContext", Modifier.PRIVATE)
+            .addAnnotation(Autowired.class)
+            .build())
+        .addMethod(initMethod)
         .build();
 
     try {
-      JavaFile.builder(fullPackageName, agentEnabler)
+      JavaFile.builder(fullPackageName, springDogDynamicTemplateResolver)
           .build()
           .writeTo(processingEnv.getFiler());
     } catch (IOException e) {
       processingEnv.getMessager()
-          .printMessage(Kind.ERROR, "Error writing Thymeleaf configuration: " + e.getMessage());
+          .printMessage(javax.tools.Diagnostic.Kind.ERROR,
+              "Error writing Thymeleaf configuration: " + e.getMessage());
     }
   }
 
