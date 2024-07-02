@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package smoketest.data.jpa.controller;
+package smoketest.apache.cayenne;
+
+import smoketest.apache.cayenne.Book;
 
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import smoketest.data.jpa.domain.Book;
-import smoketest.data.jpa.service.BookService;
 
 @RestController
 public class BookController {
