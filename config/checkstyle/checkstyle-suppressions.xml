@@ -30,8 +30,10 @@
   <!-- Suppress all warning for generated entity by Cayenne -->
   <suppress checks=".*" files=".*\/auto\/_.*\.java"/>
   <!-- Suppress all warning for Cayenne project xml -->
-  <suppress checks=".*" files=".*cayenne.xml"/>
-  <suppress checks=".*" files=".*.map.xml"/>
+  <suppress checks=".*" files=".*[\\/]springdog\.xml"/>
+  <suppress checks=".*" files=".*[\\/]cayenne\.xml"/>
+  <suppress checks=".*" files=".*[\\/]map\.xml"/>
+  <suppress checks=".*" files=".*[\\/]graph\.xml"/>
   <!-- Suppress all warning for springdog tests -->
   <suppress checks="[a-zA-Z0-9]*" files="springdog-project/springdog-tests/.*"/>
 </suppressions>
