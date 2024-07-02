@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package smoketest.data.jpa.repository;
+package smoketest.apache.cayenne;
 
-import java.util.List;
+import org.easypeelsecurity.springdog.autoconfigure.applier.SpringDogEnable;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+@SpringDogEnable
+@SpringBootApplication
+public class SampleCayenneApplication {
 
-import smoketest.data.jpa.domain.Book;
-
-public interface BookRepository extends JpaRepository<Book, Long> {
-
-  List<Book> findByAuthor(String authorName);
+  public static void main(String[] args) {
+    SpringApplication.run(SampleCayenneApplication.class, args);
+  }
 }

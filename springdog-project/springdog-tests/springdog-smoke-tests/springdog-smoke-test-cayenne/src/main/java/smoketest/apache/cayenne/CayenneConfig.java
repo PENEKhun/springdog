@@ -14,28 +14,19 @@
  * limitations under the License.
  */
 
-package smoketest.data.jpa.service;
+package smoketest.apache.cayenne;
 
-import java.util.List;
+import org.apache.cayenne.configuration.server.ServerRuntime;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+@Configuration
+public class CayenneConfig {
 
-import smoketest.data.jpa.domain.Book;
-import smoketest.data.jpa.repository.BookRepository;
-
-@Service
-@Transactional
-public class BookService {
-
-  private final BookRepository bookRepository;
-
-  public BookService(BookRepository bookRepository) {
-    this.bookRepository = bookRepository;
+  @Bean(name = "cayenneRuntime")
+  public ServerRuntime cayenneRuntime() {
+    return ServerRuntime.builder()
+        .addConfig("cayenne-springdog-smoke-test-cayenne.xml")
+        .build();
   }
-
-  public List<Book> allBooksByAuthor(String authorName) {
-    return bookRepository.findByAuthor(authorName);
-  }
-
 }

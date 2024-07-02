@@ -14,27 +14,63 @@
  * limitations under the License.
  */
 
-package smoketest.data.jpa.service;
+package smoketest.apache.cayenne;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.List;
 
+import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.configuration.CayenneRuntime;
+import org.apache.cayenne.query.ObjectSelect;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import smoketest.data.jpa.domain.Book;
-
 @SpringBootTest
-class BookServiceIntegrationTests {
+class BookIntegrationTests {
 
   @Autowired
-  private BookService bookService;
+  CayenneRuntime cayenneRuntime;
+
+  @Autowired
+  BookService bookService;
+
+  @BeforeEach
+  void setUp() {
+    // given
+    ObjectContext context = cayenneRuntime.newContext();
+    context.deleteObjects(
+        ObjectSelect.query(Book.class)
+            .select(context));
+
+    Book book1 = context.newObject(Book.class);
+    book1.setAuthor("PENEKhun");
+    book1.setName("To Kill a Mockingbird");
+    book1.setDescription(
+        "A gripping and heart-wrenching story of racial injustice in the Deep South, told through the eyes of young Scout Finch.");
+    book1.setPrice(18_000L);
+
+    Book book2 = context.newObject(Book.class);
+    book2.setAuthor("PENEKhun");
+    book2.setName("1984");
+    book2.setDescription(
+        "A dystopian novel exploring the dangers of totalitarianism and extreme political ideology in a repressive society.");
+    book2.setPrice(14_000L);
+
+    Book book3 = context.newObject(Book.class);
+    book3.setAuthor("George Orwell");
+    book3.setName("Animal Farm");
+    book3.setDescription("A satirical allegory of the Russian Revolution and the rise of Stalinism.");
+    book3.setPrice(12_000L);
+
+    context.commitChanges();
+  }
 
   @Test
-  void test() {
+  void testApplicationCayenneWork() {
     // given
     String authorName = "PENEKhun";
 
@@ -53,5 +89,4 @@ class BookServiceIntegrationTests {
                 14_000L)
         );
   }
-
 }
