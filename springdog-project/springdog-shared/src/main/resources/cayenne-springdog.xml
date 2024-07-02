@@ -15,21 +15,21 @@
   ~ limitations under the License.
   -->
 
-<domain xmlns="http://cayenne.apache.org/schema/10/domain"
-	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/domain https://cayenne.apache.org/schema/10/domain.xsd"
-	 project-version="10">
-	<map name="Ratelimit"/>
-	<node name="springdog derby"
-		 factory="org.apache.cayenne.configuration.server.XMLPoolingDataSourceFactory"
-		 schema-update-strategy="org.apache.cayenne.access.dbsync.CreateIfNoSchemaStrategy">
-		<map-ref name="Ratelimit"/>
-		<data-source>
-			<driver value="org.apache.derby.jdbc.EmbeddedDriver"/>
-			<url value="jdbc:derby:springdog-embedded-database;create=true"/>
-			<connectionPool min="1" max="1"/>
-			<login/>
-		</data-source>
-	</node>
-	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="springdog.graph.xml"/>
+<domain xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  project-version="10"
+  xmlns="http://cayenne.apache.org/schema/10/domain"
+  xsi:schemaLocation="http://cayenne.apache.org/schema/10/domain https://cayenne.apache.org/schema/10/domain.xsd">
+  <map name="Ratelimit"/>
+  <node factory="org.apache.cayenne.configuration.server.XMLPoolingDataSourceFactory"
+    name="springdog derby"
+    schema-update-strategy="org.apache.cayenne.access.dbsync.CreateIfNoSchemaStrategy">
+    <data-source>
+      <connectionPool max="1" min="1"/>
+      <driver value="org.apache.derby.jdbc.EmbeddedDriver"/>
+      <login/>
+      <url value="jdbc:derby:springdog-embedded-database;create=true"/>
+    </data-source>
+    <map-ref name="Ratelimit"/>
+  </node>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="springdog.graph.xml"/>
 </domain>

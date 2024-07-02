@@ -16,7 +16,7 @@
   -->
 
 <graphs xmlns="http://cayenne.apache.org/schema/10/graph">
-	<graph type="ER" scale="1.0">
-		<entity name="Book" x="0.0" y="0.0" width="66.0" height="107.0"/>
-	</graph>
+  <graph scale="1.0" type="ER">
+    <entity height="107.0" name="Book" width="66.0" x="0.0" y="0.0"/>
+  </graph>
 </graphs>
