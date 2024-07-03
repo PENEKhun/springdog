@@ -16,7 +16,6 @@ dependencies {
 	implementation project(':springdog-project:springdog-starter')
 	annotationProcessor project(':springdog-project:springdog-starter')
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation "org.springframework.boot:spring-boot-starter-thymeleaf:${springbootVersion}"
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
