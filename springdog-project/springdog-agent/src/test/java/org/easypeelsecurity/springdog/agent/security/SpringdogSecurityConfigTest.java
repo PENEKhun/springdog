@@ -42,7 +42,7 @@ class SpringdogSecurityConfigTest {
     when(springdogProperties.getAgentUsername()).thenReturn("username");
     when(springdogProperties.getAgentPassword()).thenReturn("password");
     // when
-    UserDetailsService userDetailsService = springdogSecurityConfig.userDetailsService();
+    UserDetailsService userDetailsService = springdogSecurityConfig.springdogUserDetailsService();
     // then
     assertNotNull(userDetailsService);
   }

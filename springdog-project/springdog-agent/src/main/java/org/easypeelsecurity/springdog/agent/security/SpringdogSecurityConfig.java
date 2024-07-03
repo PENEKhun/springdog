@@ -19,6 +19,10 @@ package org.easypeelsecurity.springdog.agent.security;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
@@ -46,15 +50,13 @@ public class SpringdogSecurityConfig {
    * Security filter chain for springdog agent.
    */
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  @Order(Integer.MIN_VALUE)
+  public SecurityFilterChain springdogSecurityFilterChain(HttpSecurity http) throws Exception {
     String baseAbsolutePath = springdogProperties.computeAbsolutePath("");
     http
-        .authorizeHttpRequests(authorizeRequests ->
-            authorizeRequests
-                .requestMatchers(request -> request.getRequestURI().startsWith(baseAbsolutePath))
-                .authenticated()
-                .anyRequest().permitAll()
-        ).formLogin(formLogin -> formLogin
+        .securityMatcher(baseAbsolutePath + "/**")
+        .authorizeHttpRequests(auth -> auth.anyRequest().hasRole("SPRINGDOG_AGENT_ADMIN"))
+        .formLogin(formLogin -> formLogin
             .loginPage(springdogProperties.computeAbsolutePath("/login"))
             .failureUrl(springdogProperties.computeAbsolutePath("/login?error"))
             .loginProcessingUrl(springdogProperties.computeAbsolutePath("/login"))
@@ -70,16 +72,26 @@ public class SpringdogSecurityConfig {
   }
 
   /**
-   * UserDetailsService bean to configure in-memory authentication.
+   * Allows to define duplicate Authentication Manager beans.
    */
-  @Bean
-  public UserDetailsService userDetailsService() {
+  @Bean("springdogAuthenticationManager")
+  public AuthenticationManager springdogAuthenticationManager(HttpSecurity http) {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setUserDetailsService(springdogUserDetailsService());
+    return new ProviderManager(provider);
+  }
+
+  /**
+   * Springdog use in-memory user details service.
+   */
+  public UserDetailsService springdogUserDetailsService() {
     String username = springdogProperties.getAgentUsername();
     String password = springdogProperties.getAgentPassword();
     UserDetails user = User.withUsername(username)
         .password("{noop}" + password)
-        .roles("ADMIN")
+        .roles("SPRINGDOG_AGENT_ADMIN")
         .build();
+
     return new InMemoryUserDetailsManager(user);
   }
 }
