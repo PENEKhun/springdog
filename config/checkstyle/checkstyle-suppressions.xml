@@ -36,4 +36,6 @@
   <suppress checks=".*" files=".*graph\.xml"/>
   <!-- Suppress all warning for springdog tests -->
   <suppress checks="[a-zA-Z0-9]*" files="springdog-project/springdog-tests/.*"/>
+  <!-- Suppress java for compiling test -->
+  <suppress checks=".*" files=".*\/test\/resources\/.*\.java"/>
 </suppressions>
