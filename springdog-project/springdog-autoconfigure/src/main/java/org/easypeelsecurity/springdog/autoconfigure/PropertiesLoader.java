@@ -19,6 +19,7 @@ package org.easypeelsecurity.springdog.autoconfigure;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -99,7 +100,11 @@ public class PropertiesLoader {
     try {
       Filer filer = processingEnv.getFiler();
       FileObject resource = filer.getResource(StandardLocation.CLASS_OUTPUT, "", "dummy");
-      Path currentPath = Paths.get(resource.toUri());
+      URI uri = resource.toUri();
+      if (!uri.getScheme().equals("file")) {
+        return null;
+      }
+      Path currentPath = Paths.get(uri);
 
       while (currentPath != null && !Files.exists(currentPath.resolve("src/main"))) {
         currentPath = currentPath.getParent();
