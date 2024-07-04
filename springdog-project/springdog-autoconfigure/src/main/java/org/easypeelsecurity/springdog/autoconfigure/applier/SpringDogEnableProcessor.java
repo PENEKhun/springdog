@@ -74,14 +74,4 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
       generatedCodes.forEach(generator -> generator.writeTo(fullPackageName, processingEnv));
     });
   }
-
-  /**
-   * Defines Hibernate properties.
-   */
-  private HashMap<String, String> hibernateProperties() {
-    HashMap<String, String> properties = new HashMap<>();
-    properties.put("hibernate.hbm2ddl.auto", "update");
-    properties.put("hibernate.show_sql", "true");
-    return properties;
-  }
 }
