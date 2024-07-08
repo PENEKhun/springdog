@@ -16,8 +16,6 @@
 
 package smoketest.apache.cayenne;
 
-import smoketest.apache.cayenne.Book;
-
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,5 +34,4 @@ public class BookController {
   public List<Book> getBooks(String authorName) {
     return bookService.allBooksByAuthor(authorName);
   }
-
 }

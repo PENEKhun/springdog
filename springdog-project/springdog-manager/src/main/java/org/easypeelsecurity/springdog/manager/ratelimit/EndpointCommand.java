@@ -19,15 +19,17 @@ package org.easypeelsecurity.springdog.manager.ratelimit;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.cayenne.ObjectContext;
-import org.apache.cayenne.configuration.CayenneRuntime;
-import org.apache.cayenne.query.ObjectSelect;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointHash;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+
+import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.configuration.CayenneRuntime;
+import org.apache.cayenne.query.ObjectSelect;
 
 /**
  * Command class for endpoint.

@@ -20,27 +20,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.io.IOException;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import org.junit.jupiter.api.Test;
+
 class ParameterNameExtractorTest {
-
-  private static final class ControllerStub {
-
-    public void simpleMethod(String param1, int param2) {
-      // Simple method with basic parameters
-    }
-
-    public void annotatedMethod(@RequestParam("paramA") String param1, @RequestParam("paramB") int param2,
-        @RequestBody Object paramC) {
-      // Method with @RequestParam, @RequestBody annotations
-    }
-
-    public void mixedMethod(@RequestParam("paramC") String param1, int param2) {
-      // Mixed method with one annotated parameter
-    }
-  }
 
   @Test
   void testSimpleMethodParameterNames() throws IOException, NoSuchMethodException {
@@ -71,5 +56,21 @@ class ParameterNameExtractorTest {
 
     // then
     assertThat(paramNames).containsExactlyInAnyOrder("paramC", "param2");
+  }
+
+  private static final class ControllerStub {
+
+    public void simpleMethod(String param1, int param2) {
+      // Simple method with basic parameters
+    }
+
+    public void annotatedMethod(@RequestParam("paramA") String param1, @RequestParam("paramB") int param2,
+        @RequestBody Object paramC) {
+      // Method with @RequestParam, @RequestBody annotations
+    }
+
+    public void mixedMethod(@RequestParam("paramC") String param1, int param2) {
+      // Mixed method with one annotated parameter
+    }
   }
 }

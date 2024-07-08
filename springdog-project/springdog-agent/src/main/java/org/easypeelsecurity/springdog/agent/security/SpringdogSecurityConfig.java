@@ -16,7 +16,6 @@
 
 package org.easypeelsecurity.springdog.agent.security;
 
-import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -30,6 +29,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 
 /**
  * Setting up Spring Security for Agent pages.

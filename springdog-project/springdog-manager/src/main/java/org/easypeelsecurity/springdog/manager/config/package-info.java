@@ -17,4 +17,5 @@
 /**
  * Contains configuration classes for the Springdog manager.
  */
+
 package org.easypeelsecurity.springdog.manager.config;

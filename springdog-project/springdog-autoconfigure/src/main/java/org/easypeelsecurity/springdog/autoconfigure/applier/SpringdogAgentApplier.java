@@ -18,9 +18,10 @@ package org.easypeelsecurity.springdog.autoconfigure.applier;
 
 import javax.lang.model.element.Modifier;
 
-import org.easypeelsecurity.springdog.agent.SpringdogAgentView;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.easypeelsecurity.springdog.agent.SpringdogAgentView;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.TypeSpec;

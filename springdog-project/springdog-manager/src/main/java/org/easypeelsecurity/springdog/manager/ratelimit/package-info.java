@@ -17,4 +17,5 @@
 /**
  * Core of Ratelimit.
  */
+
 package org.easypeelsecurity.springdog.manager.ratelimit;

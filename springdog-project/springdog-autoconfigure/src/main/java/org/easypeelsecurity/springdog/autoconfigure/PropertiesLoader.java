@@ -39,7 +39,6 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class PropertiesLoader {
 
-  private final ProcessingEnvironment processingEnv;
   private static final String[] PROPERTIES_LOCATIONS = {
       "src/main/resources/application.properties",
       "src/main/resources/config/application.properties",
@@ -50,6 +49,7 @@ public class PropertiesLoader {
       "application.yml",
       "config/application.yml"
   };
+  private final ProcessingEnvironment processingEnv;
 
   /**
    * Constructor.

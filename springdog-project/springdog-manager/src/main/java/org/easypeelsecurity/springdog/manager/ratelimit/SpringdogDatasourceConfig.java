@@ -16,9 +16,10 @@
 
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
-import org.apache.cayenne.configuration.server.ServerRuntime;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import org.apache.cayenne.configuration.server.ServerRuntime;
 
 /**
  * Configuration for Springdog datasource.

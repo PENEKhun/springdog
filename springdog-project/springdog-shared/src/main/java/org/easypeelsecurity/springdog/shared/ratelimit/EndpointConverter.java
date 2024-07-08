@@ -19,12 +19,13 @@ package org.easypeelsecurity.springdog.shared.ratelimit;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.cayenne.ObjectContext;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.ApiParameterType;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointParameter;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
+
+import org.apache.cayenne.ObjectContext;
 
 /**
  * Converter for rate limit. between DTO and Entity.

@@ -18,17 +18,18 @@ package org.easypeelsecurity.springdog.autoconfigure.applier;
 
 import javax.lang.model.element.Modifier;
 
+import jakarta.annotation.PostConstruct;
+
+import org.springframework.stereotype.Component;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
-
-import jakarta.annotation.PostConstruct;
 
 /**
  * Displays a banner when the classes required to run Springdog are loaded.

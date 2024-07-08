@@ -16,13 +16,14 @@
 
 package org.easypeelsecurity.springdog.manager.agent;
 
-import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
-import org.easypeelsecurity.springdog.shared.util.IpAddressUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
+import org.easypeelsecurity.springdog.shared.util.IpAddressUtil;
 
 /**
  * A pre-handle for filtering agent connections.

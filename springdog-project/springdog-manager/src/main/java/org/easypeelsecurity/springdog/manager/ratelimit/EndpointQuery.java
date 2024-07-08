@@ -20,17 +20,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.cayenne.ObjectContext;
-import org.apache.cayenne.configuration.CayenneRuntime;
-import org.apache.cayenne.query.ObjectSelect;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.VersionCompare;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+
+import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.configuration.CayenneRuntime;
+import org.apache.cayenne.query.ObjectSelect;
 
 /**
  * Endpoint query service.

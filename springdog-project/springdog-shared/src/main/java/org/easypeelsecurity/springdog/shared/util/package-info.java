@@ -17,4 +17,5 @@
 /**
  * The ubiquitous utility class.
  */
+
 package org.easypeelsecurity.springdog.shared.util;

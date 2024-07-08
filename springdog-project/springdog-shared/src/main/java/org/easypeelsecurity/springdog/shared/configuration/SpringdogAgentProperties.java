@@ -30,24 +30,24 @@ class SpringdogAgentProperties {
   private String password = "admin";
   private boolean externalAccess;
 
-  public void setBasePath(String basePath) {
-    this.basePath = basePath;
-  }
-
   public String getBasePath() {
     return basePath;
+  }
+
+  public void setBasePath(String basePath) {
+    this.basePath = basePath;
   }
 
   public String getUsername() {
     return username;
   }
 
-  public String getPassword() {
-    return password;
-  }
-
   public void setUsername(String username) {
     this.username = username;
+  }
+
+  public String getPassword() {
+    return password;
   }
 
   public void setPassword(String password) {

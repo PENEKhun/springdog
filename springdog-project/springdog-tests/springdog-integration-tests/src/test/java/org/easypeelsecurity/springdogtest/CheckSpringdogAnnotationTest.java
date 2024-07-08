@@ -19,6 +19,7 @@ package org.easypeelsecurity.springdogtest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.easypeelsecurity.springdog.autoconfigure.applier.SpringDogEnable;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

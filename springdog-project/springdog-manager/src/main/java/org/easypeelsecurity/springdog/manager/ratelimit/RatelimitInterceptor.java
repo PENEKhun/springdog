@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
 import java.io.IOException;
@@ -24,11 +25,9 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
-import org.easypeelsecurity.springdog.shared.util.IpAddressUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,11 +35,14 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
+import org.easypeelsecurity.springdog.shared.util.IpAddressUtil;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Interceptor for ratelimit.
@@ -120,10 +122,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
       return true;
     }
     String requestPath = request.getRequestURI().substring(request.getContextPath().length());
-    if (requestPath.startsWith(springdogProperties.computeAbsolutePath(""))) {
-      return true;
-    }
-    return false;
+    return requestPath.startsWith(springdogProperties.computeAbsolutePath(""));
   }
 
   private void applyRatelimitResponse(HttpServletResponse response, String retryAfter)

@@ -17,4 +17,5 @@
 /**
  * Model for ratelimit.
  */
+
 package org.easypeelsecurity.springdog.shared.ratelimit.model;

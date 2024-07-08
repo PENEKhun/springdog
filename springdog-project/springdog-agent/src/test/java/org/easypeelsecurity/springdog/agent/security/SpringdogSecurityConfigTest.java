@@ -20,10 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
+
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 class SpringdogSecurityConfigTest {
 

@@ -18,12 +18,12 @@ package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 import java.lang.annotation.Annotation;
 
+import jakarta.websocket.server.PathParam;
+
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import jakarta.websocket.server.PathParam;
 
 /**
  * Enum for controller parameter type.

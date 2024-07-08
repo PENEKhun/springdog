@@ -18,13 +18,15 @@ package org.easypeelsecurity.springdog.manager.ratelimit;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangelog;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
+
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.configuration.CayenneRuntime;
 import org.apache.cayenne.query.ObjectSelect;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangelog;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 
 @Service
 @SuppressWarnings({"checkstyle:MissingJavadocMethod", "checkstyle:MissingJavadocType"})

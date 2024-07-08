@@ -17,4 +17,5 @@
 /**
  * Contains configuration classes.
  */
+
 package org.easypeelsecurity.springdog.shared.configuration;
