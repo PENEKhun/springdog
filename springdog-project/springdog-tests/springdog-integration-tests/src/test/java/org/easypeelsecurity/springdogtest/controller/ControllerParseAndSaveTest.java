@@ -54,7 +54,7 @@ class ControllerParseAndSaveTest {
 
     // then
     assertThat(endpoints)
-        .extracting(EndpointDto::getPath, EndpointDto::getHttpMethod, EndpointDto::getFqcn,
+        .extracting(EndpointDto::getPath, EndpointDto::getHttpMethod, EndpointDto::getFqmn,
             EndpointDto::isPatternPath)
         .containsExactlyInAnyOrder(
             tuple("/api/get", GET,
@@ -84,9 +84,9 @@ class ControllerParseAndSaveTest {
       "org.easypeelsecurity.springdogtest.ExampleController.example4, newTitle&newContent",
       "org.easypeelsecurity.springdogtest.ExampleController.example5, id"
   })
-  void parameterParsedWell(String fqcn, @ConvertWith(StringToArrayConverter.class) String[] params) {
+  void parameterParsedWell(String fqmn, @ConvertWith(StringToArrayConverter.class) String[] params) {
     // given
-    var endpoint = endpointQuery.getEndpointByFqcn(fqcn).get();
+    var endpoint = endpointQuery.getEndpointByFqmn(fqmn).get();
     Set<EndpointParameterDto> parameters = endpoint.getParameters();
 
     // when & then

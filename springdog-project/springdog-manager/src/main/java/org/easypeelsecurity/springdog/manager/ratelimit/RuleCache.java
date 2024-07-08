@@ -25,7 +25,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
  * Rule cache instance.
- * KEY: fqcn
+ * KEY: fqmn
  * VALUE: EndpointDto
  */
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
@@ -34,17 +34,17 @@ public final class RuleCache {
   private RuleCache() {
   }
 
-  public static Optional<EndpointDto> findEndpointByFqcn(String fqcn) {
-    EndpointDto temp = getInstance().getIfPresent(fqcn);
+  public static Optional<EndpointDto> findEndpointByFqmn(String fqmn) {
+    EndpointDto temp = getInstance().getIfPresent(fqmn);
     return temp == null ? Optional.empty() : Optional.of(temp);
   }
 
   public static void cachingRule(EndpointDto endpointDto) {
-    getInstance().put(endpointDto.getFqcn(), endpointDto);
+    getInstance().put(endpointDto.getFqmn(), endpointDto);
   }
 
-  public static void changeRuleCached(String fqcn, EndpointDto endpointDto) {
-    getInstance().put(fqcn, endpointDto);
+  public static void changeRuleCached(String fqmn, EndpointDto endpointDto) {
+    getInstance().put(fqmn, endpointDto);
   }
 
   private static Cache<String, EndpointDto> getInstance() {

@@ -56,7 +56,7 @@ public class EndpointHashProvider implements EndpointHash {
         return methodCompare;
       }
 
-      return e1.getFqcn().compareTo(e2.getFqcn());
+      return e1.getFqmn().compareTo(e2.getFqmn());
     });
 
     StringBuilder sb = new StringBuilder();
@@ -82,7 +82,7 @@ public class EndpointHashProvider implements EndpointHash {
         .append(PROPERTY_DELIMITER)
         .append(api.getHttpMethod())
         .append(PROPERTY_DELIMITER)
-        .append(api.getFqcn());
+        .append(api.getFqmn());
 
     for (EndpointParameterDto parameter : parameters) {
       sb.append(parameter.getName())

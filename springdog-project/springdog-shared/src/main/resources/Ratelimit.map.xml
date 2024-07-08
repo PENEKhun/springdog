@@ -37,7 +37,7 @@
     <usePkgPath>true</usePkgPath>
   </cgen>
   <db-entity name="ENDPOINT" schema="APP">
-    <db-attribute isMandatory="true" length="255" name="FQCN" type="VARCHAR"/>
+    <db-attribute isMandatory="true" length="255" name="FQMN" type="VARCHAR"/>
     <db-attribute isMandatory="true" length="64" name="HASH" type="VARCHAR"/>
     <db-attribute isMandatory="true" length="10" name="HTTPMETHOD" type="VARCHAR"/>
     <db-attribute isMandatory="true" isPrimaryKey="true" length="19" name="ID" type="BIGINT"/>
@@ -56,7 +56,7 @@
     <db-attribute isGenerated="true" isMandatory="true" isPrimaryKey="true" length="19" name="ID"
       type="BIGINT"/>
     <db-attribute isMandatory="true" length="1" name="ISRESOLVED" type="BOOLEAN"/>
-    <db-attribute isMandatory="true" length="255" name="TARGETFQCN" type="VARCHAR"/>
+    <db-attribute isMandatory="true" length="255" name="TARGETFQMN" type="VARCHAR"/>
     <db-attribute isMandatory="true" length="30" name="TARGETMETHOD" type="VARCHAR"/>
     <db-attribute isMandatory="true" length="255" name="TARGETPATH" type="VARCHAR"/>
     <db-attribute isMandatory="true" length="29" name="VERSION_DATEOFVERSION" type="TIMESTAMP"/>
@@ -123,7 +123,7 @@
   <obj-entity className="org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint"
     dbEntityName="ENDPOINT"
     name="Endpoint">
-    <obj-attribute db-attribute-path="FQCN" name="fqcn" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="FQMN" name="fqmn" type="java.lang.String"/>
     <obj-attribute db-attribute-path="HASH" name="hash" type="java.lang.String"/>
     <obj-attribute db-attribute-path="HTTPMETHOD" name="httpMethod" type="java.lang.String"/>
     <obj-attribute db-attribute-path="ISPATTERNPATH" name="isPatternPath" type="boolean"/>
@@ -143,7 +143,7 @@
     <obj-attribute db-attribute-path="CHANGETYPE" name="changeType" type="java.lang.String"/>
     <obj-attribute db-attribute-path="DETAILSTRING" name="detailString" type="java.lang.String"/>
     <obj-attribute db-attribute-path="ISRESOLVED" name="isResolved" type="boolean"/>
-    <obj-attribute db-attribute-path="TARGETFQCN" name="targetFqcn" type="java.lang.String"/>
+    <obj-attribute db-attribute-path="TARGETFQMN" name="targetFqmn" type="java.lang.String"/>
     <obj-attribute db-attribute-path="TARGETMETHOD" name="targetMethod" type="java.lang.String"/>
     <obj-attribute db-attribute-path="TARGETPATH" name="targetPath" type="java.lang.String"/>
   </obj-entity>

@@ -45,7 +45,7 @@ public class EndpointConverter {
     Endpoint endpoint = context.newObject(Endpoint.class);
     endpoint.setHash(hashProvider.getHash(endpointDto));
     endpoint.setPath(endpointDto.getPath());
-    endpoint.setFqcn(endpointDto.getFqcn());
+    endpoint.setFqmn(endpointDto.getFqmn());
     endpoint.setHttpMethod(endpointDto.getHttpMethod().name());
     endpoint.setIsPatternPath(endpointDto.isPatternPath());
     endpoint.setRuleStatus(endpointDto.getRuleStatus() != null ? endpointDto.getRuleStatus().name()
@@ -82,7 +82,7 @@ public class EndpointConverter {
     return new EndpointDto.Builder()
         .hash(endpointEntity.getHash())
         .path(endpointEntity.getPath())
-        .fqcn(endpointEntity.getFqcn())
+        .fqmn(endpointEntity.getFqmn())
         .httpMethod(HttpMethod.valueOf(endpointEntity.getHttpMethod()))
         .parameters(endpointEntity.getEndpointparameters().stream().map(EndpointConverter::toDto)
             .collect(Collectors.toSet()))

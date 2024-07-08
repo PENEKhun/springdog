@@ -165,9 +165,9 @@
         <div class="alert alert-info" th:text="${api.path}"></div>
         <strong>Request Type:</strong>
         <div class="alert alert-info" th:text="${api.httpMethod}"></div>
-        <strong>Controller Class:</strong>
-        <div class="alert alert-info" th:text="${api.fqcn}"></div>
-        <input th:field="*{fqcn}" type="hidden"/>
+        <strong>Fully qualified method name:</strong>
+        <div class="alert alert-info" th:text="${api.fqmn}"></div>
+        <input th:field="*{fqmn}" type="hidden"/>
         <input th:field="*{hash}" type="hidden"/>
       </div>
     </div>

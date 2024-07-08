@@ -91,7 +91,7 @@ class ControllerParserTest {
 
     // then
     assertThat(result.toArray())
-        .extracting("path", "httpMethod", "fqcn")
+        .extracting("path", "httpMethod", "fqmn")
         .containsExactly(
             tuple("/api/test", HttpMethod.GET,
                 "org.easypeelsecurity.springdog.autoconfigure.controller.parser.MockHandlerMethod.method"));
