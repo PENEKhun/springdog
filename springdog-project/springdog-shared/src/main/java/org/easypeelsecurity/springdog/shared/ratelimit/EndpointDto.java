@@ -221,6 +221,30 @@ public class EndpointDto {
   }
 
   /**
+   * Get the fully qualified class name.
+   * (ex) org.easypeelsecurity.springdog.autoconfigure.controller.parser.ControllerParser
+   *
+   * @return the fully qualified class name
+   */
+  public String getFqcn() {
+    Assert.isTrue(this.fqmn.lastIndexOf(".") != -1, "FQMN must contain '.'");
+
+    return this.fqmn.substring(0, this.fqmn.lastIndexOf("."));
+  }
+
+  /**
+   * Get the method name.
+   * (ex) parseController
+   *
+   * @return the method name
+   */
+  public String getMethodName() {
+    Assert.isTrue(this.fqmn.lastIndexOf(".") != -1, "FQMN must contain '.'");
+
+    return this.fqmn.substring(this.fqmn.lastIndexOf(".") + 1);
+  }
+
+  /**
    * Setter.
    */
   public void setFqmn(String fqmn) {

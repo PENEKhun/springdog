@@ -156,11 +156,8 @@ public class RatelimitInterceptor implements HandlerInterceptor {
       JsonNode requestBody = getRequestBodyAsJson(request);
       // FIXME: json 말고도 다른 타입도 처리해야함
       // FIXME: 성능을 위해선 일단 Object라면 Object의 FQCN정도는 저장하고... 이를 불러와서 직렬화 할필요가 있어보임.
-      String fqmn = endpoint.getFqmn();
-      String fqcn = fqmn.substring(0, fqmn.lastIndexOf("."));
-      String methodName = fqmn.substring(fqmn.lastIndexOf(".") + 1);
-      Arrays.stream(Class.forName(fqcn).getDeclaredMethods())
-          .filter(method -> method.getName().equals(methodName))
+      Arrays.stream(Class.forName(endpoint.getFqcn()).getDeclaredMethods())
+          .filter(method -> method.getName().equals(endpoint.getMethodName()))
           .forEach(method -> Arrays.stream(method.getParameters())
               .filter(param -> param.isAnnotationPresent(RequestBody.class))
               .map(Parameter::getType)

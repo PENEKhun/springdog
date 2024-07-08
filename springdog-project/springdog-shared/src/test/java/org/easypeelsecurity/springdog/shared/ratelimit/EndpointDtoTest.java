@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.HashSet;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,20 +31,15 @@ class EndpointDtoTest {
   void timeLimitDays() {
     // given
     int timeLimitInSeconds = 12_582_035;
-    EndpointDto endpointDto = new EndpointDto(
-        "hash",
-        "path",
-        "fqmn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false,
-        RuleStatus.ACTIVE,
-        false,
-        false,
-        0,
-        timeLimitInSeconds,
-        0
-    );
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .ruleTimeLimitInSeconds(timeLimitInSeconds)
+        .build();
 
     // when
     int actual = endpointDto.timeLimitDays();
@@ -58,20 +52,15 @@ class EndpointDtoTest {
   void timeLimitHours() {
     // given
     int timeLimitInSeconds = 12_582_035;
-    EndpointDto endpointDto = new EndpointDto(
-        "hash",
-        "path",
-        "fqmn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false,
-        RuleStatus.ACTIVE,
-        false,
-        false,
-        0,
-        timeLimitInSeconds,
-        0
-    );
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .ruleTimeLimitInSeconds(timeLimitInSeconds)
+        .build();
 
     // when
     int actual = endpointDto.timeLimitHours();
@@ -84,20 +73,15 @@ class EndpointDtoTest {
   void timeLimitMinutes() {
     // given
     int timeLimitInSeconds = 12_582_035;
-    EndpointDto endpointDto = new EndpointDto(
-        "hash",
-        "path",
-        "fqmn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false,
-        RuleStatus.ACTIVE,
-        false,
-        false,
-        0,
-        timeLimitInSeconds,
-        0
-    );
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .ruleTimeLimitInSeconds(timeLimitInSeconds)
+        .build();
 
     // when
     int actual = endpointDto.timeLimitMinutes();
@@ -110,20 +94,15 @@ class EndpointDtoTest {
   void timeLimitSeconds() {
     // given
     int timeLimitInSeconds = 12_582_035;
-    EndpointDto endpointDto = new EndpointDto(
-        "hash",
-        "path",
-        "fqmn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false,
-        RuleStatus.ACTIVE,
-        false,
-        false,
-        0,
-        timeLimitInSeconds,
-        0
-    );
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .ruleTimeLimitInSeconds(timeLimitInSeconds)
+        .build();
 
     // when
     int actual = endpointDto.timeLimitSeconds();
@@ -136,20 +115,15 @@ class EndpointDtoTest {
   void banTimeDays() {
     // given
     int banTimeInSeconds = 12_582_035;
-    EndpointDto endpointDto = new EndpointDto(
-        "hash",
-        "path",
-        "fqmn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false,
-        RuleStatus.ACTIVE,
-        false,
-        false,
-        0,
-        0,
-        banTimeInSeconds
-    );
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .ruleBanTimeInSeconds(banTimeInSeconds)
+        .build();
 
     // when
     int actual = endpointDto.banTimeDays();
@@ -162,20 +136,15 @@ class EndpointDtoTest {
   void banTimeHours() {
     // given
     int banTimeInSeconds = 12_582_035;
-    EndpointDto endpointDto = new EndpointDto(
-        "hash",
-        "path",
-        "fqmn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false,
-        RuleStatus.ACTIVE,
-        false,
-        false,
-        0,
-        0,
-        banTimeInSeconds
-    );
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .ruleBanTimeInSeconds(banTimeInSeconds)
+        .build();
 
     // when
     int actual = endpointDto.banTimeHours();
@@ -188,20 +157,15 @@ class EndpointDtoTest {
   void banTimeMinutes() {
     // given
     int banTimeInSeconds = 12_582_035;
-    EndpointDto endpointDto = new EndpointDto(
-        "hash",
-        "path",
-        "fqmn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false,
-        RuleStatus.ACTIVE,
-        false,
-        false,
-        0,
-        0,
-        banTimeInSeconds
-    );
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .ruleBanTimeInSeconds(banTimeInSeconds)
+        .build();
 
     // when
     int actual = endpointDto.banTimeMinutes();
@@ -214,20 +178,15 @@ class EndpointDtoTest {
   void banTimeSeconds() {
     // given
     int banTimeInSeconds = 12_582_035;
-    EndpointDto endpointDto = new EndpointDto(
-        "hash",
-        "path",
-        "fqmn",
-        HttpMethod.GET,
-        new HashSet<>(),
-        false,
-        RuleStatus.ACTIVE,
-        false,
-        false,
-        0,
-        0,
-        banTimeInSeconds
-    );
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .ruleBanTimeInSeconds(banTimeInSeconds)
+        .build();
 
     // when
     int actual = endpointDto.banTimeSeconds();
@@ -330,5 +289,65 @@ class EndpointDtoTest {
 
     // when & then
     assertThat(endpoint1).isNotEqualTo(endpoint2);
+  }
+
+  @Test
+  void getFqcnWork() {
+    // given
+    String fqmn = "org.easypeelsecurity.springdogtest.ExampleController.example";
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .fqmn(fqmn)
+        .build();
+
+    // when
+    String actual = endpointDto.getFqcn();
+
+    // then
+    assertEquals("org.easypeelsecurity.springdogtest.ExampleController", actual);
+  }
+
+  @Test
+  void getMethodNameWork() {
+    // given
+    String fqmn = "org.easypeelsecurity.springdogtest.ExampleController.example";
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .fqmn(fqmn)
+        .build();
+
+    // when
+    String actual = endpointDto.getMethodName();
+
+    // then
+    assertEquals("example", actual);
+  }
+
+  @Test
+  void getFqmnWork() {
+    // given
+    String fqmn = "org.easypeelsecurity.springdogtest.ExampleController.example";
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .hash("hash")
+        .path("/api/books")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .fqmn(fqmn)
+        .build();
+
+    // when
+    String actual = endpointDto.getFqmn();
+
+    // then
+    assertEquals("org.easypeelsecurity.springdogtest.ExampleController.example", actual);
   }
 }
