@@ -29,7 +29,7 @@ public enum EndpointChangeType {
   ENABLED_PARAMETER_WAS_DELETED(
       "With Endpoint Ratelimit enabled, one of the applied parameters was deleted or changed in the code.");
 
-  private String description;
+  private final String description;
 
   EndpointChangeType(String description) {
     this.description = description;

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;

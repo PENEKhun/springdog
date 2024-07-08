@@ -29,18 +29,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.cayenne.ObjectContext;
-import org.apache.cayenne.configuration.CayenneRuntime;
-import org.apache.cayenne.query.ObjectSelect;
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
-import org.easypeelsecurity.springdog.manager.ratelimit.RatelimitCache;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -48,25 +36,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
+import org.easypeelsecurity.springdog.manager.ratelimit.RatelimitCache;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
+
+import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.configuration.CayenneRuntime;
+import org.apache.cayenne.query.ObjectSelect;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class RatelimitBlockingTest {
-
-  private static final class CASE1 {
-
-    static final String PATH = "/api/get";
-    static final String HTTP_METHOD = "GET";
-    static final int REQUEST_LIMIT = 50;
-    static final Set<String> PARAMETER_NAMES_TO_ENABLE = Set.of("param1");
-  }
-
-  private static final class CASE2 {
-
-    static final String PATH = "/api/post";
-    static final String HTTP_METHOD = "POST";
-    static final int REQUEST_LIMIT = 50;
-    static final Set<String> PARAMETER_NAMES_TO_ENABLE = Set.of("postRequest");
-  }
 
   @Autowired
   ExampleController exampleController;
@@ -238,4 +224,19 @@ class RatelimitBlockingTest {
     }
   }
 
+  private static final class CASE1 {
+
+    static final String PATH = "/api/get";
+    static final String HTTP_METHOD = "GET";
+    static final int REQUEST_LIMIT = 50;
+    static final Set<String> PARAMETER_NAMES_TO_ENABLE = Set.of("param1");
+  }
+
+  private static final class CASE2 {
+
+    static final String PATH = "/api/post";
+    static final String HTTP_METHOD = "POST";
+    static final int REQUEST_LIMIT = 50;
+    static final Set<String> PARAMETER_NAMES_TO_ENABLE = Set.of("postRequest");
+  }
 }

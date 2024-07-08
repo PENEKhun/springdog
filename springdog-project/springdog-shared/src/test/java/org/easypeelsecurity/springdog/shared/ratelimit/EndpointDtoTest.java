@@ -23,6 +23,7 @@ import java.util.HashSet;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
+
 import org.junit.jupiter.api.Test;
 
 class EndpointDtoTest {
@@ -243,14 +244,16 @@ class EndpointDtoTest {
         .path("/api/books")
         .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.GET)
-        .parameters(new HashSet<>() {})
+        .parameters(new HashSet<>() {
+        })
         .build();
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books")
         .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.GET)
-        .parameters(new HashSet<>() {})
+        .parameters(new HashSet<>() {
+        })
         .build();
 
     // when & then
@@ -265,14 +268,16 @@ class EndpointDtoTest {
         .path("/api/books1") // diff
         .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.GET)
-        .parameters(new HashSet<>() {})
+        .parameters(new HashSet<>() {
+        })
         .build();
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books2") // diff
         .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.GET)
-        .parameters(new HashSet<>() {})
+        .parameters(new HashSet<>() {
+        })
         .build();
 
     // when & then
@@ -287,14 +292,16 @@ class EndpointDtoTest {
         .path("/api/books")
         .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example1") // diff
         .httpMethod(HttpMethod.GET)
-        .parameters(new HashSet<>() {})
+        .parameters(new HashSet<>() {
+        })
         .build();
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books")
         .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example2") // diff
         .httpMethod(HttpMethod.GET)
-        .parameters(new HashSet<>() {})
+        .parameters(new HashSet<>() {
+        })
         .build();
 
     // when & then
@@ -309,14 +316,16 @@ class EndpointDtoTest {
         .path("/api/books")
         .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.GET)
-        .parameters(new HashSet<>() {})
+        .parameters(new HashSet<>() {
+        })
         .build();
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books")
         .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.POST) // diff
-        .parameters(new HashSet<>() {})
+        .parameters(new HashSet<>() {
+        })
         .build();
 
     // when & then

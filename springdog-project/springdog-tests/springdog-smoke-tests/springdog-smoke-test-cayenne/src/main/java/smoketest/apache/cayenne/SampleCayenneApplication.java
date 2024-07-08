@@ -16,9 +16,10 @@
 
 package smoketest.apache.cayenne;
 
-import org.easypeelsecurity.springdog.autoconfigure.applier.SpringDogEnable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import org.easypeelsecurity.springdog.autoconfigure.applier.SpringDogEnable;
 
 @SpringDogEnable
 @SpringBootApplication

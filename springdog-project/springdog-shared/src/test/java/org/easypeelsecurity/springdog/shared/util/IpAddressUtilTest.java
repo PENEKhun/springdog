@@ -18,9 +18,10 @@ package org.easypeelsecurity.springdog.shared.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.springframework.mock.web.MockHttpServletRequest;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.mock.web.MockHttpServletRequest;
 
 class IpAddressUtilTest {
 

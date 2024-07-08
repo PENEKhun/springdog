@@ -32,11 +32,11 @@ import org.easypeelsecurity.springdog.shared.util.Assert;
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
 public class EndpointDto {
 
+  private final Set<EndpointParameterDto> parameters = new HashSet<>();
   private String hash;
   private String path;
   private String fqcn;
   private HttpMethod httpMethod;
-  private final Set<EndpointParameterDto> parameters = new HashSet<>();
   private Set<String> parameterNamesToEnable = new HashSet<>();
   private boolean isPatternPath;
   private RuleStatus ruleStatus;

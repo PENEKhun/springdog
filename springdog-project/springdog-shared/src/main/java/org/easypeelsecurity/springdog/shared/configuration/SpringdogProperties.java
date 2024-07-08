@@ -16,15 +16,17 @@
 
 package org.easypeelsecurity.springdog.shared.configuration;
 
-import org.easypeelsecurity.springdog.shared.util.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import jakarta.annotation.PostConstruct;
+import org.easypeelsecurity.springdog.shared.util.Assert;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Springdog configuration.
@@ -56,6 +58,7 @@ public class SpringdogProperties {
   /**
    * Take a relative path named 'path' and computes it as an absolute path.
    * (e.g. '/health' -> /springdog-base-path/health).
+   *
    * @param extraPath extra path
    * @return absolute path
    */

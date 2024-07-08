@@ -16,13 +16,14 @@
 
 package org.easypeelsecurity.springdog.manager.config;
 
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 import org.easypeelsecurity.springdog.manager.agent.AgentExternalAccessInterceptor;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.manager.ratelimit.RatelimitInterceptor;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Applier for ratelimit interceptor.

@@ -20,12 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
-import org.easypeelsecurity.springdog.manager.ratelimit.VersionControlQuery;
-import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.util.Assert;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -35,8 +32,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
+import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
+import org.easypeelsecurity.springdog.manager.ratelimit.VersionControlQuery;
+import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
  * Controller for the agent's view.
@@ -44,11 +45,11 @@ import jakarta.servlet.http.HttpServletResponse;
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
 public class SpringdogAgentView {
 
+  SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
   @Autowired
   private EndpointQuery rateLimitQuery;
   @Autowired
   private EndpointCommand rateLimitCommand;
-  SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
   @Autowired
   private SpringdogProperties properties;
   @Autowired

@@ -16,9 +16,10 @@
 
 package smoketest.springframework;
 
-import org.easypeelsecurity.springdog.autoconfigure.applier.SpringDogEnable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import org.easypeelsecurity.springdog.autoconfigure.applier.SpringDogEnable;
 
 @SpringDogEnable
 @SpringBootApplication
@@ -27,5 +28,4 @@ public class SimpleSecurityApplication {
   public static void main(String[] args) {
     SpringApplication.run(SimpleSecurityApplication.class, args);
   }
-
 }

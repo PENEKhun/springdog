@@ -26,25 +26,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.cayenne.configuration.CayenneRuntime;
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
-import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import jakarta.annotation.PostConstruct;
+import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
+import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
+import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
+import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
+
+import org.apache.cayenne.configuration.CayenneRuntime;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 class ControllerParserTest {
 
@@ -70,12 +72,6 @@ class ControllerParserTest {
     MockitoAnnotations.openMocks(this);
     controllerParser =
         new ControllerParser(handlerMapping, endpointQuery, endpointCommand, springdogRepository, properties);
-  }
-
-  private final class MockHandlerMethod {
-
-    public void method() {
-    }
   }
 
   @Test
@@ -132,5 +128,11 @@ class ControllerParserTest {
 
     // then
     assertThat(isAnnotationPresent).isTrue();
+  }
+
+  private final class MockHandlerMethod {
+
+    public void method() {
+    }
   }
 }
