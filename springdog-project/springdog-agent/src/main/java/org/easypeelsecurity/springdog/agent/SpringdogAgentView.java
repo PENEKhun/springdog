@@ -35,8 +35,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.manager.ratelimit.VersionControlQuery;
+import org.easypeelsecurity.springdog.manager.statistics.StatisticsQuery;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
 import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
@@ -54,6 +56,8 @@ public class SpringdogAgentView {
   private SpringdogProperties properties;
   @Autowired
   private VersionControlQuery versionControlQuery;
+  @Autowired
+  private StatisticsQuery statisticsQuery;
 
   @GetMapping("/login")
   public String login() {
@@ -74,6 +78,12 @@ public class SpringdogAgentView {
   public String home(Model model) {
     model.addAttribute("endpointChangeLog",
         versionControlQuery.getAllChangeLogsNotResolved());
+    int totalEndpointCount = statisticsQuery.totalEndpointCount();
+    model.addAttribute("totalEndpointCount", totalEndpointCount);
+    int activeCount = statisticsQuery.totalEndpointCountByStatus(RuleStatus.ACTIVE.name());
+    model.addAttribute("totalEndpointCountActive", activeCount);
+    model.addAttribute("totalEndpointCountNotActive", totalEndpointCount - activeCount);
+
     return "/templates/content/main.html";
   }
 

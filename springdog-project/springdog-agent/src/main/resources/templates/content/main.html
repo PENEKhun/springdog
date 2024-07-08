@@ -209,7 +209,7 @@
           <div class="card-body">
             <h6 class="card-title">Total Endpoints</h6>
             <i class="bi bi-diagram-3 fs-2" style="color: #6c757d;"></i>
-            <p class="card-text fs-5">150</p>
+            <p class="card-text fs-5" th:text="${totalEndpointCount}"></p>
           </div>
         </div>
       </div>
@@ -218,7 +218,7 @@
           <div class="card-body">
             <h6 class="card-title">Endpoints with Active Ratelimits</h6>
             <i class="bi bi-shield-check fs-2" style="color: #28a745;"></i>
-            <p class="card-text fs-5">85</p>
+            <p class="card-text fs-5" th:text="${totalEndpointCountActive}"></p>
           </div>
         </div>
       </div>
@@ -227,7 +227,7 @@
           <div class="card-body">
             <h6 class="card-title">Endpoints without Ratelimits</h6>
             <i class="bi bi-shield-x fs-2" style="color: #dc3545;"></i>
-            <p class="card-text fs-5">65</p>
+            <p class="card-text fs-5" th:text="${totalEndpointCountNotActive}"></p>
           </div>
         </div>
       </div>
