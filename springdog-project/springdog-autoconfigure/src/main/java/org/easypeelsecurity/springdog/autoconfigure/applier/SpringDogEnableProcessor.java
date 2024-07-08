@@ -17,7 +17,6 @@
 package org.easypeelsecurity.springdog.autoconfigure.applier;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
