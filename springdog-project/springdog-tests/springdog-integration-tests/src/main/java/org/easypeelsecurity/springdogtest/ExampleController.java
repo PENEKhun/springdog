@@ -46,7 +46,7 @@ public class ExampleController {
   }
 
   @PutMapping("/put")
-  public String example4(String newTitle, String newContent) {
+  public String example4(@RequestParam("newTitle") String newTitle, @RequestParam("newContent") String newContent) {
     return "example4";
   }
 
@@ -59,6 +59,15 @@ public class ExampleController {
 
     private String title;
     private String content;
+
+    public PostRequest() {
+
+    }
+
+    public PostRequest(String title, String content) {
+      this.title = title;
+      this.content = content;
+    }
 
     public String getTitle() {
       return title;

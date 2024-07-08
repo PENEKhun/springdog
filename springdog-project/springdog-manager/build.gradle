@@ -9,6 +9,7 @@ dependencies {
     compileOnly("org.apache.cayenne:cayenne-server:${cayenneVersion}") {
         exclude group: 'org.slf4j', module: 'slf4j'
     }
+    implementation "commons-io:commons-io:2.11.0"
 
     testImplementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
 }
