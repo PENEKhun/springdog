@@ -35,7 +35,7 @@ public class EndpointDto {
   private final Set<EndpointParameterDto> parameters = new HashSet<>();
   private String hash;
   private String path;
-  private String fqcn;
+  private String fqmn;
   private HttpMethod httpMethod;
   private Set<String> parameterNamesToEnable = new HashSet<>();
   private boolean isPatternPath;
@@ -46,17 +46,17 @@ public class EndpointDto {
   private int ruleTimeLimitInSeconds;
   private int ruleBanTimeInSeconds;
 
-  public EndpointDto(String hash, String path, String fqcn, HttpMethod httpMethod,
+  public EndpointDto(String hash, String path, String fqmn, HttpMethod httpMethod,
       Set<EndpointParameterDto> parameters, boolean isPatternPath, RuleStatus ruleStatus, boolean ruleIpBased,
       boolean rulePermanentBan, int ruleRequestLimitCount, int ruleTimeLimitInSeconds,
       int ruleBanTimeInSeconds) {
     Assert.hasText(path, "Endpoint must not be null or empty");
-    Assert.hasText(fqcn, "FQCN must not be null or empty");
+    Assert.hasText(fqmn, "FQMN must not be null or empty");
     Assert.notNull(httpMethod, "HttpMethod must not be null");
 
     this.hash = hash;
     this.path = path;
-    this.fqcn = fqcn;
+    this.fqmn = fqmn;
     this.httpMethod = httpMethod;
     if (parameters != null && !parameters.isEmpty()) {
       this.parameters.addAll(parameters);
@@ -76,9 +76,9 @@ public class EndpointDto {
   public EndpointDto() {
   }
 
-  public EndpointDto(String path, String fqcn, HttpMethod httpMethod, boolean isPatternPath) {
+  public EndpointDto(String path, String fqmn, HttpMethod httpMethod, boolean isPatternPath) {
     this.path = path;
-    this.fqcn = fqcn;
+    this.fqmn = fqmn;
     this.httpMethod = httpMethod;
     this.isPatternPath = isPatternPath;
   }
@@ -165,14 +165,14 @@ public class EndpointDto {
     }
 
     return path.equals(that.path) &&
-        fqcn.equals(that.fqcn) && httpMethod == that.httpMethod &&
+        fqmn.equals(that.fqmn) && httpMethod == that.httpMethod &&
         Objects.equals(parameters, that.parameters);
   }
 
   @Override
   public int hashCode() {
     int result = path.hashCode();
-    result = 31 * result + fqcn.hashCode();
+    result = 31 * result + fqmn.hashCode();
     result = 31 * result + httpMethod.hashCode();
     result = 31 * result + Objects.hashCode(parameters);
     return result;
@@ -211,19 +211,20 @@ public class EndpointDto {
   }
 
   /**
-   * Get the fully qualified class name.
+   * Get the fully qualified method name.
+   * (ex) org.easypeelsecurity.springdog.autoconfigure.controller.parser.ControllerParser.parseController
    *
-   * @return the fully qualified class name
+   * @return the fully qualified method name
    */
-  public String getFqcn() {
-    return this.fqcn;
+  public String getFqmn() {
+    return this.fqmn;
   }
 
   /**
    * Setter.
    */
-  public void setFqcn(String fqcn) {
-    this.fqcn = fqcn;
+  public void setFqmn(String fqmn) {
+    this.fqmn = fqmn;
   }
 
   /**
@@ -304,7 +305,7 @@ public class EndpointDto {
 
     private String hash;
     private String path;
-    private String fqcn;
+    private String fqmn;
     private HttpMethod httpMethod;
     private Set<EndpointParameterDto> parameters = new HashSet<>();
     private boolean isPatternPath;
@@ -325,8 +326,8 @@ public class EndpointDto {
       return this;
     }
 
-    public Builder fqcn(String fqcn) {
-      this.fqcn = fqcn;
+    public Builder fqmn(String fqmn) {
+      this.fqmn = fqmn;
       return this;
     }
 
@@ -376,7 +377,7 @@ public class EndpointDto {
     }
 
     public EndpointDto build() {
-      return new EndpointDto(hash, path, fqcn, httpMethod, parameters, isPatternPath, ruleStatus, ruleIpBased,
+      return new EndpointDto(hash, path, fqmn, httpMethod, parameters, isPatternPath, ruleStatus, ruleIpBased,
           rulePermanentBan, ruleRequestLimitCount, ruleTimeLimitInSeconds, ruleBanTimeInSeconds);
     }
   }

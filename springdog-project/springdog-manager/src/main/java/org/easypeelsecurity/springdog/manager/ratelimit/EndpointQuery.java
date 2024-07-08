@@ -105,15 +105,15 @@ public class EndpointQuery {
   }
 
   /**
-   * Get endpoint by fully qualified class name.
+   * Get endpoint by fully qualified method name.
    *
-   * @param fqcn fully qualified class name
+   * @param fqmn fully qualified method name
    * @return Optional EndpointDto
    */
-  public Optional<EndpointDto> getEndpointByFqcn(String fqcn) {
+  public Optional<EndpointDto> getEndpointByFqmn(String fqmn) {
     ObjectContext context = springdogRepository.newContext();
     return ObjectSelect.query(Endpoint.class)
-        .where(Endpoint.FQCN.eq(fqcn))
+        .where(Endpoint.FQMN.eq(fqmn))
         .select(context)
         .stream()
         .map(EndpointConverter::toDto)

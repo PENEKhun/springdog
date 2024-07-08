@@ -76,12 +76,12 @@ public class RatelimitInterceptor implements HandlerInterceptor {
       Object controller = handlerMethod.getBean();
       Class<?> controllerClass = controller.getClass();
       String functionName = handlerMethod.getMethod().getName();
-      String fqcn = controllerClass.getName() + "." + functionName;
+      String fqmn = controllerClass.getName() + "." + functionName;
       if (shouldSkipRequest(request, controllerClass)) {
         return true;
       }
 
-      EndpointDto endpoint = getEndpoint(fqcn)
+      EndpointDto endpoint = getEndpoint(fqmn)
           .orElseThrow(() -> new IllegalStateException("Endpoint not found"));
       if (!RuleStatus.ACTIVE.equals(endpoint.getRuleStatus())) {
         return true;
@@ -102,10 +102,10 @@ public class RatelimitInterceptor implements HandlerInterceptor {
     return true;
   }
 
-  private Optional<EndpointDto> getEndpoint(String fqcn) {
-    EndpointDto endpoint = RuleCache.findEndpointByFqcn(fqcn)
+  private Optional<EndpointDto> getEndpoint(String fqmn) {
+    EndpointDto endpoint = RuleCache.findEndpointByFqmn(fqmn)
         .orElseGet(() -> {
-          Optional<EndpointDto> item = endpointQuery.getEndpointByFqcn(fqcn);
+          Optional<EndpointDto> item = endpointQuery.getEndpointByFqmn(fqmn);
           if (item.isEmpty()) {
             return null;
           } else {
@@ -135,7 +135,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
 
   private String generateRequestHash(HttpServletRequest request, EndpointDto endpoint) {
     StringBuilder result = new StringBuilder();
-    result.append(endpoint.getFqcn()).append("\n");
+    result.append(endpoint.getFqmn()).append("\n");
 
     if (endpoint.isRuleIpBased()) {
       result.append(IpAddressUtil.getClientIp(request)).append("\n");
@@ -156,7 +156,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
       JsonNode requestBody = getRequestBodyAsJson(request);
       // FIXME: json 말고도 다른 타입도 처리해야함
       // FIXME: 성능을 위해선 일단 Object라면 Object의 FQCN정도는 저장하고... 이를 불러와서 직렬화 할필요가 있어보임.
-      String fqmn = endpoint.getFqcn();
+      String fqmn = endpoint.getFqmn();
       String fqcn = fqmn.substring(0, fqmn.lastIndexOf("."));
       String methodName = fqmn.substring(fqmn.lastIndexOf(".") + 1);
       Arrays.stream(Class.forName(fqcn).getDeclaredMethods())

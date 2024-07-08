@@ -17,129 +17,125 @@ import org.apache.cayenne.exp.property.StringProperty;
  */
 public abstract class _Book extends BaseDataObject {
 
-    private static final long serialVersionUID = 1L;
+  public static final String ID_PK_COLUMN = "id";
+  public static final StringProperty<String> AUTHOR = PropertyFactory.createString("author", String.class);
+  public static final StringProperty<String> DESCRIPTION =
+      PropertyFactory.createString("description", String.class);
+  public static final StringProperty<String> NAME = PropertyFactory.createString("name", String.class);
+  public static final NumericProperty<Long> PRICE = PropertyFactory.createNumeric("price", Long.class);
+  private static final long serialVersionUID = 1L;
+  protected String author;
+  protected String description;
+  protected String name;
+  protected long price;
 
-    public static final String ID_PK_COLUMN = "id";
+  public String getAuthor() {
+    beforePropertyRead("author");
+    return this.author;
+  }
 
-    public static final StringProperty<String> AUTHOR = PropertyFactory.createString("author", String.class);
-    public static final StringProperty<String> DESCRIPTION = PropertyFactory.createString("description", String.class);
-    public static final StringProperty<String> NAME = PropertyFactory.createString("name", String.class);
-    public static final NumericProperty<Long> PRICE = PropertyFactory.createNumeric("price", Long.class);
+  public void setAuthor(String author) {
+    beforePropertyWrite("author", this.author, author);
+    this.author = author;
+  }
 
-    protected String author;
-    protected String description;
-    protected String name;
-    protected long price;
+  public String getDescription() {
+    beforePropertyRead("description");
+    return this.description;
+  }
 
+  public void setDescription(String description) {
+    beforePropertyWrite("description", this.description, description);
+    this.description = description;
+  }
 
-    public void setAuthor(String author) {
-        beforePropertyWrite("author", this.author, author);
-        this.author = author;
+  public String getName() {
+    beforePropertyRead("name");
+    return this.name;
+  }
+
+  public void setName(String name) {
+    beforePropertyWrite("name", this.name, name);
+    this.name = name;
+  }
+
+  public long getPrice() {
+    beforePropertyRead("price");
+    return this.price;
+  }
+
+  public void setPrice(long price) {
+    beforePropertyWrite("price", this.price, price);
+    this.price = price;
+  }
+
+  @Override
+  public Object readPropertyDirectly(String propName) {
+    if (propName == null) {
+      throw new IllegalArgumentException();
     }
 
-    public String getAuthor() {
-        beforePropertyRead("author");
+    switch (propName) {
+      case "author":
         return this.author;
-    }
-
-    public void setDescription(String description) {
-        beforePropertyWrite("description", this.description, description);
-        this.description = description;
-    }
-
-    public String getDescription() {
-        beforePropertyRead("description");
+      case "description":
         return this.description;
-    }
-
-    public void setName(String name) {
-        beforePropertyWrite("name", this.name, name);
-        this.name = name;
-    }
-
-    public String getName() {
-        beforePropertyRead("name");
+      case "name":
         return this.name;
-    }
-
-    public void setPrice(long price) {
-        beforePropertyWrite("price", this.price, price);
-        this.price = price;
-    }
-
-    public long getPrice() {
-        beforePropertyRead("price");
+      case "price":
         return this.price;
+      default:
+        return super.readPropertyDirectly(propName);
+    }
+  }
+
+  @Override
+  public void writePropertyDirectly(String propName, Object val) {
+    if (propName == null) {
+      throw new IllegalArgumentException();
     }
 
-    @Override
-    public Object readPropertyDirectly(String propName) {
-        if(propName == null) {
-            throw new IllegalArgumentException();
-        }
-
-        switch(propName) {
-            case "author":
-                return this.author;
-            case "description":
-                return this.description;
-            case "name":
-                return this.name;
-            case "price":
-                return this.price;
-            default:
-                return super.readPropertyDirectly(propName);
-        }
+    switch (propName) {
+      case "author":
+        this.author = (String) val;
+        break;
+      case "description":
+        this.description = (String) val;
+        break;
+      case "name":
+        this.name = (String) val;
+        break;
+      case "price":
+        this.price = val == null ? 0 : (long) val;
+        break;
+      default:
+        super.writePropertyDirectly(propName, val);
     }
+  }
 
-    @Override
-    public void writePropertyDirectly(String propName, Object val) {
-        if(propName == null) {
-            throw new IllegalArgumentException();
-        }
+  private void writeObject(ObjectOutputStream out) throws IOException {
+    writeSerialized(out);
+  }
 
-        switch (propName) {
-            case "author":
-                this.author = (String)val;
-                break;
-            case "description":
-                this.description = (String)val;
-                break;
-            case "name":
-                this.name = (String)val;
-                break;
-            case "price":
-                this.price = val == null ? 0 : (long)val;
-                break;
-            default:
-                super.writePropertyDirectly(propName, val);
-        }
-    }
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    readSerialized(in);
+  }
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        writeSerialized(out);
-    }
+  @Override
+  protected void writeState(ObjectOutputStream out) throws IOException {
+    super.writeState(out);
+    out.writeObject(this.author);
+    out.writeObject(this.description);
+    out.writeObject(this.name);
+    out.writeLong(this.price);
+  }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        readSerialized(in);
-    }
-
-    @Override
-    protected void writeState(ObjectOutputStream out) throws IOException {
-        super.writeState(out);
-        out.writeObject(this.author);
-        out.writeObject(this.description);
-        out.writeObject(this.name);
-        out.writeLong(this.price);
-    }
-
-    @Override
-    protected void readState(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        super.readState(in);
-        this.author = (String)in.readObject();
-        this.description = (String)in.readObject();
-        this.name = (String)in.readObject();
-        this.price = in.readLong();
-    }
-
+  @Override
+  protected void readState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    super.readState(in);
+    this.author = (String) in.readObject();
+    this.description = (String) in.readObject();
+    this.name = (String) in.readObject();
+    this.price = in.readLong();
+  }
 }

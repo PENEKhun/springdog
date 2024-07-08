@@ -35,7 +35,7 @@ class EndpointDtoTest {
     EndpointDto endpointDto = new EndpointDto(
         "hash",
         "path",
-        "fqcn",
+        "fqmn",
         HttpMethod.GET,
         new HashSet<>(),
         false,
@@ -61,7 +61,7 @@ class EndpointDtoTest {
     EndpointDto endpointDto = new EndpointDto(
         "hash",
         "path",
-        "fqcn",
+        "fqmn",
         HttpMethod.GET,
         new HashSet<>(),
         false,
@@ -87,7 +87,7 @@ class EndpointDtoTest {
     EndpointDto endpointDto = new EndpointDto(
         "hash",
         "path",
-        "fqcn",
+        "fqmn",
         HttpMethod.GET,
         new HashSet<>(),
         false,
@@ -113,7 +113,7 @@ class EndpointDtoTest {
     EndpointDto endpointDto = new EndpointDto(
         "hash",
         "path",
-        "fqcn",
+        "fqmn",
         HttpMethod.GET,
         new HashSet<>(),
         false,
@@ -139,7 +139,7 @@ class EndpointDtoTest {
     EndpointDto endpointDto = new EndpointDto(
         "hash",
         "path",
-        "fqcn",
+        "fqmn",
         HttpMethod.GET,
         new HashSet<>(),
         false,
@@ -165,7 +165,7 @@ class EndpointDtoTest {
     EndpointDto endpointDto = new EndpointDto(
         "hash",
         "path",
-        "fqcn",
+        "fqmn",
         HttpMethod.GET,
         new HashSet<>(),
         false,
@@ -191,7 +191,7 @@ class EndpointDtoTest {
     EndpointDto endpointDto = new EndpointDto(
         "hash",
         "path",
-        "fqcn",
+        "fqmn",
         HttpMethod.GET,
         new HashSet<>(),
         false,
@@ -217,7 +217,7 @@ class EndpointDtoTest {
     EndpointDto endpointDto = new EndpointDto(
         "hash",
         "path",
-        "fqcn",
+        "fqmn",
         HttpMethod.GET,
         new HashSet<>(),
         false,
@@ -242,7 +242,7 @@ class EndpointDtoTest {
     EndpointDto endpoint1 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books")
-        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -250,7 +250,7 @@ class EndpointDtoTest {
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books")
-        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -266,7 +266,7 @@ class EndpointDtoTest {
     EndpointDto endpoint1 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books1") // diff
-        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -274,7 +274,7 @@ class EndpointDtoTest {
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books2") // diff
-        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -285,12 +285,12 @@ class EndpointDtoTest {
   }
 
   @Test
-  void fqcnAffectEqual() {
+  void fqmnAffectEqual() {
     // given
     EndpointDto endpoint1 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books")
-        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example1") // diff
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1") // diff
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -298,7 +298,7 @@ class EndpointDtoTest {
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books")
-        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example2") // diff
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example2") // diff
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -314,7 +314,7 @@ class EndpointDtoTest {
     EndpointDto endpoint1 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books")
-        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -322,7 +322,7 @@ class EndpointDtoTest {
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .hash("hash")
         .path("/api/books")
-        .fqcn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
         .httpMethod(HttpMethod.POST) // diff
         .parameters(new HashSet<>() {
         })

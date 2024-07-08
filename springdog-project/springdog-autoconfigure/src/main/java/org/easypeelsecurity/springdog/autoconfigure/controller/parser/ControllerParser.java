@@ -96,11 +96,11 @@ public class ControllerParser {
 
   private EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod,
       boolean isPatternPath) {
-    String fqcn = method.getBeanType().getPackageName() + "." + method.getBeanType().getSimpleName() + "." +
+    String fqmn = method.getBeanType().getPackageName() + "." + method.getBeanType().getSimpleName() + "." +
         method.getMethod().getName();
 
     EndpointDto api = new EndpointDto.Builder()
-        .fqcn(fqcn)
+        .fqmn(fqmn)
         .path(endPoint)
         .httpMethod(httpMethod)
         .isPatternPath(isPatternPath).build();
@@ -166,7 +166,7 @@ public class ControllerParser {
             .forEach(disappearedActiveEndpoint -> {
               EndpointChangelog changelog = context.newObject(EndpointChangelog.class);
               changelog.setChangeType(ENABLED_ENDPOINT_WAS_DELETED.name());
-              changelog.setTargetFqcn(disappearedActiveEndpoint.getFqcn());
+              changelog.setTargetFqmn(disappearedActiveEndpoint.getFqmn());
               changelog.setTargetMethod(disappearedActiveEndpoint.getHttpMethod().name());
               changelog.setTargetPath(disappearedActiveEndpoint.getPath());
               changelog.setDetailString(
@@ -191,7 +191,7 @@ public class ControllerParser {
 
               EndpointChangelog endpointChangelog = context.newObject(EndpointChangelog.class);
               endpointChangelog.setChangeType(ENABLED_PARAMETER_WAS_DELETED.name());
-              endpointChangelog.setTargetFqcn(endpoint.getFqcn());
+              endpointChangelog.setTargetFqmn(endpoint.getFqmn());
               endpointChangelog.setTargetMethod(endpoint.getHttpMethod().name());
               endpointChangelog.setTargetPath(endpoint.getPath());
               endpointChangelog.setDetailString(

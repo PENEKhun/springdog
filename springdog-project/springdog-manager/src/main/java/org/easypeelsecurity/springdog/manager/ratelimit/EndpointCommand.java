@@ -87,7 +87,7 @@ public class EndpointCommand {
         endpointDto.getRuleBanTimeInSeconds(),
         endpointDto.getParameterNamesToEnable());
 
-    RuleCache.changeRuleCached(endpoint.getFqcn(), EndpointConverter.toDto(endpoint));
+    RuleCache.changeRuleCached(endpoint.getFqmn(), EndpointConverter.toDto(endpoint));
     context.commitChanges();
   }
 }
