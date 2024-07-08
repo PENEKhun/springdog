@@ -59,6 +59,11 @@ public final class RatelimitCache {
     getBanHistoryInstance().put(requestHashed, banUntil);
   }
 
+  public static void clearCaches() {
+    getAccessHistoryInstance().invalidateAll();
+    getBanHistoryInstance().invalidateAll();
+  }
+
   /**
    * When this method called, add access timestamp to the local database. and check if the request is banned or
    * not by the ratelimit rule.

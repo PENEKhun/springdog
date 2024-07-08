@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.easypeelsecurity.springdog.manager.ratelimit;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Parameter;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
@@ -28,8 +31,13 @@ import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
 import org.easypeelsecurity.springdog.shared.util.IpAddressUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,15 +45,19 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * Interceptor for ratelimit.
  */
+
 @Service
 public class RatelimitInterceptor implements HandlerInterceptor {
 
   private final EndpointQuery endpointQuery;
   private final SpringdogProperties springdogProperties;
+  private final Logger logger = Logger.getLogger(RatelimitInterceptor.class.getName());
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
   /**
    * Constructor.
    */
+
   public RatelimitInterceptor(EndpointQuery endpointQuery, SpringdogProperties springdogProperties) {
     this.endpointQuery = endpointQuery;
     this.springdogProperties = springdogProperties;
@@ -54,6 +66,9 @@ public class RatelimitInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
+    if (!(request instanceof ContentCachingRequestWrapper)) {
+      request = new ContentCachingRequestWrapper(request);
+    }
 
     if (handler instanceof HandlerMethod handlerMethod) {
       Object controller = handlerMethod.getBean();
@@ -127,6 +142,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
       result.append(IpAddressUtil.getClientIp(request)).append("\n");
     }
 
+    // to make hash from default type (such as int, String ...)
     endpoint.getParameters().stream()
         .sorted(Comparator.comparing(EndpointParameterDto::getName))
         .filter(EndpointParameterDto::isEnabled)
@@ -136,8 +152,44 @@ public class RatelimitInterceptor implements HandlerInterceptor {
             result.append(param.getName()).append("=").append(value).append("\n");
           }
         });
+    try {
+      // to make hash from class(Request body)
+      JsonNode requestBody = getRequestBodyAsJson(request);
+      // FIXME: json 말고도 다른 타입도 처리해야함
+      // FIXME: 성능을 위해선 일단 Object라면 Object의 FQCN정도는 저장하고... 이를 불러와서 직렬화 할필요가 있어보임.
+      String fqmn = endpoint.getFqcn();
+      String fqcn = fqmn.substring(0, fqmn.lastIndexOf("."));
+      String methodName = fqmn.substring(fqmn.lastIndexOf(".") + 1);
+      Arrays.stream(Class.forName(fqcn).getDeclaredMethods())
+          .filter(method -> method.getName().equals(methodName))
+          .forEach(method -> Arrays.stream(method.getParameters())
+              .filter(param -> param.isAnnotationPresent(RequestBody.class))
+              .map(Parameter::getType)
+              .forEach(obj -> Arrays.stream(obj.getDeclaredFields())
+                  .sorted(Comparator.comparing(Field::getName))
+                  .forEach(field -> {
+                    String value = request.getParameter(field.getName());
+                    if (value == null && requestBody != null && requestBody.has(field.getName())) {
+                      value = requestBody.get(field.getName()).asText();
+                    }
+                    if (value != null) {
+                      result.append(field.getName()).append("=").append(value).append("\n");
+                    }
+                  })));
+      // TODO: REAL HASHlize
+      return result.toString();
+    } catch (ClassNotFoundException e) {
+      logger.warning("Failed to generate request hash" + e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
 
-    // TODO: REAL HASHlize
-    return result.toString();
+  private JsonNode getRequestBodyAsJson(HttpServletRequest request) {
+    try {
+      return objectMapper.readTree(request.getReader());
+    } catch (IOException e) {
+      logger.warning("Failed to read request body as json" + e.getMessage());
+      return null;
+    }
   }
 }
