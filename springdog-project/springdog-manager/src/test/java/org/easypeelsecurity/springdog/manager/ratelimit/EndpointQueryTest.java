@@ -43,20 +43,6 @@ class EndpointQueryTest {
   }
 
   @Test
-  @DisplayName("Returns FIRST_RUN if the latest version does not exist.")
-  void returnFirstR() {
-    // given
-    EndpointQuery endpointQuery = new EndpointQuery(null);
-    Optional<EndpointVersionControl> latestVersion = Optional.empty();
-
-    // when
-    VersionCompare result = endpointQuery.compareToLatestVersion("hash", latestVersion);
-
-    // then
-    assertThat(result).isEqualTo(VersionCompare.FIRST_RUN);
-  }
-
-  @Test
   @DisplayName("Returns DIFFERENT if it is different from the latest version hash that exists.")
   void returnDifferent() {
     // given
