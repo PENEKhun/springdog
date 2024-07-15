@@ -66,7 +66,18 @@
       background-color: #dc3545; /* Red */
     }
   </style>
-  <script>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    let recentSystemMetrics = [[${recentSystemMetrics}]].reverse();
+    /*]]>*/
+    console.log(recentSystemMetrics);
+
+    const labels = recentSystemMetrics.map(
+        metric => new Date(metric.timestamp).toLocaleTimeString());
+    const cpuUsageData = recentSystemMetrics.map(metric => (metric.cpuUsagePercent !== null && !isNaN(metric.cpuUsagePercent) && metric.cpuUsagePercent !== 0) ? metric.cpuUsagePercent : null);
+    const memoryUsageData = recentSystemMetrics.map(metric => (metric.memoryUsagePercent !== null && !isNaN(metric.memoryUsagePercent) && metric.memoryUsagePercent !== 0) ? metric.memoryUsagePercent : null);
+    const diskUsageData = recentSystemMetrics.map(metric => (metric.diskUsagePercent !== null && !isNaN(metric.diskUsagePercent) && metric.diskUsagePercent !== 0) ? metric.diskUsagePercent : null);
+
     window.onload = function () {
       const ctx1 = document.getElementById('errorRateChart').getContext('2d');
       const errorRateChart = new Chart(ctx1, {
@@ -145,25 +156,25 @@
       const systemUsageChart = new Chart(ctx2, {
         type: 'line',
         data: {
-          labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+          labels: labels,
           datasets: [
             {
               label: 'CPU Usage (%)',
-              data: [30, 45, 50, 60, 70, 55, 50, 40],
+              data: cpuUsageData,
               backgroundColor: 'rgba(255, 206, 86, 0.2)',
               borderColor: 'rgba(255, 206, 86, 1)',
               borderWidth: 1
             },
             {
               label: 'Memory Usage (%)',
-              data: [40, 50, 55, 65, 75, 60, 55, 50],
+              data: memoryUsageData,
               backgroundColor: 'rgba(54, 162, 235, 0.2)',
               borderColor: 'rgba(54, 162, 235, 1)',
               borderWidth: 1
             },
             {
               label: 'Disk Usage (%)',
-              data: [20, 30, 40, 45, 55, 50, 45, 35],
+              data: diskUsageData,
               backgroundColor: 'rgba(255, 99, 132, 0.2)',
               borderColor: 'rgba(255, 99, 132, 1)',
               borderWidth: 1
@@ -174,6 +185,13 @@
           responsive: true,
           maintainAspectRatio: false,
           scales: {
+            x: {
+              ticks: {
+                callback: function(value, index, values) {
+                  return index % 5 === 0 ? this.getLabelForValue(value) : '';
+                }
+              }
+            },
             y: {
               beginAtZero: true,
               title: {
@@ -181,18 +199,38 @@
                 text: 'Usage (%)'
               }
             }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                title: function(tooltipItems, data) {
+                  const index = tooltipItems[0].dataIndex;
+                  const metric = recentSystemMetrics[index];
+                  const timestamp = new Date(metric.timestamp);
+                  return timestamp.toLocaleString();
+                },
+                label: function(tooltipItem) {
+                  const metric = recentSystemMetrics[tooltipItem.dataIndex];
+                  return [
+                    `CPU Usage: ${metric.cpuUsagePercent}%`,
+                    `Memory Usage: ${metric.memoryUsagePercent}%`,
+                    `Disk Usage: ${metric.diskUsagePercent}%`
+                  ];
+                }
+              }
+            }
           }
         }
       });
-    }
 
-    document.addEventListener('DOMContentLoaded', function () {
-      var tooltipTriggerList = [].slice.call(
-          document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+      document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(
+            document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
       });
-    });
+    }
   </script>
 </head>
 
@@ -258,7 +296,7 @@
       <div class="col-md-12 col-lg-4 mb-3">
         <div class="card shadow-sm" style="border-radius: 1rem;">
           <div class="card-header">
-            <h6 class="my-0 fw-normal">System Usage Over Time</h6>
+            <h6 class="my-0 fw-normal">System Metrics</h6>
           </div>
           <div class="card-body">
             <div class="chart-container">

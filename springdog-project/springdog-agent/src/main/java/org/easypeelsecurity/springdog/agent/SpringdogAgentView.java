@@ -39,6 +39,7 @@ import org.easypeelsecurity.springdog.manager.statistics.StatisticsQuery;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
+import org.easypeelsecurity.springdog.shared.statistics.SystemMetricDto;
 import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
@@ -83,6 +84,8 @@ public class SpringdogAgentView {
     int activeCount = statisticsQuery.totalEndpointCountByStatus(RuleStatus.ACTIVE.name());
     model.addAttribute("totalEndpointCountActive", activeCount);
     model.addAttribute("totalEndpointCountNotActive", totalEndpointCount - activeCount);
+    List<SystemMetricDto> recentSystemMetrics = statisticsQuery.getRecentSystemMetrics(50);
+    model.addAttribute("recentSystemMetrics", recentSystemMetrics);
 
     return "/templates/content/main.html";
   }

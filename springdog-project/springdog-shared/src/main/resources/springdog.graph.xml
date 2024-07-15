@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <graphs xmlns="http://cayenne.apache.org/schema/10/graph">
-  <graph scale="0.7692307692307692" type="ER">
-    <entity height="62.0" name="ENDPOINT_ENDPOINTPARAMETER" width="210.0" x="1345.08" y="59.71"/>
-    <entity height="122.0" name="ENDPOINTPARAMETER" width="140.0" x="1035.72" y="0.0"/>
-    <entity height="212.0" name="ENDPOINT" width="156.0" x="1139.48" y="300.72"/>
-    <entity height="152.0" name="ENDPOINTCHANGELOG" width="155.0" x="794.44" y="588.22"/>
-    <entity height="77.0" name="ENDPOINTVERSIONCONTROL" width="180.0" x="502.67" y="351.74"/>
-  </graph>
-  <graph scale="1.365498406918525" type="CLASS">
-    <entity height="122.0" name="EndpointChangelog" width="125.0" x="97.46" y="347.63"/>
-    <entity height="197.0" name="Endpoint" width="137.0" x="1459.07" y="241.09"/>
-    <entity height="92.0" name="EndpointParameter" width="120.0" x="1349.56" y="0.0"/>
-    <entity height="62.0" name="EndpointVersionControl" width="152.0" x="0.0" y="652.89"/>
-  </graph>
+	<graph type="CLASS" scale="1.365498406918525">
+		<entity name="EndpointChangelog" x="97.46" y="347.63" width="125.0" height="122.0"/>
+		<entity name="Endpoint" x="1459.07" y="241.09" width="137.0" height="197.0"/>
+		<entity name="SystemMetric" x="0.0" y="0.0" width="127.0" height="92.0"/>
+		<entity name="EndpointParameter" x="1349.56" y="0.0" width="120.0" height="92.0"/>
+		<entity name="EndpointVersionControl" x="0.0" y="652.89" width="152.0" height="62.0"/>
+	</graph>
+	<graph type="ER" scale="0.7692307692307692">
+		<entity name="SYSTEM_METRIC" x="0.0" y="0.0" width="157.0" height="107.0"/>
+		<entity name="ENDPOINT_ENDPOINTPARAMETER" x="1345.08" y="59.71" width="210.0" height="62.0"/>
+		<entity name="ENDPOINTPARAMETER" x="1035.72" y="0.0" width="140.0" height="122.0"/>
+		<entity name="ENDPOINT" x="1139.48" y="300.72" width="156.0" height="212.0"/>
+		<entity name="ENDPOINTCHANGELOG" x="794.44" y="588.22" width="155.0" height="152.0"/>
+		<entity name="ENDPOINTVERSIONCONTROL" x="502.67" y="351.74" width="180.0" height="77.0"/>
+	</graph>
 </graphs>

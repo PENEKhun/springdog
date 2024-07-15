@@ -16,10 +16,15 @@
 
 package org.easypeelsecurity.springdog.manager.statistics;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
+import org.easypeelsecurity.springdog.shared.statistics.SystemMetricConverter;
+import org.easypeelsecurity.springdog.shared.statistics.SystemMetricDto;
+import org.easypeelsecurity.springdog.shared.statistics.model.SystemMetric;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.configuration.CayenneRuntime;
@@ -64,5 +69,22 @@ public class StatisticsQuery {
     return ObjectSelect.query(Endpoint.class)
         .where(Endpoint.RULE_STATUS.eq(status))
         .select(context).size();
+  }
+
+  /**
+   * Retrieves a list of recent system metrics up to a specified limit.
+   *
+   * @param limit the maximum number of system metrics to retrieve
+   * @return a list of SystemMetricDto objects representing the most recent system metrics
+   */
+  public List<SystemMetricDto> getRecentSystemMetrics(int limit) {
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(SystemMetric.class)
+        .orderBy(SystemMetric.TIMESTAMP.desc())
+        .limit(limit)
+        .select(context)
+        .stream()
+        .map(SystemMetricConverter::convert)
+        .toList();
   }
 }
