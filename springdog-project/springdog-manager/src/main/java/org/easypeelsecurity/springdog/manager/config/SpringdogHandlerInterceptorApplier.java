@@ -26,10 +26,10 @@ import org.easypeelsecurity.springdog.manager.ratelimit.RatelimitInterceptor;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 
 /**
- * Applier for ratelimit interceptor.
+ * Configuration for Springdog handler interceptors.
  */
 @Configuration
-public class SpringdogAgentInterceptorApplier implements WebMvcConfigurer {
+public class SpringdogHandlerInterceptorApplier implements WebMvcConfigurer {
 
   private final EndpointQuery endpointQuery;
   private final SpringdogProperties springdogProperties;
@@ -37,7 +37,7 @@ public class SpringdogAgentInterceptorApplier implements WebMvcConfigurer {
   /**
    * Constructor.
    */
-  public SpringdogAgentInterceptorApplier(EndpointQuery endpointQuery,
+  public SpringdogHandlerInterceptorApplier(EndpointQuery endpointQuery,
       SpringdogProperties springdogProperties) {
     this.endpointQuery = endpointQuery;
     this.springdogProperties = springdogProperties;
