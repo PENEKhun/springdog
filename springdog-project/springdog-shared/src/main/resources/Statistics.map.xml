@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap https://cayenne.apache.org/schema/10/modelMap.xsd"
+	 project-version="10">
+	<property name="defaultPackage" value="org.easypeelsecurity.springdog.shared.statistics.model"/>
+	<property name="defaultSchema" value="APP"/>
+	<db-entity name="SYSTEM_METRIC" schema="APP">
+		<db-attribute name="CPU_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
+		<db-attribute name="DISK_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
+		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isGenerated="true" isMandatory="true"/>
+		<db-attribute name="MEMORY_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
+		<db-attribute name="TIMESTAMP" type="TIMESTAMP" isMandatory="true"/>
+	</db-entity>
+	<obj-entity name="SystemMetric" className="org.easypeelsecurity.springdog.shared.statistics.model.SystemMetric" dbEntityName="SYSTEM_METRIC">
+		<obj-attribute name="cpuUsagePercent" type="double" db-attribute-path="CPU_USAGE_PERCENT"/>
+		<obj-attribute name="diskUsagePercent" type="double" db-attribute-path="DISK_USAGE_PERCENT"/>
+		<obj-attribute name="memoryUsagePercent" type="double" db-attribute-path="MEMORY_USAGE_PERCENT"/>
+		<obj-attribute name="timestamp" type="java.time.LocalDateTime" db-attribute-path="TIMESTAMP"/>
+		<post-add method-name="onPostAdd"/>
+	</obj-entity>
+</data-map>
