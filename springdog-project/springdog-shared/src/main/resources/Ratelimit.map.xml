@@ -6,6 +6,7 @@
 	<property name="defaultPackage" value="org.easypeelsecurity.springdog.shared.ratelimit.model"/>
 	<property name="defaultSchema" value="APP"/>
 	<db-entity name="ENDPOINT" schema="APP">
+		<db-attribute name="ENDPOINT_METRIC_ID" type="BIGINT"/>
 		<db-attribute name="FQMN" type="VARCHAR" isMandatory="true" length="255"/>
 		<db-attribute name="HASH" type="VARCHAR" isMandatory="true" length="64"/>
 		<db-attribute name="HTTPMETHOD" type="VARCHAR" isMandatory="true" length="10"/>
@@ -78,6 +79,10 @@
 		<obj-attribute name="fullHashOfEndpoints" type="java.lang.String" db-attribute-path="FULLHASHOFENDPOINTS"/>
 		<pre-persist method-name="onPrePersist"/>
 	</obj-entity>
+	<db-relationship name="endpointMetric" source="ENDPOINT" target="ENDPOINT_METRIC" toMany="true">
+		<db-attribute-pair source="ID" target="ENDPOINT_ID"/>
+		<db-attribute-pair source="ENDPOINT_METRIC_ID" target="ID"/>
+	</db-relationship>
 	<db-relationship name="endpointparameters" source="ENDPOINT" target="ENDPOINTPARAMETER" toMany="true">
 		<db-attribute-pair source="ID" target="ENDPOINT_ID"/>
 	</db-relationship>
@@ -118,9 +123,9 @@
 		<usePrimitives>true</usePrimitives>
 	</dbImport>
 	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
-		<excludeEntities>EndpointChangelog,Endpoint,EndpointParameter,EndpointVersionControl</excludeEntities>
+		<excludeEntities>EndpointChangelog,EndpointParameter,EndpointVersionControl</excludeEntities>
 		<destDir>../java</destDir>
-		<mode>all</mode>
+		<mode>entity</mode>
 		<template>templates/v4_1/subclass.vm</template>
 		<superTemplate>templates/v4_1/superclass.vm</superTemplate>
 		<embeddableTemplate>templates/v4_1/embeddable-subclass.vm</embeddableTemplate>

@@ -16,6 +16,7 @@
 
 package org.easypeelsecurity.springdog.agent;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -86,6 +87,7 @@ public class SpringdogAgentView {
     model.addAttribute("totalEndpointCountNotActive", totalEndpointCount - activeCount);
     List<SystemMetricDto> recentSystemMetrics = statisticsQuery.getRecentSystemMetrics(50);
     model.addAttribute("recentSystemMetrics", recentSystemMetrics);
+    model.addAttribute("todayEndpointMetrics", statisticsQuery.getEndpointMetrics(LocalDate.now()));
 
     return "/templates/content/main.html";
   }
