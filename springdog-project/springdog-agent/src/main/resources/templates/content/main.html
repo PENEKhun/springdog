@@ -69,45 +69,51 @@
   <script th:inline="javascript">
     /*<![CDATA[*/
     let recentSystemMetrics = [[${recentSystemMetrics}]].reverse();
+    let todayEndpointMetrics = [[${todayEndpointMetrics}]];
     /*]]>*/
     console.log(recentSystemMetrics);
 
     const labels = recentSystemMetrics.map(
         metric => new Date(metric.timestamp).toLocaleTimeString());
-    const cpuUsageData = recentSystemMetrics.map(metric => (metric.cpuUsagePercent !== null && !isNaN(metric.cpuUsagePercent) && metric.cpuUsagePercent !== 0) ? metric.cpuUsagePercent : null);
-    const memoryUsageData = recentSystemMetrics.map(metric => (metric.memoryUsagePercent !== null && !isNaN(metric.memoryUsagePercent) && metric.memoryUsagePercent !== 0) ? metric.memoryUsagePercent : null);
-    const diskUsageData = recentSystemMetrics.map(metric => (metric.diskUsagePercent !== null && !isNaN(metric.diskUsagePercent) && metric.diskUsagePercent !== 0) ? metric.diskUsagePercent : null);
+    const cpuUsageData = recentSystemMetrics.map(
+        metric => (metric.cpuUsagePercent !== null && !isNaN(metric.cpuUsagePercent)
+            && metric.cpuUsagePercent !== 0) ? metric.cpuUsagePercent : null);
+    const memoryUsageData = recentSystemMetrics.map(
+        metric => (metric.memoryUsagePercent !== null && !isNaN(metric.memoryUsagePercent)
+            && metric.memoryUsagePercent !== 0) ? metric.memoryUsagePercent : null);
+    const diskUsageData = recentSystemMetrics.map(
+        metric => (metric.diskUsagePercent !== null && !isNaN(metric.diskUsagePercent)
+            && metric.diskUsagePercent !== 0) ? metric.diskUsagePercent : null);
+
+    const totalVisitCount = todayEndpointMetrics.reduce((sum, item) => sum + item.visitCount, 0);
+    const totalAverageResponseTime = todayEndpointMetrics.reduce(
+        (sum, item) => sum + item.averageResponseMilliseconds, 0);
 
     window.onload = function () {
-      const ctx1 = document.getElementById('errorRateChart').getContext('2d');
-      const errorRateChart = new Chart(ctx1, {
+
+      const ctx = document.getElementById('endpointMetricsChart').getContext('2d');
+      new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          labels: ['Total Metrics'],
           datasets: [
             {
-              label: 'Ratelimit Error Rate (%)',
-              data: [0, 10, 5, 2, 20, 30, 45],
-              backgroundColor: 'rgba(255, 99, 132, 0.2)',
-              borderColor: 'rgba(255, 99, 132, 1)',
-              borderWidth: 1,
-              yAxisID: 'y'
-            },
-            {
-              label: 'Total Traffic',
-              data: [1000, 2000, 1500, 3000, 5000, 4500, 7000],
+              label: 'Visit Count',
+              data: [totalVisitCount],
               backgroundColor: 'rgba(54, 162, 235, 0.2)',
               borderColor: 'rgba(54, 162, 235, 1)',
               borderWidth: 1,
-              yAxisID: 'y1'
+              yAxisID: 'y',
+              fill: false
             },
             {
-              label: 'Average API Response Time (ms)',
-              data: [120, 150, 140, 160, 200, 180, 210],
+              label: 'Average Response Time (ms)',
+              data: [totalAverageResponseTime],
               backgroundColor: 'rgba(75, 192, 192, 0.2)',
               borderColor: 'rgba(75, 192, 192, 1)',
               borderWidth: 1,
-              yAxisID: 'y2'
+              yAxisID: 'y1',
+              fill: false
             }
           ]
         },
@@ -121,7 +127,7 @@
               beginAtZero: true,
               title: {
                 display: true,
-                text: 'Ratelimit Error Rate (%)'
+                text: 'Visit Count'
               }
             },
             y1: {
@@ -130,19 +136,7 @@
               beginAtZero: true,
               title: {
                 display: true,
-                text: 'Total Traffic'
-              },
-              grid: {
-                drawOnChartArea: false
-              }
-            },
-            y2: {
-              type: 'linear',
-              position: 'right',
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: 'Average API Response Time (ms)'
+                text: 'Average Response Time (ms)'
               },
               grid: {
                 drawOnChartArea: false
@@ -187,7 +181,7 @@
           scales: {
             x: {
               ticks: {
-                callback: function(value, index, values) {
+                callback: function (value, index, values) {
                   return index % 5 === 0 ? this.getLabelForValue(value) : '';
                 }
               }
@@ -203,13 +197,13 @@
           plugins: {
             tooltip: {
               callbacks: {
-                title: function(tooltipItems, data) {
+                title: function (tooltipItems, data) {
                   const index = tooltipItems[0].dataIndex;
                   const metric = recentSystemMetrics[index];
                   const timestamp = new Date(metric.timestamp);
                   return timestamp.toLocaleString();
                 },
-                label: function(tooltipItem) {
+                label: function (tooltipItem) {
                   const metric = recentSystemMetrics[tooltipItem.dataIndex];
                   return [
                     `CPU Usage: ${metric.cpuUsagePercent}%`,
@@ -223,14 +217,40 @@
         }
       });
 
-      document.addEventListener('DOMContentLoaded', function () {
-        var tooltipTriggerList = [].slice.call(
-            document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-          return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
+      const topTrafficMetrics = todayEndpointMetrics.sort((a, b) => b.visitCount - a.visitCount).slice(0, 3);
+      console.log(topTrafficMetrics);
+      const dailyTopTraffic = document.getElementById('dailyTopTraffic');
+      topTrafficMetrics.forEach(metric => {
+        const listItem = document.createElement('li');
+        listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+        listItem.innerHTML = `
+          <span class="method-icon method-${metric.method.toLowerCase()}">${metric.method}</span>${metric.path}
+          <span class="badge bg-primary rounded-pill">${metric.visitCount}</span>
+        `;
+        dailyTopTraffic.appendChild(listItem);
+      });
+
+      const slowestEndpoints = todayEndpointMetrics.sort((a, b) => b.averageResponseMilliseconds - a.averageResponseMilliseconds).slice(0, 3);
+      console.log(slowestEndpoints);
+      const dailySlowestEndpoints = document.getElementById('dailySlowestEndpoints');
+      slowestEndpoints.forEach(metric => {
+        const listItem = document.createElement('li');
+        listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+        listItem.innerHTML = `
+          <span class="method-icon method-${metric.method.toLowerCase()}">${metric.method}</span>${metric.path}
+          <span class="badge bg-primary rounded-pill">${metric.averageResponseMilliseconds} ms</span>
+        `;
+        dailySlowestEndpoints.appendChild(listItem);
       });
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var tooltipTriggerList = [].slice.call(
+          document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    });
   </script>
 </head>
 
@@ -284,11 +304,11 @@
       <div class="col-md-12 col-lg-8 mb-3">
         <div class="card shadow-sm" style="border-radius: 1rem;">
           <div class="card-header">
-            <h6 class="my-0 fw-normal">API Metrics</h6>
+            <h6 class="my-0 fw-normal">Daily API Statistics</h6>
           </div>
           <div class="card-body">
             <div class="chart-container">
-              <canvas id="errorRateChart"></canvas>
+              <canvas id="endpointMetricsChart"></canvas>
             </div>
           </div>
         </div>
@@ -315,18 +335,6 @@
           </div>
           <div class="card-body">
             <ul class="list-group">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="method-icon method-get">GET</span>/api/users
-                <span class="badge bg-danger rounded-pill">25%</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="method-icon method-post">POST</span>/api/orders
-                <span class="badge bg-danger rounded-pill">20%</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="method-icon method-get">GET</span>/api/products
-                <span class="badge bg-danger rounded-pill">15%</span>
-              </li>
             </ul>
           </div>
         </div>
@@ -334,22 +342,10 @@
       <div class="col-md-6 col-lg-4 mb-3">
         <div class="card shadow-sm" style="border-radius: 1rem;">
           <div class="card-header">
-            <h6 class="my-0 fw-normal">Top Traffic APIs</h6>
+            <h6 class="my-0 fw-normal">Daily Top Traffic Endpoints</h6>
           </div>
           <div class="card-body">
-            <ul class="list-group">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="method-icon method-get">GET</span>/api/books
-                <span class="badge bg-primary rounded-pill">5000</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="method-icon method-get">GET</span>/api/authors
-                <span class="badge bg-primary rounded-pill">4000</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="method-icon method-get">GET</span>/api/reviews
-                <span class="badge bg-primary rounded-pill">3500</span>
-              </li>
+            <ul class="list-group" id="dailyTopTraffic">
             </ul>
           </div>
         </div>
@@ -357,22 +353,10 @@
       <div class="col-md-6 col-lg-4 mb-3">
         <div class="card shadow-sm" style="border-radius: 1rem;">
           <div class="card-header">
-            <h6 class="my-0 fw-normal">Slowest APIs</h6>
+            <h6 class="my-0 fw-normal">Daily Slowest Endpoints</h6>
           </div>
           <div class="card-body">
-            <ul class="list-group">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="method-icon method-get">GET</span>/api/orders
-                <span class="badge bg-warning rounded-pill">250ms</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="method-icon method-post">POST</span>/api/users
-                <span class="badge bg-warning rounded-pill">200ms</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="method-icon method-get">GET</span>/api/products
-                <span class="badge bg-warning rounded-pill">180ms</span>
-              </li>
+            <ul class="list-group" id="dailySlowestEndpoints">
             </ul>
           </div>
         </div>

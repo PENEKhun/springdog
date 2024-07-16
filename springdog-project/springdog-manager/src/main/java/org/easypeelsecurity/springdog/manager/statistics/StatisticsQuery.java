@@ -16,14 +16,17 @@
 
 package org.easypeelsecurity.springdog.manager.statistics;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
+import org.easypeelsecurity.springdog.shared.statistics.EndpointMetricDto;
 import org.easypeelsecurity.springdog.shared.statistics.SystemMetricConverter;
 import org.easypeelsecurity.springdog.shared.statistics.SystemMetricDto;
+import org.easypeelsecurity.springdog.shared.statistics.model.EndpointMetric;
 import org.easypeelsecurity.springdog.shared.statistics.model.SystemMetric;
 
 import org.apache.cayenne.ObjectContext;
@@ -85,6 +88,24 @@ public class StatisticsQuery {
         .select(context)
         .stream()
         .map(SystemMetricConverter::convert)
+        .toList();
+  }
+
+  /**
+   * Get endpoint metrics for a specific baseDate.
+   */
+  public List<EndpointMetricDto> getEndpointMetrics(LocalDate baseDate) {
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(EndpointMetric.class)
+        .where(EndpointMetric.METRIC_DATE.eq(baseDate))
+        .select(context)
+        .stream()
+        .map(metric -> new EndpointMetricDto(
+            metric.getEndpoint().getPath(),
+            metric.getEndpoint().getHttpMethod(),
+            metric.getPageView(),
+            metric.getAverageResponseMs(),
+            baseDate))
         .toList();
   }
 }
