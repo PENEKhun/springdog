@@ -16,13 +16,20 @@
 
 package org.easypeelsecurity.springdog.manager.statistics;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
+import org.easypeelsecurity.springdog.shared.statistics.model.EndpointMetric;
 import org.easypeelsecurity.springdog.shared.statistics.model.SystemMetric;
+import org.easypeelsecurity.springdog.shared.util.Assert;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.configuration.CayenneRuntime;
+import org.apache.cayenne.query.ObjectSelect;
 
 /**
  * Command for statistics.
@@ -69,6 +76,44 @@ public class StatisticsCommand {
     systemMetric.setCpuUsagePercent(cpuUsagePercent);
     systemMetric.setMemoryUsagePercent(memoryUsagePercent);
     systemMetric.setDiskUsagePercent(diskUsagePercent);
+
+    context.commitChanges();
+  }
+
+  /**
+   * Updates or inserts endpoint metrics including page views and response times.
+   * <p>
+   * This method updates the statistics of an endpoint for the current date.
+   * If the endpoint or its metrics do not exist, they will be created.
+   * </p>
+   *
+   * @param fqmn          the fully qualified method name of the endpoint
+   * @param responseTimes the array of response times to be included in the statistics
+   * @param today         the current date
+   * @throws IllegalArgumentException if the parameters are invalid
+   */
+  public void upsertEndpointMetrics(String fqmn, long[] responseTimes, LocalDate today) {
+    Assert.isTrue(Arrays.stream(responseTimes).allMatch(time -> time >= 0),
+        "Response times must be non-negative");
+    Assert.isTrue(today != null, "Date must not be null");
+
+    ObjectContext context = springdogRepository.newContext();
+    Endpoint endpoint = ObjectSelect.query(Endpoint.class)
+        .where(Endpoint.FQMN.eq(fqmn))
+        .selectOne(context);
+
+    Assert.notNull(endpoint, "Endpoint not found");
+    EndpointMetric endpointMetric = ObjectSelect.query(EndpointMetric.class)
+        .where(EndpointMetric.ENDPOINT.eq(endpoint)
+            .andExp(EndpointMetric.METRIC_DATE.eq(today)))
+        .selectOne(context);
+    if (endpointMetric == null) {
+      endpointMetric = context.newObject(EndpointMetric.class);
+      endpointMetric.setEndpoint(endpoint);
+      endpointMetric.setMetricDate(today);
+    }
+    long responseTimeSum = Arrays.stream(responseTimes).sum();
+    endpointMetric.updateStatistics(responseTimes.length, responseTimeSum);
 
     context.commitChanges();
   }

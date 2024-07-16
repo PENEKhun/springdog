@@ -95,15 +95,14 @@ class StatisticsCommandTest {
   @Test
   void testUpsertEndpointMetricsWithInvalidEndpoint() {
     // given
-    String path = "/invalid/endpoint/qwidjqwoidjqwoidjqwoidjqwd";
-    String method = "GET";
+    String targetHandlerFqmn = "org.epsec.app.controller.ExampleController";
     long[] responseTimes = {100L, 200L, 300L, 500L, 400L};
 
     Endpoint mockEndpoint = mock(Endpoint.class);
     EndpointMetric mockEndpointMetric = mock(EndpointMetric.class);
 
     when(ObjectSelect.query(Endpoint.class)
-        .where(Endpoint.PATH.eq(path).andExp(Endpoint.HTTP_METHOD.eq(method)))
+        .where(Endpoint.FQMN.eq(targetHandlerFqmn))
         .selectOne(mockContext)).thenReturn(mockEndpoint);
 
     when(ObjectSelect.query(EndpointMetric.class)
@@ -114,7 +113,7 @@ class StatisticsCommandTest {
     assertThrows(
         IllegalArgumentException.class,
         () -> {
-          statisticsCommand.upsertEndpointMetrics(path, method, responseTimes,
+          statisticsCommand.upsertEndpointMetrics("unknown-fqmn", responseTimes,
               LocalDate.now());
         }, "Endpoint not found");
   }
@@ -122,14 +121,13 @@ class StatisticsCommandTest {
   @Test
   void testUpsertEndpointMetricsWithInvalidValue() {
     // given
-    String path = "/test";
-    String method = "GET";
+    String targetHandlerFqmn = "org.epsec.app.controller.ExampleController";
     long[] responseTimes = {100L, 200L, 300L, 500L, 400L, -200L};
 
     // when & then
     assertThrows(IllegalArgumentException.class,
         () -> {
-          statisticsCommand.upsertEndpointMetrics(path, method, responseTimes,
+          statisticsCommand.upsertEndpointMetrics(targetHandlerFqmn, responseTimes,
               LocalDate.now());
         }, "Response time must be greater than 0");
   }

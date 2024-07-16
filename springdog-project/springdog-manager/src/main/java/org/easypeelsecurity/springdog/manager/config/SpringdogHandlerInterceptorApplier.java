@@ -23,6 +23,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.easypeelsecurity.springdog.manager.agent.AgentExternalAccessInterceptor;
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.manager.ratelimit.RatelimitInterceptor;
+import org.easypeelsecurity.springdog.manager.statistics.RequestTimingInterceptor;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 
 /**
@@ -47,5 +48,6 @@ public class SpringdogHandlerInterceptorApplier implements WebMvcConfigurer {
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new RatelimitInterceptor(this.endpointQuery, this.springdogProperties));
     registry.addInterceptor(new AgentExternalAccessInterceptor(this.springdogProperties));
+    registry.addInterceptor(new RequestTimingInterceptor(this.springdogProperties));
   }
 }

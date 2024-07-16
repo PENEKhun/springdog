@@ -5,6 +5,13 @@
 	 project-version="10">
 	<property name="defaultPackage" value="org.easypeelsecurity.springdog.shared.statistics.model"/>
 	<property name="defaultSchema" value="APP"/>
+	<db-entity name="ENDPOINT_METRIC" schema="APP">
+		<db-attribute name="AVERAGE_RESPONSE_MS" type="INTEGER" isMandatory="true"/>
+		<db-attribute name="ENDPOINT_ID" type="BIGINT" isMandatory="true"/>
+		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isGenerated="true" isMandatory="true"/>
+		<db-attribute name="METRIC_DATE" type="DATE" isMandatory="true"/>
+		<db-attribute name="PAGE_VIEW" type="BIGINT" isMandatory="true"/>
+	</db-entity>
 	<db-entity name="SYSTEM_METRIC" schema="APP">
 		<db-attribute name="CPU_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
 		<db-attribute name="DISK_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
@@ -12,6 +19,11 @@
 		<db-attribute name="MEMORY_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
 		<db-attribute name="TIMESTAMP" type="TIMESTAMP" isMandatory="true"/>
 	</db-entity>
+	<obj-entity name="EndpointMetric" className="org.easypeelsecurity.springdog.shared.statistics.model.EndpointMetric" dbEntityName="ENDPOINT_METRIC">
+		<obj-attribute name="averageResponseMs" type="int" db-attribute-path="AVERAGE_RESPONSE_MS"/>
+		<obj-attribute name="metricDate" type="java.time.LocalDate" db-attribute-path="METRIC_DATE"/>
+		<obj-attribute name="pageView" type="long" db-attribute-path="PAGE_VIEW"/>
+	</obj-entity>
 	<obj-entity name="SystemMetric" className="org.easypeelsecurity.springdog.shared.statistics.model.SystemMetric" dbEntityName="SYSTEM_METRIC">
 		<obj-attribute name="cpuUsagePercent" type="double" db-attribute-path="CPU_USAGE_PERCENT"/>
 		<obj-attribute name="diskUsagePercent" type="double" db-attribute-path="DISK_USAGE_PERCENT"/>
@@ -19,4 +31,27 @@
 		<obj-attribute name="timestamp" type="java.time.LocalDateTime" db-attribute-path="TIMESTAMP"/>
 		<post-add method-name="onPostAdd"/>
 	</obj-entity>
+	<db-relationship name="endpoint" source="ENDPOINT_METRIC" target="ENDPOINT">
+		<db-attribute-pair source="ENDPOINT_ID" target="ID"/>
+		<db-attribute-pair source="ID" target="ENDPOINT_METRIC_ID"/>
+	</db-relationship>
+	<obj-relationship name="endpoint" source="EndpointMetric" target="Endpoint" deleteRule="Nullify" db-relationship-path="endpoint"/>
+	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
+		<excludeEntities>SystemMetric</excludeEntities>
+		<destDir>../java</destDir>
+		<mode>entity</mode>
+		<template>templates/v4_1/subclass.vm</template>
+		<superTemplate>templates/v4_1/superclass.vm</superTemplate>
+		<embeddableTemplate>templates/v4_1/embeddable-subclass.vm</embeddableTemplate>
+		<embeddableSuperTemplate>templates/v4_1/embeddable-superclass.vm</embeddableSuperTemplate>
+		<queryTemplate>templates/v4_1/datamap-subclass.vm</queryTemplate>
+		<querySuperTemplate>templates/v4_1/datamap-superclass.vm</querySuperTemplate>
+		<outputPattern>*.java</outputPattern>
+		<makePairs>true</makePairs>
+		<usePkgPath>true</usePkgPath>
+		<overwrite>false</overwrite>
+		<createPropertyNames>false</createPropertyNames>
+		<createPKProperties>false</createPKProperties>
+		<client>false</client>
+	</cgen>
 </data-map>
