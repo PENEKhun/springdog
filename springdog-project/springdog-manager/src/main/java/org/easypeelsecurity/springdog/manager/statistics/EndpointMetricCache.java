@@ -33,12 +33,10 @@ public abstract class EndpointMetricCache {
   /**
    * Adds a response time for a specific endpoint identified by its path and method.
    *
-   * @param path         the path of the endpoint
-   * @param method       the HTTP method of the endpoint
    * @param responseTime the response time to be added
    */
-  public static synchronized void addResponseTime(String path, String method, long responseTime) {
-    CACHE_MANAGER.getOrCreateCache(new EndpointCacheKey(path, method)).add(responseTime);
+  public static synchronized void addResponseTime(String fqmn, long responseTime) {
+    CACHE_MANAGER.getOrCreateCache(fqmn).add(responseTime);
   }
 
   /**
@@ -46,11 +44,11 @@ public abstract class EndpointMetricCache {
    *
    * @return a list of entries where each entry contains an endpoint key and an array of response times
    */
-  public static List<Entry<EndpointCacheKey, long[]>> getAllResponseTimes() {
-    List<Entry<EndpointCacheKey, long[]>> result = new ArrayList<>(CACHE_MANAGER.getCacheKeys().length);
-    for (var key : CACHE_MANAGER.getCacheKeys()) {
-      var responseTimes = CACHE_MANAGER.getOrCreateCache(key).stream().mapToLong(Long::longValue).toArray();
-      result.add(Map.entry(key, responseTimes));
+  public static List<Entry<String, long[]>> getAllResponseTimes() {
+    List<Entry<String, long[]>> result = new ArrayList<>(CACHE_MANAGER.getCacheKeys().length);
+    for (var fqmn : CACHE_MANAGER.getCacheKeys()) {
+      var responseTimes = CACHE_MANAGER.getOrCreateCache(fqmn).stream().mapToLong(Long::longValue).toArray();
+      result.add(Map.entry(fqmn, responseTimes));
     }
     return result;
   }
@@ -58,7 +56,7 @@ public abstract class EndpointMetricCache {
   /**
    * Clears the cached response times for a specific endpoint identified by its path and method.
    */
-  public static void clear(EndpointCacheKey key) {
-    CACHE_MANAGER.invalidateCache(key);
+  public static void clear(String fqmn) {
+    CACHE_MANAGER.invalidateCache(fqmn);
   }
 }

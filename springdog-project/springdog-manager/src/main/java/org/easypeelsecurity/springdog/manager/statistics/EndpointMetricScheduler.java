@@ -17,6 +17,7 @@
 package org.easypeelsecurity.springdog.manager.statistics;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -45,14 +46,15 @@ public class EndpointMetricScheduler {
   /**
    * Scheduled task that calculates the average response times of HTTP requests and stores them in the database.
    */
-  @Scheduled(fixedRateString = "${springdog.endpointMetricScheduler.fixedRate:300000}")
+  @Scheduled(fixedRateString = "${springdog.endpointMetricScheduler.fixedRate:10000}")
   public void calculateAverageResponseTimes() {
-    List<Entry<EndpointCacheKey, long[]>> allResponseTimes = EndpointMetricCache.getAllResponseTimes();
+    List<Entry<String, long[]>> allResponseTimes = EndpointMetricCache.getAllResponseTimes();
 
-    for (Entry<EndpointCacheKey, long[]> entry : allResponseTimes) {
-      String path = entry.getKey().path();
-      String method = entry.getKey().method();
-      statisticsCommand.upsertEndpointMetrics(path, method, entry.getValue(), LocalDate.now());
+    for (Entry<String, long[]> entry : allResponseTimes) {
+      String fqmn = entry.getKey();
+      System.out.println(fqmn);
+      System.out.println(Arrays.toString(entry.getValue()));
+      statisticsCommand.upsertEndpointMetrics(fqmn, entry.getValue(), LocalDate.now());
       EndpointMetricCache.clear(entry.getKey());
     }
   }

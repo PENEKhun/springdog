@@ -28,45 +28,44 @@ import org.junit.jupiter.api.Test;
 class EndpointVisitCacheManagerTest {
 
   private EndpointVisitCacheManager cacheManager;
-  private EndpointCacheKey testKey;
+  static final String TEST_FQMN = "org.easypeelsecurity.springdog.controller.ExampleController";
 
   @BeforeEach
   void setUp() {
     cacheManager = new EndpointVisitCacheManager();
-    testKey = new EndpointCacheKey("/test/path", "GET");
-    cacheManager.invalidateCache(testKey);
+    cacheManager.invalidateCache(TEST_FQMN);
   }
 
   @Test
   void testGetOrCreateCache() {
-    List<Long> cache = cacheManager.getOrCreateCache(testKey);
+    List<Long> cache = cacheManager.getOrCreateCache(TEST_FQMN);
     assertNotNull(cache, "Cache should not be null");
     assertTrue(cache.isEmpty(), "Cache should be empty initially");
 
     cache.add(123L);
-    List<Long> cacheAgain = cacheManager.getOrCreateCache(testKey);
+    List<Long> cacheAgain = cacheManager.getOrCreateCache(TEST_FQMN);
     assertEquals(1, cacheAgain.size(), "Cache should contain one item");
     assertEquals(123L, cacheAgain.get(0), "Cache item should be 123L");
   }
 
   @Test
   void testGetCacheKeys() {
-    EndpointCacheKey[] keys = cacheManager.getCacheKeys();
+    String[] keys = cacheManager.getCacheKeys();
     assertEquals(0, keys.length, "No keys should be present initially");
 
-    cacheManager.getOrCreateCache(testKey);
+    cacheManager.getOrCreateCache(TEST_FQMN);
     keys = cacheManager.getCacheKeys();
     assertEquals(1, keys.length, "One key should be present");
-    assertEquals(testKey, keys[0], "The key should match the testKey");
+    assertEquals(TEST_FQMN, keys[0], "The key should match the testKey");
   }
 
   @Test
   void testInvalidateCache() {
-    List<Long> cache = cacheManager.getOrCreateCache(testKey);
+    List<Long> cache = cacheManager.getOrCreateCache(TEST_FQMN);
     cache.add(123L);
 
-    cacheManager.invalidateCache(testKey);
-    List<Long> invalidatedCache = cacheManager.getOrCreateCache(testKey);
+    cacheManager.invalidateCache(TEST_FQMN);
+    List<Long> invalidatedCache = cacheManager.getOrCreateCache(TEST_FQMN);
     assertTrue(invalidatedCache.isEmpty(), "Cache should be empty after invalidation");
   }
 }

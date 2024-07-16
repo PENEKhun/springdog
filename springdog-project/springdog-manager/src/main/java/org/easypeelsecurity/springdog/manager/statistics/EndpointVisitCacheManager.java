@@ -28,19 +28,19 @@ import com.github.benmanes.caffeine.cache.Caffeine;
  */
 public class EndpointVisitCacheManager {
 
-  private static final Cache<EndpointCacheKey, Vector<Long>> CACHE_INSTANCE;
+  private static final Cache<String, Vector<Long>> CACHE_INSTANCE;
 
   static {
     CACHE_INSTANCE = Caffeine.newBuilder().build();
   }
 
   /**
-   * Gets the cache for the specified key or creates it if it doesn't exist.
+   * Gets the cache for the fqmn or creates it if it doesn't exist.
    *
    * @return the cache for the specified key
    */
-  public List<Long> getOrCreateCache(EndpointCacheKey key) {
-    return CACHE_INSTANCE.get(key, k -> new Vector<>());
+  public List<Long> getOrCreateCache(String fqmn) {
+    return CACHE_INSTANCE.get(fqmn, k -> new Vector<>());
   }
 
   /**
@@ -48,14 +48,14 @@ public class EndpointVisitCacheManager {
    *
    * @return an array of all cache keys
    */
-  public EndpointCacheKey[] getCacheKeys() {
-    return CACHE_INSTANCE.asMap().keySet().toArray(new EndpointCacheKey[0]);
+  public String[] getCacheKeys() {
+    return CACHE_INSTANCE.asMap().keySet().toArray(new String[0]);
   }
 
   /**
    * Invalidates the cache for the specified key.
    */
-  public void invalidateCache(EndpointCacheKey key) {
+  public void invalidateCache(String key) {
     CACHE_INSTANCE.invalidate(key);
   }
 }
