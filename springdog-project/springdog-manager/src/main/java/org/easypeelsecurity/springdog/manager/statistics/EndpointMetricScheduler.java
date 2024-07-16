@@ -31,7 +31,6 @@ import org.springframework.stereotype.Component;
  * @author PENEKhun
  */
 @Component
-
 @EnableScheduling
 public class EndpointMetricScheduler {
   private final StatisticsCommand statisticsCommand;
