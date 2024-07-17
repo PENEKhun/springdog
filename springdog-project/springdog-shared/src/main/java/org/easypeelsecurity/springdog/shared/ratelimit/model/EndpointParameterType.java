@@ -25,12 +25,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import org.apache.cayenne.ExtendedEnumeration;
+
 /**
  * Enum for controller parameter type.
  *
  * @author PENEKhun
  */
-public enum ApiParameterType {
+public enum EndpointParameterType implements ExtendedEnumeration {
   BODY,
   QUERY,
   MODEL,
@@ -42,7 +44,7 @@ public enum ApiParameterType {
    * @param annotation annotation
    * @return parameter type or {@code QUERY} if not found
    */
-  public static ApiParameterType resolve(Annotation[] annotation) {
+  public static EndpointParameterType resolve(Annotation[] annotation) {
     for (Annotation a : annotation) {
       if (a instanceof RequestBody) {
         return BODY;
@@ -58,5 +60,10 @@ public enum ApiParameterType {
     }
 
     return QUERY;
+  }
+
+  @Override
+  public Object getDatabaseValue() {
+    return name();
   }
 }

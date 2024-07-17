@@ -33,7 +33,7 @@ import org.easypeelsecurity.springdog.shared.util.Assert;
 public class EndpointDto {
 
   private final Set<EndpointParameterDto> parameters = new HashSet<>();
-  private String hash;
+  private long id;
   private String path;
   private String fqmn;
   private HttpMethod httpMethod;
@@ -46,7 +46,7 @@ public class EndpointDto {
   private int ruleTimeLimitInSeconds;
   private int ruleBanTimeInSeconds;
 
-  public EndpointDto(String hash, String path, String fqmn, HttpMethod httpMethod,
+  public EndpointDto(long id, String path, String fqmn, HttpMethod httpMethod,
       Set<EndpointParameterDto> parameters, boolean isPatternPath, RuleStatus ruleStatus, boolean ruleIpBased,
       boolean rulePermanentBan, int ruleRequestLimitCount, int ruleTimeLimitInSeconds,
       int ruleBanTimeInSeconds) {
@@ -54,7 +54,7 @@ public class EndpointDto {
     Assert.hasText(fqmn, "FQMN must not be null or empty");
     Assert.notNull(httpMethod, "HttpMethod must not be null");
 
-    this.hash = hash;
+    this.id = id;
     this.path = path;
     this.fqmn = fqmn;
     this.httpMethod = httpMethod;
@@ -187,27 +187,19 @@ public class EndpointDto {
     return this.path;
   }
 
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
   /**
    * Setter.
    */
   public void setPath(String path) {
     this.path = path;
-  }
-
-  /**
-   * Get the hashed object (id).
-   *
-   * @return hashed object (id)
-   */
-  public String getHash() {
-    return this.hash;
-  }
-
-  /**
-   * Setter.
-   */
-  public void setHash(String hash) {
-    this.hash = hash;
   }
 
   /**
@@ -327,7 +319,7 @@ public class EndpointDto {
   @SuppressWarnings({"checkstyle:MissingJavadocType", "checkstyle:MissingJavadocMethod"})
   public static class Builder {
 
-    private String hash;
+    private long id;
     private String path;
     private String fqmn;
     private HttpMethod httpMethod;
@@ -340,8 +332,8 @@ public class EndpointDto {
     private int ruleTimeLimitInSeconds;
     private int ruleBanTimeInSeconds;
 
-    public Builder hash(String hash) {
-      this.hash = hash;
+    public Builder id(long id) {
+      this.id = id;
       return this;
     }
 
@@ -401,7 +393,7 @@ public class EndpointDto {
     }
 
     public EndpointDto build() {
-      return new EndpointDto(hash, path, fqmn, httpMethod, parameters, isPatternPath, ruleStatus, ruleIpBased,
+      return new EndpointDto(id, path, fqmn, httpMethod, parameters, isPatternPath, ruleStatus, ruleIpBased,
           rulePermanentBan, ruleRequestLimitCount, ruleTimeLimitInSeconds, ruleBanTimeInSeconds);
     }
   }

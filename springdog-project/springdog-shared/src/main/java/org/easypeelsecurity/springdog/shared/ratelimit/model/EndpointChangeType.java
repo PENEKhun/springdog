@@ -16,10 +16,12 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
+import org.apache.cayenne.ExtendedEnumeration;
+
 /**
  * Enum for endpoint change type for showing how changes.
  */
-public enum EndpointChangeType {
+public enum EndpointChangeType implements ExtendedEnumeration {
   API_DELETED("Can’t found endpoints that existed before."),
   API_ADDED("New endpoint added."),
   ACTIVATED("Endpoint activated."),
@@ -40,5 +42,10 @@ public enum EndpointChangeType {
    */
   public String getDescription() {
     return description;
+  }
+
+  @Override
+  public Object getDatabaseValue() {
+    return name();
   }
 }

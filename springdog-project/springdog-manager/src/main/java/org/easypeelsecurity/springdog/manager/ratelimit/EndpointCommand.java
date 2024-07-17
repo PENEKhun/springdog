@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointHash;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
 
 import org.apache.cayenne.ObjectContext;
@@ -49,22 +48,19 @@ public class EndpointCommand {
   /**
    * Apply changes.
    *
-   * @param hashProvider hash provider
-   * @param added        new endpoint
-   * @param deleted      deleted endpoint
+   * @param added   newly added endpoint
+   * @param deleted deleted endpoint
    */
-  public void applyChanges(EndpointHash hashProvider, Set<EndpointDto> added, Set<EndpointDto> deleted) {
-    ObjectContext context = springdogRepository.newContext();
+  public void applyChanges(ObjectContext context, Set<EndpointDto> added, Set<EndpointDto> deleted) {
     List<Endpoint> toRemoved = ObjectSelect.query(Endpoint.class)
-        .where(Endpoint.HASH.in(deleted.stream().map(hashProvider::getHash).toList()))
+        .where(Endpoint.ID.in(deleted.stream().map(EndpointDto::getId).toList()))
         .select(context);
     context.deleteObjects(toRemoved);
 
-    for (EndpointDto endpointDto : added) {
-      Endpoint endpoint = EndpointConverter.toEntity(context, hashProvider, endpointDto);
+    for (EndpointDto addedEndpoint : added) {
+      Endpoint endpoint = EndpointConverter.toEntity(context, addedEndpoint);
       context.registerNewObject(endpoint);
     }
-    context.commitChanges();
   }
 
   /**
@@ -73,7 +69,7 @@ public class EndpointCommand {
   public void updateRule(EndpointDto endpointDto) {
     ObjectContext context = springdogRepository.newContext();
     Endpoint endpoint = ObjectSelect.query(Endpoint.class)
-        .where(Endpoint.HASH.eq(endpointDto.getHash()))
+        .where(Endpoint.ID.eq(endpointDto.getId()))
         .selectOne(context);
     if (endpoint == null) {
       throw new IllegalArgumentException("Endpoint not found");

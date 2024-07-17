@@ -48,7 +48,7 @@ public class VersionControlQuery {
     return ObjectSelect.query(EndpointVersionControl.class)
         .select(context)
         .stream()
-        .map(EndpointVersionControl::getEndpointchangelogs)
+        .map(EndpointVersionControl::getChangelogs)
         .flatMap(List::stream)
         .filter(changeLog -> !changeLog.isIsResolved())
         .toList();

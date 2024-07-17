@@ -16,10 +16,30 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
+import java.util.Objects;
+
 import org.easypeelsecurity.springdog.shared.ratelimit.model.auto._EndpointParameter;
 
 @SuppressWarnings("all")
 public class EndpointParameter extends _EndpointParameter {
 
   private static final long serialVersionUID = 1L;
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    EndpointParameter that = (EndpointParameter) obj;
+    return this.getName().equals(that.getName()) && this.getType().equals(that.getType())
+        && Objects.equals(this.getEndpoint(), that.getEndpoint());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.getName(), this.getType(), this.getEndpoint());
+  }
 }
