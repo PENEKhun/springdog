@@ -55,9 +55,6 @@ public class StatisticsCommand {
    * @param diskUsagePercent   disk usage percentage
    */
   public void storeSystemMetrics(double cpuUsagePercent, double memoryUsagePercent, double diskUsagePercent) {
-    if (Double.isNaN(cpuUsagePercent) || Double.isNaN(memoryUsagePercent) || Double.isNaN(diskUsagePercent)) {
-      throw new IllegalArgumentException("percentage must be a number");
-    }
 
     if (cpuUsagePercent < 0 || cpuUsagePercent > 100) {
       throw new IllegalArgumentException("CPU usage percentage must be between 0 and 100");
