@@ -17,32 +17,101 @@
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus.NOT_CONFIGURED;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Endpoint test.
+ *
+ * @author PENEKhun
+ */
 class EndpointTest {
 
   @Test
-  void equalsTrueSameHash() {
+  void endpointDefaultValue() {
     // given
-    Endpoint endpoint1 = new Endpoint();
-    endpoint1.setHash("same-hash");
-    Endpoint endpoint2 = new Endpoint();
-    endpoint2.setHash("same-hash");
+    Endpoint endpoint = new Endpoint();
 
     // when & then
-    assertThat(endpoint1).isEqualTo(endpoint2);
+    assertThat(endpoint.getRuleStatus()).isEqualTo(NOT_CONFIGURED.name());
+    assertThat(endpoint.getRuleRequestLimitCount()).isZero();
+    assertThat(endpoint.getRuleBanTimeInSeconds()).isZero();
+    assertThat(endpoint.getRuleTimeLimitInSeconds()).isZero();
+    assertThat(endpoint.isRuleIpBased()).isFalse();
+    assertThat(endpoint.isRulePermanentBan()).isFalse();
+    assertThat(endpoint.getEndpointparameters()).isNotNull();
   }
 
   @Test
-  void equalsFalseDifferentHash() {
+  void equalsFalseWhenDiffPath() {
     // given
     Endpoint endpoint1 = new Endpoint();
-    endpoint1.setHash("hash");
+    endpoint1.setPath("/api/books");
+    endpoint1.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint1.setHttpMethod(String.valueOf(HttpMethod.GET));
+    endpoint1.setIsPatternPath(false);
     Endpoint endpoint2 = new Endpoint();
-    endpoint2.setHash("different-hash");
+    endpoint2.setPath("/diff");
+    endpoint2.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint2.setHttpMethod(String.valueOf(HttpMethod.GET));
+    endpoint2.setIsPatternPath(false);
 
     // when & then
     assertThat(endpoint1).isNotEqualTo(endpoint2);
+  }
+
+  @Test
+  void equalsFalseWhenDiffMethod() {
+    // given
+    Endpoint endpoint1 = new Endpoint();
+    endpoint1.setPath("/api/books");
+    endpoint1.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint1.setHttpMethod(String.valueOf(HttpMethod.GET));
+    endpoint1.setIsPatternPath(false);
+    Endpoint endpoint2 = new Endpoint();
+    endpoint2.setPath("/api/books");
+    endpoint2.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint2.setHttpMethod(String.valueOf(HttpMethod.POST));
+    endpoint2.setIsPatternPath(false);
+
+    // when & then
+    assertThat(endpoint1).isNotEqualTo(endpoint2);
+  }
+
+  @Test
+  void equalsFalseWhenDiffPatternPath() {
+    // given
+    Endpoint endpoint1 = new Endpoint();
+    endpoint1.setPath("/api/books");
+    endpoint1.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint1.setHttpMethod(String.valueOf(HttpMethod.GET));
+    endpoint1.setIsPatternPath(false);
+    Endpoint endpoint2 = new Endpoint();
+    endpoint2.setPath("/api/books");
+    endpoint2.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint2.setHttpMethod(String.valueOf(HttpMethod.GET));
+    endpoint2.setIsPatternPath(true);
+
+    // when & then
+    assertThat(endpoint1).isNotEqualTo(endpoint2);
+  }
+
+  @Test
+  void equalsTrue() {
+    // given
+    Endpoint endpoint1 = new Endpoint();
+    endpoint1.setPath("/api/books");
+    endpoint1.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint1.setHttpMethod(String.valueOf(HttpMethod.GET));
+    endpoint1.setIsPatternPath(false);
+    Endpoint endpoint2 = new Endpoint();
+    endpoint2.setPath("/api/books");
+    endpoint2.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint2.setHttpMethod(String.valueOf(HttpMethod.GET));
+    endpoint2.setIsPatternPath(false);
+
+    // when & then
+    assertThat(endpoint1).isEqualTo(endpoint2);
   }
 }

@@ -102,12 +102,12 @@
         allowClear: true
       })
 
-      const paramHashesInput = document.createElement("input");
-      paramHashesInput.type = "hidden";
-      paramHashesInput.name = "parameterNamesToEnable";
+      const paramEnableInput = document.createElement("input");
+      paramEnableInput.type = "hidden";
+      paramEnableInput.name = "parameterNamesToEnable";
 
       const form = document.querySelector("form[name=editRule]");
-      form.appendChild(paramHashesInput);
+      form.appendChild(paramEnableInput);
 
       $("#parametersOption").select2({
         placeholder: 'Select parameters',
@@ -117,7 +117,7 @@
         allowClear: true
       }).on("change", function () {
         const selectedData = $(this).select2("data");
-        paramHashesInput.value = selectedData.map(item => item.element.dataset.name).join(",");
+        paramEnableInput.value = selectedData.map(item => item.element.dataset.name).join(",");
       });
     });
   </script>
@@ -168,7 +168,7 @@
         <strong>Fully qualified method name:</strong>
         <div class="alert alert-info" th:text="${api.fqmn}"></div>
         <input th:field="*{fqmn}" type="hidden"/>
-        <input th:field="*{hash}" type="hidden"/>
+        <input th:field="*{id}" type="hidden"/>
       </div>
     </div>
 
@@ -255,7 +255,7 @@
           <label class="form-label" for="parametersOption">Parameters</label>
           <select class="form-control" id="parametersOption" multiple>
             <option th:data-name="${parameter.name}"
-                    th:data-paramhash="${parameter.paramHash}"
+                    th:data-id="${parameter.id}"
                     th:each="parameter : ${api.parameters}"
                     th:selected="${parameter.isEnabled()}"
                     th:text="${parameter.name + ' [' + parameter.type + ']'}"></option>

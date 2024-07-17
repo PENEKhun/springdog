@@ -16,7 +16,7 @@
 
 package org.easypeelsecurity.springdog.shared.ratelimit;
 
-import org.easypeelsecurity.springdog.shared.ratelimit.model.ApiParameterType;
+import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointParameterType;
 import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
@@ -26,43 +26,32 @@ import org.easypeelsecurity.springdog.shared.util.Assert;
  */
 public class EndpointParameterDto {
 
-  private final String paramHash;
+  private Long id;
   private final String name;
-  private final ApiParameterType type;
+  private final EndpointParameterType type;
   private final boolean enabled;
 
   /**
    * All-arg Constructor.
    *
-   * @param paramHash hashed
    * @param name      name of parameter
    * @param type      type of parameter
    * @param enabled   enabled or not
    */
-  public EndpointParameterDto(String paramHash, String name, ApiParameterType type, boolean enabled) {
+  public EndpointParameterDto(String name, EndpointParameterType type, boolean enabled) {
     Assert.hasText(name, "Name must not be null or empty");
     Assert.notNull(type, "Type must not be null");
 
-    this.paramHash = paramHash;
     this.name = name;
     this.type = type;
     this.enabled = enabled;
   }
 
   /**
-   * Constructor.
+   * Getter.
    */
-  public EndpointParameterDto(String name, ApiParameterType type) {
-    this(null, name, type, false);
-  }
-
-  /**
-   * Get object hashed string.
-   *
-   * @return hashed string
-   */
-  public String getParamHash() {
-    return this.paramHash;
+  public Long getId() {
+    return id;
   }
 
   /**
@@ -79,7 +68,7 @@ public class EndpointParameterDto {
    *
    * @return type of parameter
    */
-  public ApiParameterType getType() {
+  public EndpointParameterType getType() {
     return this.type;
   }
 

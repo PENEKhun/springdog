@@ -27,8 +27,8 @@ public abstract class _Endpoint extends BaseDataObject {
     public static final String ID_PK_COLUMN = "ID";
 
     public static final StringProperty<String> FQMN = PropertyFactory.createString("fqmn", String.class);
-    public static final StringProperty<String> HASH = PropertyFactory.createString("hash", String.class);
     public static final StringProperty<String> HTTP_METHOD = PropertyFactory.createString("httpMethod", String.class);
+    public static final NumericProperty<Long> ID = PropertyFactory.createNumeric("id", Long.class);
     public static final BaseProperty<Boolean> IS_PATTERN_PATH = PropertyFactory.createBase("isPatternPath", Boolean.class);
     public static final StringProperty<String> PATH = PropertyFactory.createString("path", String.class);
     public static final NumericProperty<Integer> RULE_BAN_TIME_IN_SECONDS = PropertyFactory.createNumeric("ruleBanTimeInSeconds", Integer.class);
@@ -41,8 +41,8 @@ public abstract class _Endpoint extends BaseDataObject {
     public static final ListProperty<EndpointParameter> ENDPOINTPARAMETERS = PropertyFactory.createList("endpointparameters", EndpointParameter.class);
 
     protected String fqmn;
-    protected String hash;
     protected String httpMethod;
+    protected long id;
     protected boolean isPatternPath;
     protected String path;
     protected int ruleBanTimeInSeconds;
@@ -65,16 +65,6 @@ public abstract class _Endpoint extends BaseDataObject {
         return this.fqmn;
     }
 
-    public void setHash(String hash) {
-        beforePropertyWrite("hash", this.hash, hash);
-        this.hash = hash;
-    }
-
-    public String getHash() {
-        beforePropertyRead("hash");
-        return this.hash;
-    }
-
     public void setHttpMethod(String httpMethod) {
         beforePropertyWrite("httpMethod", this.httpMethod, httpMethod);
         this.httpMethod = httpMethod;
@@ -83,6 +73,16 @@ public abstract class _Endpoint extends BaseDataObject {
     public String getHttpMethod() {
         beforePropertyRead("httpMethod");
         return this.httpMethod;
+    }
+
+    public void setId(long id) {
+        beforePropertyWrite("id", this.id, id);
+        this.id = id;
+    }
+
+    public long getId() {
+        beforePropertyRead("id");
+        return this.id;
     }
 
     public void setIsPatternPath(boolean isPatternPath) {
@@ -200,10 +200,10 @@ public abstract class _Endpoint extends BaseDataObject {
         switch(propName) {
             case "fqmn":
                 return this.fqmn;
-            case "hash":
-                return this.hash;
             case "httpMethod":
                 return this.httpMethod;
+            case "id":
+                return this.id;
             case "isPatternPath":
                 return this.isPatternPath;
             case "path":
@@ -239,11 +239,11 @@ public abstract class _Endpoint extends BaseDataObject {
             case "fqmn":
                 this.fqmn = (String)val;
                 break;
-            case "hash":
-                this.hash = (String)val;
-                break;
             case "httpMethod":
                 this.httpMethod = (String)val;
+                break;
+            case "id":
+                this.id = val == null ? 0 : (long)val;
                 break;
             case "isPatternPath":
                 this.isPatternPath = val == null ? false : (boolean)val;
@@ -292,8 +292,8 @@ public abstract class _Endpoint extends BaseDataObject {
     protected void writeState(ObjectOutputStream out) throws IOException {
         super.writeState(out);
         out.writeObject(this.fqmn);
-        out.writeObject(this.hash);
         out.writeObject(this.httpMethod);
+        out.writeLong(this.id);
         out.writeBoolean(this.isPatternPath);
         out.writeObject(this.path);
         out.writeInt(this.ruleBanTimeInSeconds);
@@ -310,8 +310,8 @@ public abstract class _Endpoint extends BaseDataObject {
     protected void readState(ObjectInputStream in) throws IOException, ClassNotFoundException {
         super.readState(in);
         this.fqmn = (String)in.readObject();
-        this.hash = (String)in.readObject();
         this.httpMethod = (String)in.readObject();
+        this.id = in.readLong();
         this.isPatternPath = in.readBoolean();
         this.path = (String)in.readObject();
         this.ruleBanTimeInSeconds = in.readInt();

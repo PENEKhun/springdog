@@ -26,9 +26,7 @@ import org.springframework.stereotype.Service;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.VersionCompare;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.configuration.CayenneRuntime;
@@ -66,37 +64,14 @@ public class EndpointQuery {
   }
 
   /**
-   * Compares the provided hashes.
-   *
-   * @param compareWith The hash string to be compared.
-   * @param compareTo   An {@code Optional} containing the latest {@code EndpointVersionControl} instance, which
-   *                    holds the version to compare against. If empty, it indicates that there is no existing
-   *                    version.
-   * @return A {@code VersionCompare} indicating the result of the comparison.
-   *     {@code VersionCompare.FIRST_RUN}is returned if {@code compareTo} is empty, suggesting that this is the
-   *     initial version check.
-   */
-  public VersionCompare compareToLatestVersion(String compareWith,
-      Optional<EndpointVersionControl> compareTo) {
-    if (compareTo.isEmpty()) {
-      return VersionCompare.FIRST_RUN;
-    }
-
-    String latestVersionHash = compareTo.get().getFullHashOfEndpoints();
-    return latestVersionHash.equals(compareWith) ? VersionCompare.SAME : VersionCompare.DIFFERENT;
-  }
-
-  /**
-   * Find endpoint by hash.
-   *
-   * @param apiHash hash of the endpoint
+   * Find endpoint by id.
    * @return endpoint DTO
    * @throws IllegalArgumentException if endpoint not found
    */
-  public EndpointDto findApi(String apiHash) {
+  public EndpointDto findApi(long id) {
     ObjectContext context = springdogRepository.newContext();
     return ObjectSelect.query(Endpoint.class)
-        .where(Endpoint.HASH.eq(apiHash))
+        .where(Endpoint.ID.eq(id))
         .select(context)
         .stream()
         .map(EndpointConverter::toDto)
