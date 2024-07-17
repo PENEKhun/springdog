@@ -33,9 +33,12 @@ public class SystemUsageMonitor implements SystemUsageMetrics {
   public Double systemCpuUsagePercent() {
     OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
     if (osBean instanceof com.sun.management.OperatingSystemMXBean operatingSystemMXBean) {
-      return formatDouble(operatingSystemMXBean.getCpuLoad() * 100);
+      double cpuLoad = operatingSystemMXBean.getCpuLoad();
+      if (!Double.isNaN(cpuLoad) && cpuLoad >= 0.0 && cpuLoad <= 1.0) {
+        return formatDouble(cpuLoad * 100);
+      }
     }
-    return null;
+    return 0.0;
   }
 
   @Override

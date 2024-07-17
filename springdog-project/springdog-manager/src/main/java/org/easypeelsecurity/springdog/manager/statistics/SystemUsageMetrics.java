@@ -39,7 +39,7 @@ public interface SystemUsageMetrics {
   /**
    * Retrieves the current system CPU usage as a percentage.
    *
-   * @return the system CPU usage as a percentage, or null if not available
+   * @return the system CPU usage as a percentage, or 0.0 if not available
    */
   Double systemCpuUsagePercent();
 
