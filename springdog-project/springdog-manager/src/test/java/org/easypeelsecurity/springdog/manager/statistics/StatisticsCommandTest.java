@@ -78,7 +78,7 @@ class StatisticsCommandTest {
     // given invalid values
     double invalidCpuUsage = -10.0;
     double invalidMemoryUsage = 110.0;
-    double invalidDiskUsage = Double.NaN;
+    double invalidDiskUsage = -100.0;
 
     // when & then
     assertThrows(IllegalArgumentException.class, () -> {
