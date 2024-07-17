@@ -59,7 +59,7 @@ public class EndpointConverter {
       parameter.setEndpoint(endpoint);
       endpoint.addToEndpointparameters(parameter);
     }
-    return new Endpoint();
+    return endpoint;
   }
 
   private static EndpointParameter toEntity(ObjectContext context, EndpointParameterDto endpointParameterDto) {
