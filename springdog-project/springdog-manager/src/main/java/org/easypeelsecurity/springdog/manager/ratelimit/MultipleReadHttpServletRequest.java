@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
@@ -37,6 +38,7 @@ import org.apache.commons.io.IOUtils;
 public class MultipleReadHttpServletRequest extends HttpServletRequestWrapper {
 
   private ByteArrayOutputStream cachedBytes;
+  private Map<String, String[]> parameterMap;
 
   /**
    * Construct a new multi-read wrapper.
@@ -45,6 +47,7 @@ public class MultipleReadHttpServletRequest extends HttpServletRequestWrapper {
    */
   public MultipleReadHttpServletRequest(HttpServletRequest request) {
     super(request);
+    cacheParameterMap(request);
   }
 
   @Override
@@ -61,12 +64,31 @@ public class MultipleReadHttpServletRequest extends HttpServletRequestWrapper {
     return new BufferedReader(new InputStreamReader(getInputStream()));
   }
 
+  @Override
+  public String getParameter(String name) {
+    if (parameterMap.containsKey(name)) {
+      return parameterMap.get(name)[0];
+    }
+    return null;
+  }
+
+  @Override
+  public Map<String, String[]> getParameterMap() {
+    return parameterMap;
+  }
+
+  @Override
+  public String[] getParameterValues(String name) {
+    return parameterMap.get(name);
+  }
+
   private void cacheInputStream() throws IOException {
-    /* Cache the input-stream in order to read it multiple times. For
-     * convenience, I use apache.commons IOUtils
-     */
     cachedBytes = new ByteArrayOutputStream();
     IOUtils.copy(super.getInputStream(), cachedBytes);
+  }
+
+  private void cacheParameterMap(HttpServletRequest request) {
+    this.parameterMap = request.getParameterMap();
   }
 
   /* An input-stream which reads the cached request body */
