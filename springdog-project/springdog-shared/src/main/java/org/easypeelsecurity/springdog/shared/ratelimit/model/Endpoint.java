@@ -17,6 +17,7 @@
 package org.easypeelsecurity.springdog.shared.ratelimit.model;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,19 @@ public class Endpoint extends _Endpoint {
     setRulePermanentBan(false);
     setRuleIpBased(false);
     this.endpointparameters = new ArrayList<>();
+  }
+
+  @Override
+  public void addToEndpointparameters(EndpointParameter obj) {
+    Assert.notNull(obj, "EndpointParameter must not be null");
+    obj.setEndpoint(this);
+    super.addToEndpointparameters(obj);
+  }
+
+  @Override
+  public void removeFromEndpointparameters(EndpointParameter obj) {
+    Assert.notNull(obj, "EndpointParameter must not be null");
+    super.removeFromEndpointparameters(obj);
   }
 
   /**
@@ -83,20 +97,20 @@ public class Endpoint extends _Endpoint {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-
-    Endpoint endpoint = (Endpoint) o;
-    return hash.equals(endpoint.hash);
+    Endpoint endpoint = (Endpoint) obj;
+    return Objects.equals(this.path, endpoint.path) && Objects.equals(this.isPatternPath,
+        endpoint.isPatternPath) && Objects.equals(this.httpMethod, endpoint.httpMethod);
   }
 
   @Override
   public int hashCode() {
-    return hash.hashCode();
+    return Objects.hash(this.path, this.isPatternPath, this.httpMethod);
   }
 }

@@ -17,27 +17,11 @@
 package org.easypeelsecurity.springdog.shared.ratelimit;
 
 /**
- * Interface for endpoint hashing.
+ * Enum to compare version.
  */
-public interface EndpointHash {
+public enum EndpointVersionCompareResult {
 
-  String PROPERTY_DELIMITER = " : ";
-  String HASH_ALGORITHM = "SHA-256";
-
-  /**
-   * Get hash of endpoints.
-   *
-   * @param endpointDtos endpoint dtos
-   * @return hash string of endpoints
-   */
-  String getHash(EndpointDto... endpointDtos);
-
-  /**
-   * Get hash of endpoint parameters.
-   *
-   * @param apiInfo   endpoint dto
-   * @param apiParams endpoint parameters
-   * @return hash string of endpoint parameters
-   */
-  String getParamHash(EndpointDto apiInfo, EndpointParameterDto... apiParams);
+  FIRST_RUN,
+  SAME,
+  DIFFERENT,
 }

@@ -32,6 +32,8 @@ public class EndpointVersionControl extends _EndpointVersionControl {
 
   @Override
   protected void onPrePersist() {
-    setDateOfVersion(LocalDateTime.now());
+    if (getDateOfVersion() == null) {
+      setDateOfVersion(LocalDateTime.now());
+    }
   }
 }

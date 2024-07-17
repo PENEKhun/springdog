@@ -99,9 +99,9 @@ public class SpringdogAgentView {
     return "/templates/content/rate-limit/manage.html";
   }
 
-  @GetMapping("/rate-limit/{apiHash}")
-  public String viewRateLimitSpecific(@PathVariable(name = "apiHash") String apiHash, Model model) {
-    EndpointDto endpointDto = rateLimitQuery.findApi(apiHash);
+  @GetMapping("/rate-limit/{endpointId}")
+  public String viewRateLimitSpecific(@PathVariable(name = "endpointId") long endpointId, Model model) {
+    EndpointDto endpointDto = rateLimitQuery.findApi(endpointId);
     model.addAttribute("api", endpointDto);
     List<String> headers = new ArrayList<>();
     headers.add("X-Auth-Token");
@@ -110,21 +110,21 @@ public class SpringdogAgentView {
     return "/templates/content/rate-limit/actions/setting.html";
   }
 
-  @PostMapping("/rate-limit/{apiHash}")
-  public String modifyRateLimit(@PathVariable(name = "apiHash") String apiHash,
+  @PostMapping("/rate-limit/{endpointId}")
+  public String modifyRateLimit(@PathVariable(name = "endpointId") long endpointId,
       @ModelAttribute("api") EndpointDto endpointDto, Model model) {
     try {
-      Assert.isEqual(apiHash, endpointDto.getHash(), "Invalid request");
+      Assert.isEqual(endpointId, endpointDto.getId(), "Invalid request");
       rateLimitCommand.updateRule(endpointDto);
     } catch (Exception e) {
       model.addAttribute("result", false);
       model.addAttribute("message", e.getMessage());
-      return viewRateLimitSpecific(apiHash, model);
+      return viewRateLimitSpecific(endpointId, model);
     }
 
     model.addAttribute("result", true);
     model.addAttribute("message", "Successfully updated");
-    return viewRateLimitSpecific(apiHash, model);
+    return viewRateLimitSpecific(endpointId, model);
   }
 
   @GetMapping("/service/change-pw")

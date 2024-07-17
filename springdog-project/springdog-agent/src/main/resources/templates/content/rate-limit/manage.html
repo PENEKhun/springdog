@@ -16,7 +16,7 @@
 
       new DataTable('#table', {
         columns: [
-          {title: 'hash', data: 'hash', visible: false},
+          {title: 'index', data: 'id', visible: false},
           {title: 'path', data: 'path'},
           {title: 'fully qualified method name', data: 'fqmn'},
           {title: 'Http method', data: 'httpMethod'},
@@ -38,7 +38,7 @@
           // {title: 'Last modified', data: 'updatedAt'},
           {
             title: 'Actions',
-            data: 'hash',
+            data: 'id',
             render: function (data, type, row, meta) {
               return '<button class="btn btn-primary btn-sm" onclick="configure(\'' + data
                   + '\')" title="Configure"><i class="bi bi-gear-fill"></i></button> ' +
@@ -53,12 +53,12 @@
       });
     });
 
-    function configure(apiHash) {
-      window.location.href = window.location.pathname + '/' + apiHash;
+    function configure(idx) {
+      window.location.href = window.location.pathname + '/' + idx;
     }
 
-    function analyze(apiHash) {
-      window.location.href = window.location.pathname + '/' + apiHash + '/analytics';
+    function analyze(idx) {
+      window.location.href = window.location.pathname + '/' + idx + '/analytics';
     }
   </script>
   <title>Manage</title>
