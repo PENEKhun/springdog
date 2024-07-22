@@ -91,7 +91,7 @@ public class ControllerParser {
     String fqmn = method.getBeanType().getPackageName() + "." + method.getBeanType().getSimpleName() + "." +
         method.getMethod().getName();
 
-    EndpointDto api = new EndpointDto.Builder()
+    EndpointDto endpoint = new EndpointDto.Builder()
         .fqmn(fqmn)
         .path(endPoint)
         .httpMethod(httpMethod)
@@ -113,8 +113,8 @@ public class ControllerParser {
     } catch (IOException | NoSuchMethodException e) {
       logger.error("Error while extracting parameter names.", e);
     }
-    api.addParameters(parameters);
-    return api;
+    endpoint.addParameters(parameters);
+    return endpoint;
   }
 
   /**

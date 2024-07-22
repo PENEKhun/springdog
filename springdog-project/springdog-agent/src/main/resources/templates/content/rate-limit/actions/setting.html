@@ -6,7 +6,7 @@
 
 
 <head>
-  <title>Ratelimit - API Setting</title>
+  <title>Ratelimit - Endpoint Setting</title>
   <style>
     [data-card-type="request-control"]:not([data-enabled="true"]) .hover-message {
       display: block;
@@ -139,7 +139,7 @@
     </div>
   </th:block>
 
-  <form method="post" name="editRule" th:object="${api}">
+  <form method="post" name="editRule" th:object="${endpoint}">
     <div class="card mb-4">
       <div class="card-body">
         <div class="form-check form-switch">
@@ -147,12 +147,12 @@
             <strong>RateLimit</strong>
             <input id="statusValue" th:field="*{ruleStatus}" type="hidden"/>
             <input class="form-check-input" id="statusToggle" onchange="updateStatusValue(this)"
-                   th:checked="${api.ruleStatus == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE}"
+                   th:checked="${endpoint.ruleStatus == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE}"
                    type="checkbox">
             will be
             <label class="form-check-label text-decoration-underline" for="statusToggle"
-                   th:text="${api.ruleStatus == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE ? 'enabled' : 'disabled'}"></label>
-            on this API.
+                   th:text="${endpoint.ruleStatus == T(org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus).ACTIVE ? 'enabled' : 'disabled'}"></label>
+            on this Endpoint.
         </div>
       </div>
     </div>
@@ -161,12 +161,12 @@
       <div class="card-body">
         <h5 class="card-title">Endpoint Information</h5>
         <p class="card-text">
-          <strong>API Path:</strong>
-        <div class="alert alert-info" th:text="${api.path}"></div>
+          <strong>Endpoint :</strong>
+        <div class="alert alert-info" th:text="${endpoint.path}"></div>
         <strong>Request Type:</strong>
-        <div class="alert alert-info" th:text="${api.httpMethod}"></div>
+        <div class="alert alert-info" th:text="${endpoint.httpMethod}"></div>
         <strong>Fully qualified method name:</strong>
-        <div class="alert alert-info" th:text="${api.fqmn}"></div>
+        <div class="alert alert-info" th:text="${endpoint.fqmn}"></div>
         <input th:field="*{fqmn}" type="hidden"/>
         <input th:field="*{id}" type="hidden"/>
       </div>
@@ -256,7 +256,7 @@
           <select class="form-control" id="parametersOption" multiple>
             <option th:data-name="${parameter.name}"
                     th:data-id="${parameter.id}"
-                    th:each="parameter : ${api.parameters}"
+                    th:each="parameter : ${endpoint.parameters}"
                     th:selected="${parameter.isEnabled()}"
                     th:text="${parameter.name + ' [' + parameter.type + ']'}"></option>
           </select>
