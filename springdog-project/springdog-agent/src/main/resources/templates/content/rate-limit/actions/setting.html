@@ -118,7 +118,7 @@
       }).on("change", function () {
         const selectedData = $(this).select2("data");
         paramEnableInput.value = selectedData.map(item => item.element.dataset.name).join(",");
-      });
+      }).trigger('change');
     });
   </script>
 </head>
