@@ -92,6 +92,31 @@ public class StatisticsQuery {
   }
 
   /**
+   * Get recent endpoint metrics.
+   *
+   * @param endpointId the id of the endpoint to retrieve metrics for
+   * @param limit      the maximum number of endpoint metrics to retrieve
+   * @return a list of EndpointMetricDto objects representing the most recent endpoint metrics
+   */
+  public List<EndpointMetricDto> getRecentEndpointMetrics(long endpointId, int limit) {
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(EndpointMetric.class)
+        .where(EndpointMetric.ENDPOINT.eqId(endpointId))
+        .orderBy(EndpointMetric.METRIC_DATE.desc())
+        .limit(limit)
+        .select(context)
+        .stream()
+        .map(metric -> new EndpointMetricDto(
+            metric.getEndpoint().getPath(),
+            metric.getEndpoint().getHttpMethod(),
+            metric.getPageView(),
+            metric.getAverageResponseMs(),
+            metric.getFailureWithRatelimit(),
+            metric.getMetricDate()))
+        .toList();
+  }
+
+  /**
    * Get endpoint metrics for a specific baseDate.
    */
   public List<EndpointMetricDto> getEndpointMetrics(LocalDate baseDate) {

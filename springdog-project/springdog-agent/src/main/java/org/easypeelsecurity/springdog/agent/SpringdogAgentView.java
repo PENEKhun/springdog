@@ -110,6 +110,16 @@ public class SpringdogAgentView {
     return "/templates/content/rate-limit/actions/setting.html";
   }
 
+  @GetMapping("/rate-limit/{endpointId}/analytics")
+  public String viewRateLimitSpecificAnalytics(@PathVariable(name = "endpointId") long endpointId,
+      Model model) {
+    EndpointDto endpointDto = rateLimitQuery.findApi(endpointId);
+    model.addAttribute("endpoint", endpointDto);
+    model.addAttribute("statics", statisticsQuery.getRecentEndpointMetrics(endpointId, 10));
+
+    return "/templates/content/rate-limit/actions/analytics.html";
+  }
+
   @PostMapping("/rate-limit/{endpointId}")
   public String modifyRateLimit(@PathVariable(name = "endpointId") long endpointId,
       @ModelAttribute("api") EndpointDto endpointDto, Model model) {

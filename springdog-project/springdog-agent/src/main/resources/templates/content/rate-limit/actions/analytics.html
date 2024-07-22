@@ -1,0 +1,211 @@
+<!--
+  ~ Copyright 2024 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html layout:decorate="~{/templates/layout/default_layout.html}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+
+<head>
+  <title>Analytics</title>
+  <script th:src="@{/js/chart.js}"></script>
+  <script th:src="@{/js/chartjs-adapter-date-fns.js}"></script>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    let statics = [[${statics}]];
+    /*]]>*/
+
+    statics.sort((a, b) => new Date(a.baseDate) - new Date(b.baseDate));
+
+    let labels = statics.map(item => item.baseDate);
+    let visitCount = statics.map(item => item.visitCount);
+    let ratelimitFailureCount = statics.map(item => item.ratelimitFailureCount);
+    let averageResponseMilliseconds = statics.map(item => item.averageResponseMilliseconds);
+
+    let chart;
+    window.onload = function () {
+      const ctx = document.getElementById('endpointMetricsChart').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Visit Count',
+              data: visitCount,
+              borderColor: 'rgba(75, 192, 192, 1)',
+              fill: false
+            },
+            {
+              label: 'Rate Limit Failure Count',
+              data: ratelimitFailureCount,
+              borderColor: 'rgba(255, 99, 132, 1)',
+              fill: false
+            },
+            {
+              label: 'Average Response Time (ms)',
+              data: averageResponseMilliseconds,
+              borderColor: 'rgba(54, 162, 235, 1)',
+              fill: false
+            }
+          ]
+        },
+        options: {
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'day'
+              },
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Count'
+              }
+            }
+          }
+        }
+      });
+    };
+
+    function toggleDataset(index) {
+      const meta = chart.getDatasetMeta(index);
+      meta.hidden = !meta.hidden;
+      chart.update();
+    }
+  </script>
+  <style>
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .btn-group .btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-group .btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+<div class="content" layout:fragment="content">
+  <h1 class="mt-4">Rate Limit</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">Analytics</li>
+  </ol>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <div class="card shadow-sm" style="border-radius: 1rem;">
+        <div class="card-header" style="font-size: 1.25rem;">
+          <h5>Chart</h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas id="endpointMetricsChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <div class="card shadow-sm mb-3" style="border-radius: 1rem;">
+        <div class="card-header" style="font-size: 1.25rem;">
+          <h5>Endpoint Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="list-group">
+                <li class="list-group-item"><strong>Path:</strong> <span
+                    th:text="${endpoint.path}"></span></li>
+                <li class="list-group-item"><strong>Fully Qualified Method Name:</strong> <span
+                    th:text="${endpoint.fqmn}"></span></li>
+                <li class="list-group-item"><strong>HTTP Method:</strong> <span
+                    th:text="${endpoint.httpMethod}"></span></li>
+                <li class="list-group-item"><strong>Pattern Path:</strong> <span
+                    th:text="${endpoint.patternPath}"></span></li>
+                <li class="list-group-item"><strong>Rule Status:</strong> <span
+                    th:text="${endpoint.ruleStatus}"></span></li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-group">
+                <li class="list-group-item"><strong>IP Based Rule:</strong> <span
+                    th:text="${endpoint.ruleIpBased}"></span></li>
+                <li class="list-group-item"><strong>Permanent Ban Rule:</strong> <span
+                    th:text="${endpoint.rulePermanentBan}"></span></li>
+                <li class="list-group-item"><strong>Request Limit Count:</strong> <span
+                    th:text="${endpoint.ruleRequestLimitCount}"></span></li>
+                <li class="list-group-item"><strong>Time Limit (seconds):</strong> <span
+                    th:text="${endpoint.ruleTimeLimitInSeconds}"></span></li>
+                <li class="list-group-item"><strong>Ban Time (seconds):</strong> <span
+                    th:text="${endpoint.ruleBanTimeInSeconds}"></span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card shadow-sm" style="border-radius: 1rem;">
+        <div class="card-header" style="font-size: 1.25rem;">
+          <h5>Toggle DataSets</h5>
+        </div>
+        <div class="card-body">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="toggleVisitCount" checked
+                   onclick="toggleDataset(0)">
+            <label class="form-check-label" for="toggleVisitCount">
+              Toggle Visit Count
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value=""
+                   id="toggleRateLimitFailureCount" checked
+                   onclick="toggleDataset(1)">
+            <label class="form-check-label" for="toggleRateLimitFailureCount">
+              Toggle Rate Limit Failure Count
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="toggleAvgResponseTime"
+                   checked
+                   onclick="toggleDataset(2)">
+            <label class="form-check-label" for="toggleAvgResponseTime">
+              Toggle Average Response Time (ms)
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
