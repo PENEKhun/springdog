@@ -33,17 +33,20 @@ class EndpointMetricDtoTest {
     String method = "GET";
     long visitCount = 100;
     long averageResponseMilliseconds = 200;
+    long ratelimitFailureCount = 1_000;
     LocalDate baseDate = LocalDate.now();
 
     // when
     EndpointMetricDto dto =
-        new EndpointMetricDto(path, method, visitCount, averageResponseMilliseconds, baseDate);
+        new EndpointMetricDto(path, method, visitCount, averageResponseMilliseconds, ratelimitFailureCount,
+            baseDate);
 
     // then
-    assertEquals(path, dto.getPath());
-    assertEquals(method, dto.getMethod());
-    assertEquals(visitCount, dto.getVisitCount());
-    assertEquals(averageResponseMilliseconds, dto.getAverageResponseMilliseconds());
-    assertEquals(baseDate, dto.getDate());
+    assertEquals(path, dto.path());
+    assertEquals(method, dto.method());
+    assertEquals(visitCount, dto.visitCount());
+    assertEquals(averageResponseMilliseconds, dto.averageResponseMilliseconds());
+    assertEquals(ratelimitFailureCount, dto.ratelimitFailureCount());
+    assertEquals(baseDate, dto.baseDate());
   }
 }

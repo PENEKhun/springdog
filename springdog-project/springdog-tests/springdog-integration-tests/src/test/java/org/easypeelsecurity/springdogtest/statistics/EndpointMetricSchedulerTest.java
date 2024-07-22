@@ -44,7 +44,7 @@ class EndpointMetricSchedulerTest {
     Awaitility.await()
         .atMost(1100, TimeUnit.MILLISECONDS)
         .untilAsserted(() -> {
-          verify(scheduler, atLeast(10)).calculateAverageResponseTimes();
+          verify(scheduler, atLeast(10)).saveEndpointStatistics();
         });
   }
 }

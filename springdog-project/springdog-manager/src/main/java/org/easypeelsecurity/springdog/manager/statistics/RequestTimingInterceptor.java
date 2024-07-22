@@ -81,12 +81,11 @@ public class RequestTimingInterceptor implements HandlerInterceptor {
 
     long startTime = (Long) request.getAttribute(START_TIME_REQUEST_TIMING);
     long endTime = System.currentTimeMillis();
-    long duration = endTime - startTime;
+    long responseTime = endTime - startTime;
 
     HandlerMethod handlerMethod = (HandlerMethod) handler;
     String fqmn = handlerMethod.getBeanType().getName() + "." + handlerMethod.getMethod().getName();
-    EndpointMetricCache.addResponseTime(fqmn, duration);
-    System.out.println(fqmn);
+    EndpointMetricCacheManager.addResponseTime(fqmn, responseTime);
   }
 
   private boolean shouldSkipRequest(HttpServletRequest request, Class<?> controllerClass) {

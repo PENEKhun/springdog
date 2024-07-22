@@ -86,13 +86,15 @@ public class StatisticsCommand {
    *
    * @param fqmn          the fully qualified method name of the endpoint
    * @param responseTimes the array of response times to be included in the statistics
+   * @param failureCount  the number of failed rate-limited requests
    * @param today         the current date
    * @throws IllegalArgumentException if the parameters are invalid
    */
-  public void upsertEndpointMetrics(String fqmn, long[] responseTimes, LocalDate today) {
+  public void upsertEndpointMetrics(String fqmn, long[] responseTimes, long failureCount, LocalDate today) {
     Assert.isTrue(Arrays.stream(responseTimes).allMatch(time -> time >= 0),
         "Response times must be non-negative");
     Assert.isTrue(today != null, "Date must not be null");
+    Assert.isTrue(failureCount >= 0, "Failure count must be non-negative");
 
     ObjectContext context = springdogRepository.newContext();
     Endpoint endpoint = ObjectSelect.query(Endpoint.class)
@@ -110,7 +112,7 @@ public class StatisticsCommand {
       endpointMetric.setMetricDate(today);
     }
     long responseTimeSum = Arrays.stream(responseTimes).sum();
-    endpointMetric.updateStatistics(responseTimes.length, responseTimeSum);
+    endpointMetric.updateStatistics(responseTimes.length, responseTimeSum, failureCount);
 
     context.commitChanges();
   }

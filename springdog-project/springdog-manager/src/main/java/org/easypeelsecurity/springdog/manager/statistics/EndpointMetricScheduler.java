@@ -17,16 +17,15 @@
 package org.easypeelsecurity.springdog.manager.statistics;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * This class is responsible for scheduling tasks to calculate the average response times of HTTP requests.
+ * This class is responsible for scheduling tasks to store endpoint metrics in the database such as average
+ * response times, number of failures, etc.
  * It retrieves response times from {@link RequestTimingInterceptor} and processes them at regular intervals.
  *
  * @author PENEKhun
@@ -44,18 +43,16 @@ public class EndpointMetricScheduler {
   }
 
   /**
-   * Scheduled task that calculates the average response times of HTTP requests and stores them in the database.
+   * Scheduled task that saves the endpoint statistics in the database.
    */
-  @Scheduled(fixedRateString = "${springdog.endpointMetricScheduler.fixedRate:10000}")
-  public void calculateAverageResponseTimes() {
-    List<Entry<String, long[]>> allResponseTimes = EndpointMetricCache.getAllResponseTimes();
+  @Scheduled(fixedRateString = "${springdog.endpointMetricScheduler.fixedRate:300000}")
+  public void saveEndpointStatistics() {
+    List<EndpointMetricCached> cached = EndpointMetricCacheManager.getAllData();
 
-    for (Entry<String, long[]> entry : allResponseTimes) {
-      String fqmn = entry.getKey();
-      System.out.println(fqmn);
-      System.out.println(Arrays.toString(entry.getValue()));
-      statisticsCommand.upsertEndpointMetrics(fqmn, entry.getValue(), LocalDate.now());
-      EndpointMetricCache.clear(entry.getKey());
+    for (EndpointMetricCached entry : cached) {
+      statisticsCommand.upsertEndpointMetrics(entry.fqmn(), entry.responseTimes(),
+          entry.ratelimitFailureCount(), LocalDate.now());
+      EndpointMetricCacheManager.invalidateByFqmn(entry.fqmn());
     }
   }
 }

@@ -35,6 +35,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import org.easypeelsecurity.springdog.manager.statistics.EndpointMetricCacheManager;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
@@ -92,6 +93,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
         int banTimeSeconds =
             endpoint.isRulePermanentBan() ? Integer.MAX_VALUE : endpoint.getRuleBanTimeInSeconds();
         applyRatelimitResponse(response, String.valueOf(banTimeSeconds));
+        EndpointMetricCacheManager.incrementFailureCount(fqmn);
         return false;
       }
 

@@ -1,19 +1,3 @@
-/*
- * Copyright 2024 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.easypeelsecurity.springdog.shared.statistics.model.auto;
 
 import java.io.IOException;
@@ -41,11 +25,13 @@ public abstract class _EndpointMetric extends BaseDataObject {
     public static final String ID_PK_COLUMN = "ID";
 
     public static final NumericProperty<Integer> AVERAGE_RESPONSE_MS = PropertyFactory.createNumeric("averageResponseMs", Integer.class);
+    public static final NumericProperty<Long> FAILURE_WITH_RATELIMIT = PropertyFactory.createNumeric("failureWithRatelimit", Long.class);
     public static final DateProperty<LocalDate> METRIC_DATE = PropertyFactory.createDate("metricDate", LocalDate.class);
     public static final NumericProperty<Long> PAGE_VIEW = PropertyFactory.createNumeric("pageView", Long.class);
     public static final EntityProperty<Endpoint> ENDPOINT = PropertyFactory.createEntity("endpoint", Endpoint.class);
 
     protected int averageResponseMs;
+    protected long failureWithRatelimit;
     protected LocalDate metricDate;
     protected long pageView;
 
@@ -59,6 +45,16 @@ public abstract class _EndpointMetric extends BaseDataObject {
     public int getAverageResponseMs() {
         beforePropertyRead("averageResponseMs");
         return this.averageResponseMs;
+    }
+
+    public void setFailureWithRatelimit(long failureWithRatelimit) {
+        beforePropertyWrite("failureWithRatelimit", this.failureWithRatelimit, failureWithRatelimit);
+        this.failureWithRatelimit = failureWithRatelimit;
+    }
+
+    public long getFailureWithRatelimit() {
+        beforePropertyRead("failureWithRatelimit");
+        return this.failureWithRatelimit;
     }
 
     public void setMetricDate(LocalDate metricDate) {
@@ -98,6 +94,8 @@ public abstract class _EndpointMetric extends BaseDataObject {
         switch(propName) {
             case "averageResponseMs":
                 return this.averageResponseMs;
+            case "failureWithRatelimit":
+                return this.failureWithRatelimit;
             case "metricDate":
                 return this.metricDate;
             case "pageView":
@@ -118,6 +116,9 @@ public abstract class _EndpointMetric extends BaseDataObject {
         switch (propName) {
             case "averageResponseMs":
                 this.averageResponseMs = val == null ? 0 : (int)val;
+                break;
+            case "failureWithRatelimit":
+                this.failureWithRatelimit = val == null ? 0 : (long)val;
                 break;
             case "metricDate":
                 this.metricDate = (LocalDate)val;
@@ -145,6 +146,7 @@ public abstract class _EndpointMetric extends BaseDataObject {
     protected void writeState(ObjectOutputStream out) throws IOException {
         super.writeState(out);
         out.writeInt(this.averageResponseMs);
+        out.writeLong(this.failureWithRatelimit);
         out.writeObject(this.metricDate);
         out.writeLong(this.pageView);
         out.writeObject(this.endpoint);
@@ -154,6 +156,7 @@ public abstract class _EndpointMetric extends BaseDataObject {
     protected void readState(ObjectInputStream in) throws IOException, ClassNotFoundException {
         super.readState(in);
         this.averageResponseMs = in.readInt();
+        this.failureWithRatelimit = in.readLong();
         this.metricDate = (LocalDate)in.readObject();
         this.pageView = in.readLong();
         this.endpoint = in.readObject();

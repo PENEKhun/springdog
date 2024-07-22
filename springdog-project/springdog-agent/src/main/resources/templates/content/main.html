@@ -71,7 +71,6 @@
     let recentSystemMetrics = [[${recentSystemMetrics}]].reverse();
     let todayEndpointMetrics = [[${todayEndpointMetrics}]];
     /*]]>*/
-    console.log(recentSystemMetrics);
 
     const labels = recentSystemMetrics.map(
         metric => new Date(metric.timestamp).toLocaleTimeString());
@@ -218,7 +217,8 @@
       });
 
       const topTrafficMetrics = todayEndpointMetrics.sort((a, b) => b.visitCount - a.visitCount).slice(0, 3);
-      console.log(topTrafficMetrics);
+      const topFail = todayEndpointMetrics.sort((a, b) => b.ratelimitFailureCount - a.ratelimitFailureCount).slice(0, 3);
+
       const dailyTopTraffic = document.getElementById('dailyTopTraffic');
       topTrafficMetrics.forEach(metric => {
         const listItem = document.createElement('li');
@@ -230,8 +230,18 @@
         dailyTopTraffic.appendChild(listItem);
       });
 
+      const dailyFail = document.getElementById('dailyTopFail');
+      topTrafficMetrics.forEach(metric => {
+        const listItem = document.createElement('li');
+        listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+        listItem.innerHTML = `
+          <span class="method-icon method-${metric.method.toLowerCase()}">${metric.method}</span>${metric.path}
+          <span class="badge bg-danger rounded-pill">${metric.ratelimitFailureCount}</span>
+        `;
+        dailyFail.appendChild(listItem);
+      });
+
       const slowestEndpoints = todayEndpointMetrics.sort((a, b) => b.averageResponseMilliseconds - a.averageResponseMilliseconds).slice(0, 3);
-      console.log(slowestEndpoints);
       const dailySlowestEndpoints = document.getElementById('dailySlowestEndpoints');
       slowestEndpoints.forEach(metric => {
         const listItem = document.createElement('li');
@@ -334,7 +344,7 @@
             <h6 class="my-0 fw-normal">Top Ratelimit Error APIs</h6>
           </div>
           <div class="card-body">
-            <ul class="list-group">
+            <ul class="list-group" id="dailyTopFail">
             </ul>
           </div>
         </div>
