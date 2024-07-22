@@ -97,6 +97,7 @@ class StatisticsCommandTest {
     // given
     String targetHandlerFqmn = "org.epsec.app.controller.ExampleController";
     long[] responseTimes = {100L, 200L, 300L, 500L, 400L};
+    long failureCount = 10L;
 
     Endpoint mockEndpoint = mock(Endpoint.class);
     EndpointMetric mockEndpointMetric = mock(EndpointMetric.class);
@@ -113,13 +114,13 @@ class StatisticsCommandTest {
     assertThrows(
         IllegalArgumentException.class,
         () -> {
-          statisticsCommand.upsertEndpointMetrics("unknown-fqmn", responseTimes,
+          statisticsCommand.upsertEndpointMetrics("unknown-fqmn", responseTimes, failureCount,
               LocalDate.now());
         }, "Endpoint not found");
   }
 
   @Test
-  void testUpsertEndpointMetricsWithInvalidValue() {
+  void testUpsertEndpointMetricsWithInvalidResponseTime() {
     // given
     String targetHandlerFqmn = "org.epsec.app.controller.ExampleController";
     long[] responseTimes = {100L, 200L, 300L, 500L, 400L, -200L};
@@ -127,8 +128,22 @@ class StatisticsCommandTest {
     // when & then
     assertThrows(IllegalArgumentException.class,
         () -> {
-          statisticsCommand.upsertEndpointMetrics(targetHandlerFqmn, responseTimes,
+          statisticsCommand.upsertEndpointMetrics(targetHandlerFqmn, responseTimes, 10L,
               LocalDate.now());
         }, "Response time must be greater than 0");
+  }
+
+  @Test
+  void testUpsertEndpointMetricsWithInvalidFailureCount() {
+    // given
+    String targetHandlerFqmn = "org.epsec.app.controller.ExampleController";
+    long failureCount = -10L;
+
+    // when & then
+    assertThrows(IllegalArgumentException.class,
+        () -> {
+          statisticsCommand.upsertEndpointMetrics(targetHandlerFqmn, new long[]{10L, 10L}, failureCount,
+              LocalDate.now());
+        }, "Failure count must be non-negative");
   }
 }

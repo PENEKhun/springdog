@@ -21,65 +21,12 @@ import java.time.LocalDate;
 /**
  * DTO for endpoint metrics.
  *
- * @author PENEKhun
+ * @param path                        endpoint path
+ * @param method                      HTTP method
+ * @param visitCount                  number of visits
+ * @param averageResponseMilliseconds average response time in milliseconds
+ * @param ratelimitFailureCount       number of rate limit failures
  */
-public class EndpointMetricDto {
-
-  private final String path;
-  private final String method;
-  private final long visitCount;
-  private final long averageResponseMilliseconds;
-  private final LocalDate baseDate;
-
-  /**
-   * Constructor.
-   *
-   * @param path                        endpoint path
-   * @param method                      HTTP method
-   * @param visitCount                  number of visits
-   * @param averageResponseMilliseconds average response time in milliseconds
-   */
-  public EndpointMetricDto(String path, String method, long visitCount, long averageResponseMilliseconds,
-      LocalDate baseDate) {
-    this.path = path;
-    this.method = method;
-    this.visitCount = visitCount;
-    this.averageResponseMilliseconds = averageResponseMilliseconds;
-    this.baseDate = baseDate;
-  }
-
-  /**
-   * Get endpoint path.
-   */
-  public String getPath() {
-    return path;
-  }
-
-  /**
-   * Get HTTP method.
-   */
-  public String getMethod() {
-    return method;
-  }
-
-  /**
-   * Get number of visits.
-   */
-  public long getVisitCount() {
-    return visitCount;
-  }
-
-  /**
-   * Get average response time.
-   */
-  public long getAverageResponseMilliseconds() {
-    return averageResponseMilliseconds;
-  }
-
-  /**
-   * Returns the base day of the data.
-   */
-  public LocalDate getDate() {
-    return baseDate;
-  }
+public record EndpointMetricDto(String path, String method, long visitCount, long averageResponseMilliseconds,
+                                long ratelimitFailureCount, LocalDate baseDate) {
 }

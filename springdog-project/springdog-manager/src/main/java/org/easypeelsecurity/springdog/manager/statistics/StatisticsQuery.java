@@ -105,6 +105,7 @@ public class StatisticsQuery {
             metric.getEndpoint().getHttpMethod(),
             metric.getPageView(),
             metric.getAverageResponseMs(),
+            metric.getFailureWithRatelimit(),
             baseDate))
         .toList();
   }

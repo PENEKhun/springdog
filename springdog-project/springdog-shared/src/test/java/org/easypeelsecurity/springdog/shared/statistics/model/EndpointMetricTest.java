@@ -32,21 +32,24 @@ import org.junit.jupiter.api.Test;
 class EndpointMetricTest {
 
   @Test
-  @DisplayName("Update statistics with additional page views and response time")
+  @DisplayName("Update statistics")
   void shouldUpdateStatisticsCorrectly() {
     // given
     EndpointMetric endpointMetric = new EndpointMetric();
     long initialPageView = 100;
     int initialAverageResponseMs = 200;
+    long initialRateLimitFailureCount = 1_000;
     endpointMetric.setPageView(initialPageView);
     endpointMetric.setAverageResponseMs(initialAverageResponseMs);
+    endpointMetric.setFailureWithRatelimit(initialRateLimitFailureCount);
 
     // when
-    endpointMetric.updateStatistics(100, 750_000);
+    endpointMetric.updateStatistics(100, 750_000, 1_000);
 
     // then
     assertEquals(200, endpointMetric.getPageView());
     assertEquals(3_850, endpointMetric.getAverageResponseMs());
+    assertEquals(2_000, endpointMetric.getFailureWithRatelimit());
   }
 
   @Test
@@ -71,6 +74,18 @@ class EndpointMetricTest {
     assertThrows(IllegalArgumentException.class,
         () -> endpointMetric.setAverageResponseMs(-10),
         "Average response time must be a positive number.");
+  }
+
+  @Test
+  @DisplayName("Should throw exception when failureCount is negative")
+  void throwExceptionForNegativeFailureCount() {
+    // given
+    EndpointMetric endpointMetric = new EndpointMetric();
+
+    // when & then
+    assertThrows(IllegalArgumentException.class,
+        () -> endpointMetric.setFailureWithRatelimit(-10),
+        "Ratelimit failure count must be a positive number");
   }
 
   @Test

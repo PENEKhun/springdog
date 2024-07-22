@@ -32,9 +32,10 @@ public class EndpointMetric extends _EndpointMetric {
    *
    * @param additionalPageView        the number of additional page views to be added
    * @param additionalResponseTimeSum the sum of additional response times to be added
-   * @author PENEKhun
+   * @param ratelimitFailureCount     the number of additional rate limit failures to be added
    */
-  public void updateStatistics(long additionalPageView, long additionalResponseTimeSum) {
+  public void updateStatistics(long additionalPageView, long additionalResponseTimeSum,
+      long ratelimitFailureCount) {
     long totalPageView = getPageView() + additionalPageView;
     long existResponseTime = getPageView() * getAverageResponseMs();
     long totalResponseTime = existResponseTime + additionalResponseTimeSum;
@@ -42,6 +43,7 @@ public class EndpointMetric extends _EndpointMetric {
 
     setPageView(totalPageView);
     setAverageResponseMs(averageResponseTime);
+    setFailureWithRatelimit(getFailureWithRatelimit() + ratelimitFailureCount);
   }
 
   @Override
@@ -66,5 +68,13 @@ public class EndpointMetric extends _EndpointMetric {
       throw new IllegalArgumentException("metric date cannot be null");
     }
     super.setMetricDate(metricDate);
+  }
+
+  @Override
+  public void setFailureWithRatelimit(long ratelimitFailureCount) {
+    if (ratelimitFailureCount < 0) {
+      throw new IllegalArgumentException("ratelimit failure count must be a positive number");
+    }
+    super.setFailureWithRatelimit(ratelimitFailureCount);
   }
 }
