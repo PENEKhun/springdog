@@ -64,14 +64,14 @@ public class EndpointQuery {
   }
 
   /**
-   * Find endpoint by id.
+   * Find endpoint by endpointId.
    * @return endpoint DTO
    * @throws IllegalArgumentException if endpoint not found
    */
-  public EndpointDto findApi(long id) {
+  public EndpointDto findEndpoint(long endpointId) {
     ObjectContext context = springdogRepository.newContext();
     return ObjectSelect.query(Endpoint.class)
-        .where(Endpoint.ID.eq(id))
+        .where(Endpoint.ID.eq(endpointId))
         .select(context)
         .stream()
         .map(EndpointConverter::toDto)

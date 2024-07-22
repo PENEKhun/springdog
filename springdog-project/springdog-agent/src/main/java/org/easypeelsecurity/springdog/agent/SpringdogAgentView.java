@@ -101,8 +101,8 @@ public class SpringdogAgentView {
 
   @GetMapping("/rate-limit/{endpointId}")
   public String viewRateLimitSpecific(@PathVariable(name = "endpointId") long endpointId, Model model) {
-    EndpointDto endpointDto = rateLimitQuery.findApi(endpointId);
-    model.addAttribute("api", endpointDto);
+    EndpointDto endpointDto = rateLimitQuery.findEndpoint(endpointId);
+    model.addAttribute("endpoint", endpointDto);
     List<String> headers = new ArrayList<>();
     headers.add("X-Auth-Token");
     model.addAttribute("headerItems", headers);
@@ -113,7 +113,7 @@ public class SpringdogAgentView {
   @GetMapping("/rate-limit/{endpointId}/analytics")
   public String viewRateLimitSpecificAnalytics(@PathVariable(name = "endpointId") long endpointId,
       Model model) {
-    EndpointDto endpointDto = rateLimitQuery.findApi(endpointId);
+    EndpointDto endpointDto = rateLimitQuery.findEndpoint(endpointId);
     model.addAttribute("endpoint", endpointDto);
     model.addAttribute("statics", statisticsQuery.getRecentEndpointMetrics(endpointId, 10));
 
@@ -122,7 +122,7 @@ public class SpringdogAgentView {
 
   @PostMapping("/rate-limit/{endpointId}")
   public String modifyRateLimit(@PathVariable(name = "endpointId") long endpointId,
-      @ModelAttribute("api") EndpointDto endpointDto, Model model) {
+      @ModelAttribute("endpoint") EndpointDto endpointDto, Model model) {
     try {
       Assert.isEqual(endpointId, endpointDto.getId(), "Invalid request");
       rateLimitCommand.updateRule(endpointDto);
