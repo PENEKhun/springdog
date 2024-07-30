@@ -26,6 +26,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
+import org.easypeelsecurity.springdog.shared.util.MethodSignatureParser;
 
 /**
  * Interceptor to measure and record the response times of HTTP requests.
@@ -84,8 +85,8 @@ public class RequestTimingInterceptor implements HandlerInterceptor {
     long responseTime = endTime - startTime;
 
     HandlerMethod handlerMethod = (HandlerMethod) handler;
-    String fqmn = handlerMethod.getBeanType().getName() + "." + handlerMethod.getMethod().getName();
-    EndpointMetricCacheManager.addResponseTime(fqmn, responseTime);
+    String methodSignature = MethodSignatureParser.parse(handlerMethod);
+    EndpointMetricCacheManager.addResponseTime(methodSignature, responseTime);
   }
 
   private boolean shouldSkipRequest(HttpServletRequest request, Class<?> controllerClass) {

@@ -85,7 +85,7 @@ public class EndpointVersionCompare {
         return methodCompare;
       }
 
-      return e1.getFqmn().compareTo(e2.getFqmn());
+      return e1.getMethodSignature().compareTo(e2.getMethodSignature());
     });
 
     StringBuilder hash = new StringBuilder();
@@ -94,7 +94,7 @@ public class EndpointVersionCompare {
           .append(PROPERTY_DELIMITER)
           .append(endpoint.getHttpMethod())
           .append(PROPERTY_DELIMITER)
-          .append(endpoint.getFqmn())
+          .append(endpoint.getMethodSignature())
           .append(PROPERTY_DELIMITER);
 
       endpoint.getParameters()

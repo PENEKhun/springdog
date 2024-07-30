@@ -29,8 +29,8 @@ public abstract class _EndpointChangelog extends BaseDataObject {
     public static final StringProperty<String> DETAIL_STRING = PropertyFactory.createString("detailString", String.class);
     public static final NumericProperty<Long> ID = PropertyFactory.createNumeric("id", Long.class);
     public static final BaseProperty<Boolean> IS_RESOLVED = PropertyFactory.createBase("isResolved", Boolean.class);
-    public static final StringProperty<String> TARGET_FQMN = PropertyFactory.createString("targetFqmn", String.class);
     public static final StringProperty<String> TARGET_METHOD = PropertyFactory.createString("targetMethod", String.class);
+    public static final StringProperty<String> TARGET_METHOD_SIGNATURE = PropertyFactory.createString("targetMethodSignature", String.class);
     public static final StringProperty<String> TARGET_PATH = PropertyFactory.createString("targetPath", String.class);
     public static final EntityProperty<EndpointVersionControl> REFLECTED_VERSION = PropertyFactory.createEntity("reflectedVersion", EndpointVersionControl.class);
 
@@ -38,8 +38,8 @@ public abstract class _EndpointChangelog extends BaseDataObject {
     protected String detailString;
     protected long id;
     protected boolean isResolved;
-    protected String targetFqmn;
     protected String targetMethod;
+    protected String targetMethodSignature;
     protected String targetPath;
 
     protected Object reflectedVersion;
@@ -84,16 +84,6 @@ public abstract class _EndpointChangelog extends BaseDataObject {
         return this.isResolved;
     }
 
-    public void setTargetFqmn(String targetFqmn) {
-        beforePropertyWrite("targetFqmn", this.targetFqmn, targetFqmn);
-        this.targetFqmn = targetFqmn;
-    }
-
-    public String getTargetFqmn() {
-        beforePropertyRead("targetFqmn");
-        return this.targetFqmn;
-    }
-
     public void setTargetMethod(String targetMethod) {
         beforePropertyWrite("targetMethod", this.targetMethod, targetMethod);
         this.targetMethod = targetMethod;
@@ -102,6 +92,16 @@ public abstract class _EndpointChangelog extends BaseDataObject {
     public String getTargetMethod() {
         beforePropertyRead("targetMethod");
         return this.targetMethod;
+    }
+
+    public void setTargetMethodSignature(String targetMethodSignature) {
+        beforePropertyWrite("targetMethodSignature", this.targetMethodSignature, targetMethodSignature);
+        this.targetMethodSignature = targetMethodSignature;
+    }
+
+    public String getTargetMethodSignature() {
+        beforePropertyRead("targetMethodSignature");
+        return this.targetMethodSignature;
     }
 
     public void setTargetPath(String targetPath) {
@@ -137,10 +137,10 @@ public abstract class _EndpointChangelog extends BaseDataObject {
                 return this.id;
             case "isResolved":
                 return this.isResolved;
-            case "targetFqmn":
-                return this.targetFqmn;
             case "targetMethod":
                 return this.targetMethod;
+            case "targetMethodSignature":
+                return this.targetMethodSignature;
             case "targetPath":
                 return this.targetPath;
             case "reflectedVersion":
@@ -169,11 +169,11 @@ public abstract class _EndpointChangelog extends BaseDataObject {
             case "isResolved":
                 this.isResolved = val == null ? false : (boolean)val;
                 break;
-            case "targetFqmn":
-                this.targetFqmn = (String)val;
-                break;
             case "targetMethod":
                 this.targetMethod = (String)val;
+                break;
+            case "targetMethodSignature":
+                this.targetMethodSignature = (String)val;
                 break;
             case "targetPath":
                 this.targetPath = (String)val;
@@ -201,8 +201,8 @@ public abstract class _EndpointChangelog extends BaseDataObject {
         out.writeObject(this.detailString);
         out.writeLong(this.id);
         out.writeBoolean(this.isResolved);
-        out.writeObject(this.targetFqmn);
         out.writeObject(this.targetMethod);
+        out.writeObject(this.targetMethodSignature);
         out.writeObject(this.targetPath);
         out.writeObject(this.reflectedVersion);
     }
@@ -214,8 +214,8 @@ public abstract class _EndpointChangelog extends BaseDataObject {
         this.detailString = (String)in.readObject();
         this.id = in.readLong();
         this.isResolved = in.readBoolean();
-        this.targetFqmn = (String)in.readObject();
         this.targetMethod = (String)in.readObject();
+        this.targetMethodSignature = (String)in.readObject();
         this.targetPath = (String)in.readObject();
         this.reflectedVersion = in.readObject();
     }

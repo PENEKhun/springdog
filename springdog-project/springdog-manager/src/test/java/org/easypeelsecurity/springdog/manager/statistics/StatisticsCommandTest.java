@@ -95,7 +95,8 @@ class StatisticsCommandTest {
   @Test
   void testUpsertEndpointMetricsWithInvalidEndpoint() {
     // given
-    String targetHandlerFqmn = "org.epsec.app.controller.ExampleController";
+    String targetHandler =
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)";
     long[] responseTimes = {100L, 200L, 300L, 500L, 400L};
     long failureCount = 10L;
 
@@ -103,7 +104,7 @@ class StatisticsCommandTest {
     EndpointMetric mockEndpointMetric = mock(EndpointMetric.class);
 
     when(ObjectSelect.query(Endpoint.class)
-        .where(Endpoint.FQMN.eq(targetHandlerFqmn))
+        .where(Endpoint.METHOD_SIGNATURE.eq(targetHandler))
         .selectOne(mockContext)).thenReturn(mockEndpoint);
 
     when(ObjectSelect.query(EndpointMetric.class)
@@ -114,7 +115,7 @@ class StatisticsCommandTest {
     assertThrows(
         IllegalArgumentException.class,
         () -> {
-          statisticsCommand.upsertEndpointMetrics("unknown-fqmn", responseTimes, failureCount,
+          statisticsCommand.upsertEndpointMetrics("unknown-methodSignature", responseTimes, failureCount,
               LocalDate.now());
         }, "Endpoint not found");
   }
@@ -122,13 +123,14 @@ class StatisticsCommandTest {
   @Test
   void testUpsertEndpointMetricsWithInvalidResponseTime() {
     // given
-    String targetHandlerFqmn = "org.epsec.app.controller.ExampleController";
+    String targetHandler =
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)";
     long[] responseTimes = {100L, 200L, 300L, 500L, 400L, -200L};
 
     // when & then
     assertThrows(IllegalArgumentException.class,
         () -> {
-          statisticsCommand.upsertEndpointMetrics(targetHandlerFqmn, responseTimes, 10L,
+          statisticsCommand.upsertEndpointMetrics(targetHandler, responseTimes, 10L,
               LocalDate.now());
         }, "Response time must be greater than 0");
   }
@@ -136,13 +138,14 @@ class StatisticsCommandTest {
   @Test
   void testUpsertEndpointMetricsWithInvalidFailureCount() {
     // given
-    String targetHandlerFqmn = "org.epsec.app.controller.ExampleController";
+    String targetHandler =
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)";
     long failureCount = -10L;
 
     // when & then
     assertThrows(IllegalArgumentException.class,
         () -> {
-          statisticsCommand.upsertEndpointMetrics(targetHandlerFqmn, new long[]{10L, 10L}, failureCount,
+          statisticsCommand.upsertEndpointMetrics(targetHandler, new long[] {10L, 10L}, failureCount,
               LocalDate.now());
         }, "Failure count must be non-negative");
   }

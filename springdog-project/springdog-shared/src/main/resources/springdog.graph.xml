@@ -5,11 +5,11 @@
 		<entity name="ENDPOINTPARAMETER" x="1035.72" y="0.0" width="140.0" height="107.0"/>
 		<entity name="ENDPOINT" x="1139.48" y="300.72" width="156.0" height="212.0"/>
 		<entity name="ENDPOINT_METRIC" x="0.0" y="0.0" width="151.0" height="122.0"/>
-		<entity name="ENDPOINTCHANGELOG" x="794.44" y="588.22" width="144.0" height="152.0"/>
+		<entity name="ENDPOINTCHANGELOG" x="794.44" y="588.22" width="180.0" height="152.0"/>
 		<entity name="ENDPOINTVERSIONCONTROL" x="176.74" y="552.56" width="180.0" height="77.0"/>
 	</graph>
 	<graph type="CLASS" scale="1.365498406918525">
-		<entity name="EndpointChangelog" x="0.0" y="0.0" width="125.0" height="137.0"/>
+		<entity name="EndpointChangelog" x="0.0" y="0.0" width="132.0" height="137.0"/>
 		<entity name="Endpoint" x="1459.07" y="241.09" width="137.0" height="197.0"/>
 		<entity name="SystemMetric" x="0.0" y="0.0" width="127.0" height="92.0"/>
 		<entity name="EndpointParameter" x="1349.56" y="0.0" width="120.0" height="77.0"/>

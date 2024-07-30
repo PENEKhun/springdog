@@ -84,13 +84,14 @@ public class StatisticsCommand {
    * If the endpoint or its metrics do not exist, they will be created.
    * </p>
    *
-   * @param fqmn          the fully qualified method name of the endpoint
-   * @param responseTimes the array of response times to be included in the statistics
-   * @param failureCount  the number of failed rate-limited requests
-   * @param today         the current date
+   * @param methodSignature the method signature of the endpoint
+   * @param responseTimes   the array of response times to be included in the statistics
+   * @param failureCount    the number of failed rate-limited requests
+   * @param today           the current date
    * @throws IllegalArgumentException if the parameters are invalid
    */
-  public void upsertEndpointMetrics(String fqmn, long[] responseTimes, long failureCount, LocalDate today) {
+  public void upsertEndpointMetrics(String methodSignature, long[] responseTimes, long failureCount,
+      LocalDate today) {
     Assert.isTrue(Arrays.stream(responseTimes).allMatch(time -> time >= 0),
         "Response times must be non-negative");
     Assert.isTrue(today != null, "Date must not be null");
@@ -98,7 +99,7 @@ public class StatisticsCommand {
 
     ObjectContext context = springdogRepository.newContext();
     Endpoint endpoint = ObjectSelect.query(Endpoint.class)
-        .where(Endpoint.FQMN.eq(fqmn))
+        .where(Endpoint.METHOD_SIGNATURE.eq(methodSignature))
         .selectOne(context);
 
     Assert.notNull(endpoint, "Endpoint not found");

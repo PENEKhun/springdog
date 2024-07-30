@@ -54,23 +54,23 @@ class ControllerParseAndSaveTest {
 
     // then
     assertThat(endpoints)
-        .extracting(EndpointDto::getPath, EndpointDto::getHttpMethod, EndpointDto::getFqmn,
+        .extracting(EndpointDto::getPath, EndpointDto::getHttpMethod, EndpointDto::getMethodSignature,
             EndpointDto::isPatternPath)
         .containsExactlyInAnyOrder(
             tuple("/api/get", GET,
-                "org.easypeelsecurity.springdogtest.ExampleController.example",
+                "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)",
                 false),
             tuple("/api/post", POST,
-                "org.easypeelsecurity.springdogtest.ExampleController.example2",
+                "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example2(org.easypeelsecurity.springdogtest.ExampleController$PostRequest)",
                 false),
             tuple("/api/delete/{id}", DELETE,
-                "org.easypeelsecurity.springdogtest.ExampleController.example3",
+                "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example3(java.lang.Integer)",
                 true),
             tuple("/api/put", PUT,
-                "org.easypeelsecurity.springdogtest.ExampleController.example4",
+                "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example4(java.lang.String, java.lang.String)",
                 false),
             tuple("/api/get/{id}", GET,
-                "org.easypeelsecurity.springdogtest.ExampleController.example5",
+                "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example5(java.lang.Integer)",
                 true)
         );
   }
@@ -78,15 +78,15 @@ class ControllerParseAndSaveTest {
   @ParameterizedTest
   @DisplayName("The controller's parameters should be parsed well.")
   @CsvSource({
-      "org.easypeelsecurity.springdogtest.ExampleController.example, param1",
-      "org.easypeelsecurity.springdogtest.ExampleController.example2, postRequest",
-      "org.easypeelsecurity.springdogtest.ExampleController.example3, id",
-      "org.easypeelsecurity.springdogtest.ExampleController.example4, newTitle&newContent",
-      "org.easypeelsecurity.springdogtest.ExampleController.example5, id"
+      "'java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)', param1",
+      "'java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example2(org.easypeelsecurity.springdogtest.ExampleController$PostRequest)', postRequest",
+      "'java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example3(java.lang.Integer)', id",
+      "'java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example4(java.lang.String, java.lang.String)', newTitle&newContent",
+      "'java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example5(java.lang.Integer)', id"
   })
-  void parameterParsedWell(String fqmn, @ConvertWith(StringToArrayConverter.class) String[] params) {
+  void parameterParsedWell(String methodSignature, @ConvertWith(StringToArrayConverter.class) String[] params) {
     // given
-    var endpoint = endpointQuery.getEndpointByFqmn(fqmn).get();
+    var endpoint = endpointQuery.getEndpointByMethodSignature(methodSignature).get();
     Set<EndpointParameterDto> parameters = endpoint.getParameters();
 
     // when & then

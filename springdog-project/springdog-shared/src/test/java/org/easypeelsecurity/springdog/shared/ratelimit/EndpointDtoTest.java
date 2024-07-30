@@ -24,6 +24,8 @@ import java.util.HashSet;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class EndpointDtoTest {
 
@@ -33,7 +35,8 @@ class EndpointDtoTest {
     int timeLimitInSeconds = 12_582_035;
     EndpointDto endpointDto = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -53,7 +56,8 @@ class EndpointDtoTest {
     int timeLimitInSeconds = 12_582_035;
     EndpointDto endpointDto = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -73,7 +77,8 @@ class EndpointDtoTest {
     int timeLimitInSeconds = 12_582_035;
     EndpointDto endpointDto = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -93,7 +98,8 @@ class EndpointDtoTest {
     int timeLimitInSeconds = 12_582_035;
     EndpointDto endpointDto = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -113,7 +119,8 @@ class EndpointDtoTest {
     int banTimeInSeconds = 12_582_035;
     EndpointDto endpointDto = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -133,7 +140,8 @@ class EndpointDtoTest {
     int banTimeInSeconds = 12_582_035;
     EndpointDto endpointDto = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -153,7 +161,8 @@ class EndpointDtoTest {
     int banTimeInSeconds = 12_582_035;
     EndpointDto endpointDto = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -173,7 +182,8 @@ class EndpointDtoTest {
     int banTimeInSeconds = 12_582_035;
     EndpointDto endpointDto = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -192,14 +202,16 @@ class EndpointDtoTest {
     // given
     EndpointDto endpoint1 = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
         .build();
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -214,14 +226,16 @@ class EndpointDtoTest {
     // given
     EndpointDto endpoint1 = new EndpointDto.Builder()
         .path("/api/books1") // diff
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
         .build();
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .path("/api/books2") // diff
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -232,18 +246,20 @@ class EndpointDtoTest {
   }
 
   @Test
-  void fqmnAffectEqual() {
+  void methodSignatureAffectEqual() {
     // given
     EndpointDto endpoint1 = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example1") // diff
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.Integer)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
         .build();
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example2") // diff
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
@@ -258,14 +274,16 @@ class EndpointDtoTest {
     // given
     EndpointDto endpoint1 = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
         .build();
     EndpointDto endpoint2 = new EndpointDto.Builder()
         .path("/api/books")
-        .fqmn("org.easypeelsecurity.springdogtest.ExampleController.example")
+        .methodSignature(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)")
         .httpMethod(HttpMethod.POST) // diff
         .parameters(new HashSet<>() {
         })
@@ -275,60 +293,97 @@ class EndpointDtoTest {
     assertThat(endpoint1).isNotEqualTo(endpoint2);
   }
 
-  @Test
-  void getFqcnWork() {
+  @ParameterizedTest
+  @CsvSource({
+      "java.lang.String org.msh.ExampleController.example(java.lang.String), org.msh.ExampleController",
+      "java.lang.String org.qwe.QQ.example(java.lang.Integer), org.qwe.QQ",
+      "void kr.epsec.controller.example(java.lang.String), kr.epsec.controller",
+      "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(), org.easypeelsecurity.springdogtest.ExampleController"
+  })
+  void getFqcnWork(String givenSignature, String expectedFqcn) {
     // given
-    String fqmn = "org.easypeelsecurity.springdogtest.ExampleController.example";
     EndpointDto endpointDto = new EndpointDto.Builder()
         .path("/api/books")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
-        .fqmn(fqmn)
+        .methodSignature(givenSignature)
         .build();
 
     // when
     String actual = endpointDto.getFqcn();
 
     // then
-    assertEquals("org.easypeelsecurity.springdogtest.ExampleController", actual);
+    assertEquals(expectedFqcn, actual);
   }
 
-  @Test
-  void getMethodNameWork() {
+  @ParameterizedTest
+  @CsvSource({
+      "java.lang.String org.msh.ExampleController.example(java.lang.String), org.msh.ExampleController.example(java.lang.String)",
+      "java.lang.String org.qwe.QQ.example(java.lang.Integer), org.qwe.QQ.example(java.lang.Integer)",
+      "void kr.epsec.controller.example(java.lang.String), kr.epsec.controller.example(java.lang.String)",
+      "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(), org.easypeelsecurity.springdogtest.ExampleController.example()"
+  })
+  void getFqmnWork(String givenSignature, String expectedFqmn) {
     // given
-    String fqmn = "org.easypeelsecurity.springdogtest.ExampleController.example";
     EndpointDto endpointDto = new EndpointDto.Builder()
         .path("/api/books")
         .httpMethod(HttpMethod.GET)
         .parameters(new HashSet<>() {
         })
-        .fqmn(fqmn)
-        .build();
-
-    // when
-    String actual = endpointDto.getMethodName();
-
-    // then
-    assertEquals("example", actual);
-  }
-
-  @Test
-  void getFqmnWork() {
-    // given
-    String fqmn = "org.easypeelsecurity.springdogtest.ExampleController.example";
-    EndpointDto endpointDto = new EndpointDto.Builder()
-        .path("/api/books")
-        .httpMethod(HttpMethod.GET)
-        .parameters(new HashSet<>() {
-        })
-        .fqmn(fqmn)
+        .methodSignature(givenSignature)
         .build();
 
     // when
     String actual = endpointDto.getFqmn();
 
     // then
-    assertEquals("org.easypeelsecurity.springdogtest.ExampleController.example", actual);
+    assertEquals(expectedFqmn, actual);
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+      "java.lang.String org.msh.ExampleController.example(java.lang.String), example(java.lang.String)",
+      "java.lang.String org.qwe.QQ.example(java.lang.Integer), example(java.lang.Integer)",
+      "void kr.epsec.controller.example(java.lang.String), example(java.lang.String)",
+      "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(), example()"
+  })
+  void getMethodNameWork(String givenSignature, String expected) {
+    // given
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .path("/api/books")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .methodSignature(givenSignature)
+        .build();
+
+    // when
+    String actual = endpointDto.getMethodName();
+
+    // then
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  void getMethodSignatureWork() {
+    // given
+    String methodSignature =
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)";
+    EndpointDto endpointDto = new EndpointDto.Builder()
+        .path("/api/books")
+        .httpMethod(HttpMethod.GET)
+        .parameters(new HashSet<>() {
+        })
+        .methodSignature(methodSignature)
+        .build();
+
+    // when
+    String actual = endpointDto.getMethodSignature();
+
+    // then
+    assertEquals(
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)",
+        actual);
   }
 }

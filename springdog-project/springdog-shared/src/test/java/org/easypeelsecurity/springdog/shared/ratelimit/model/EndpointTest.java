@@ -48,12 +48,14 @@ class EndpointTest {
     // given
     Endpoint endpoint1 = new Endpoint();
     endpoint1.setPath("/api/books");
-    endpoint1.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint1.setMethodSignature(
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)");
     endpoint1.setHttpMethod(String.valueOf(HttpMethod.GET));
     endpoint1.setIsPatternPath(false);
     Endpoint endpoint2 = new Endpoint();
     endpoint2.setPath("/diff");
-    endpoint2.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint2.setMethodSignature(
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)");
     endpoint2.setHttpMethod(String.valueOf(HttpMethod.GET));
     endpoint2.setIsPatternPath(false);
 
@@ -66,12 +68,14 @@ class EndpointTest {
     // given
     Endpoint endpoint1 = new Endpoint();
     endpoint1.setPath("/api/books");
-    endpoint1.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint1.setMethodSignature(
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)");
     endpoint1.setHttpMethod(String.valueOf(HttpMethod.GET));
     endpoint1.setIsPatternPath(false);
     Endpoint endpoint2 = new Endpoint();
     endpoint2.setPath("/api/books");
-    endpoint2.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint2.setMethodSignature(
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)");
     endpoint2.setHttpMethod(String.valueOf(HttpMethod.POST));
     endpoint2.setIsPatternPath(false);
 
@@ -84,12 +88,14 @@ class EndpointTest {
     // given
     Endpoint endpoint1 = new Endpoint();
     endpoint1.setPath("/api/books");
-    endpoint1.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint1.setMethodSignature(
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)");
     endpoint1.setHttpMethod(String.valueOf(HttpMethod.GET));
     endpoint1.setIsPatternPath(false);
     Endpoint endpoint2 = new Endpoint();
     endpoint2.setPath("/api/books");
-    endpoint2.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint2.setMethodSignature(
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)");
     endpoint2.setHttpMethod(String.valueOf(HttpMethod.GET));
     endpoint2.setIsPatternPath(true);
 
@@ -102,12 +108,14 @@ class EndpointTest {
     // given
     Endpoint endpoint1 = new Endpoint();
     endpoint1.setPath("/api/books");
-    endpoint1.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint1.setMethodSignature(
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)");
     endpoint1.setHttpMethod(String.valueOf(HttpMethod.GET));
     endpoint1.setIsPatternPath(false);
     Endpoint endpoint2 = new Endpoint();
     endpoint2.setPath("/api/books");
-    endpoint2.setFqmn("org.easypeelsecurity.springdogtest.ExampleController.example1");
+    endpoint2.setMethodSignature(
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)");
     endpoint2.setHttpMethod(String.valueOf(HttpMethod.GET));
     endpoint2.setIsPatternPath(false);
 

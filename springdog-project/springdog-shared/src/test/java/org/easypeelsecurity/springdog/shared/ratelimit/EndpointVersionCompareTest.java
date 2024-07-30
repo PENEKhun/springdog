@@ -36,7 +36,7 @@ class EndpointVersionCompareTest {
         new EndpointDto.Builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
-            .fqmn("org.epsec.app.Test")
+            .methodSignature("void org.epsec.app.Test")
             .build()
     };
     EndpointVersionCompare endpointVersionCompare = new EndpointVersionCompare(parsedEndpoints, null);
@@ -56,7 +56,7 @@ class EndpointVersionCompareTest {
         new EndpointDto.Builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
-            .fqmn("org.epsec.app.Test")
+            .methodSignature("void org.epsec.app.Test")
             .parameters(Set.of(new EndpointParameterDto("param", EndpointParameterType.QUERY, true)))
             .build()
     };
@@ -65,7 +65,7 @@ class EndpointVersionCompareTest {
         new EndpointDto.Builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
-            .fqmn("org.epsec.app.Test")
+            .methodSignature("void org.epsec.app.Test")
             .parameters(Set.of(new EndpointParameterDto("differentName", EndpointParameterType.QUERY, true)))
             .build()
     };
@@ -86,7 +86,7 @@ class EndpointVersionCompareTest {
         new EndpointDto.Builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
-            .fqmn("org.epsec.app.Test")
+            .methodSignature("void org.epsec.app.Test")
             .parameters(Set.of(new EndpointParameterDto("param", EndpointParameterType.QUERY, true)))
             .build()
     };
@@ -95,7 +95,7 @@ class EndpointVersionCompareTest {
         new EndpointDto.Builder()
             .path("/api/v1/different/path")
             .httpMethod(HttpMethod.GET)
-            .fqmn("org.epsec.app.Test")
+            .methodSignature("void org.epsec.app.Test")
             .parameters(Set.of(new EndpointParameterDto("param", EndpointParameterType.QUERY, true)))
             .build()
     };
@@ -116,7 +116,7 @@ class EndpointVersionCompareTest {
         new EndpointDto.Builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
-            .fqmn("org.epsec.app.Test")
+            .methodSignature("void org.epsec.app.Test")
             .parameters(Set.of(new EndpointParameterDto("param", EndpointParameterType.QUERY, true)))
             .build()
     };
@@ -125,7 +125,7 @@ class EndpointVersionCompareTest {
         new EndpointDto.Builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.POST)
-            .fqmn("org.epsec.app.Test")
+            .methodSignature("void org.epsec.app.Test")
             .parameters(Set.of(new EndpointParameterDto("param", EndpointParameterType.QUERY, true)))
             .build()
     };
@@ -139,14 +139,14 @@ class EndpointVersionCompareTest {
   }
 
   @Test
-  @DisplayName("Returns DIFFERENT when fully qualified method name (FQMN) does not match.")
-  void returnsDifferentWhenFqmnDoesNotMatch() {
+  @DisplayName("Returns DIFFERENT when Method Signature does not match.")
+  void returnsDifferentWhenMethodSignatureDoesNotMatch() {
     // given
     EndpointDto[] parsedEndpoints = new EndpointDto[] {
         new EndpointDto.Builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
-            .fqmn("org.epsec.app.Test")
+            .methodSignature("void org.epsec.app.Test(String)")
             .parameters(Set.of(new EndpointParameterDto("param", EndpointParameterType.QUERY, true)))
             .build()
     };
@@ -155,7 +155,7 @@ class EndpointVersionCompareTest {
         new EndpointDto.Builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
-            .fqmn("org.epsec.app.AnotherTest")
+            .methodSignature("void org.epsec.app.AnotherTest(String)")
             .parameters(Set.of(new EndpointParameterDto("param", EndpointParameterType.QUERY, true)))
             .build()
     };
