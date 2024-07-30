@@ -38,4 +38,6 @@
   <suppress checks="[a-zA-Z0-9]*" files="springdog-project/springdog-tests/.*"/>
   <!-- Suppress java for compiling test -->
   <suppress checks=".*" files=".*\/test\/resources\/.*\.java"/>
+  <!-- Suppress line length check for test files -->
+  <suppress checks="LineLength" files=".*\/test\/.*\.java"/>
 </suppressions>
