@@ -37,20 +37,20 @@ public abstract class EndpointMetricCacheManager {
   /**
    * Adds a response time for a specific endpoint identified by its path and method.
    *
-   * @param fqmn         the fully qualified method name of the endpoint
-   * @param responseTime the response time to be added
+   * @param methodSignature the method signature of the endpoint
+   * @param responseTime    the response time to be added
    */
-  public static void addResponseTime(String fqmn, long responseTime) {
-    CACHE_INSTANCE.get(fqmn, k -> new EndpointMetricCachedValue()).addResponseTime(responseTime);
+  public static void addResponseTime(String methodSignature, long responseTime) {
+    CACHE_INSTANCE.get(methodSignature, k -> new EndpointMetricCachedValue()).addResponseTime(responseTime);
   }
 
   /**
-   * Increments the failure count for a specific endpoint identified by its path and method.
+   * Increments the failure count for a specific endpoint identified by method signature.
    *
-   * @param fqmn the fully qualified method name of the endpoint
+   * @param methodSignature the fully qualified method name of the endpoint
    */
-  public static void incrementFailureCount(String fqmn) {
-    CACHE_INSTANCE.get(fqmn, k -> new EndpointMetricCachedValue()).incrementFailureCount();
+  public static void incrementFailureCount(String methodSignature) {
+    CACHE_INSTANCE.get(methodSignature, k -> new EndpointMetricCachedValue()).incrementFailureCount();
   }
 
   /**
@@ -73,8 +73,8 @@ public abstract class EndpointMetricCacheManager {
   /**
    * Invalidates the cache for the specified key.
    */
-  public static void invalidateByFqmn(String fqmn) {
-    CACHE_INSTANCE.invalidate(fqmn);
+  public static void invalidateByMethodSignature(String methodSignature) {
+    CACHE_INSTANCE.invalidate(methodSignature);
   }
 
   /**

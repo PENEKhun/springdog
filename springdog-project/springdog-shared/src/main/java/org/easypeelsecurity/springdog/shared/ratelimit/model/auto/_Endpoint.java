@@ -26,10 +26,10 @@ public abstract class _Endpoint extends BaseDataObject {
 
     public static final String ID_PK_COLUMN = "ID";
 
-    public static final StringProperty<String> FQMN = PropertyFactory.createString("fqmn", String.class);
     public static final StringProperty<String> HTTP_METHOD = PropertyFactory.createString("httpMethod", String.class);
     public static final NumericProperty<Long> ID = PropertyFactory.createNumeric("id", Long.class);
     public static final BaseProperty<Boolean> IS_PATTERN_PATH = PropertyFactory.createBase("isPatternPath", Boolean.class);
+    public static final StringProperty<String> METHOD_SIGNATURE = PropertyFactory.createString("methodSignature", String.class);
     public static final StringProperty<String> PATH = PropertyFactory.createString("path", String.class);
     public static final NumericProperty<Integer> RULE_BAN_TIME_IN_SECONDS = PropertyFactory.createNumeric("ruleBanTimeInSeconds", Integer.class);
     public static final BaseProperty<Boolean> RULE_IP_BASED = PropertyFactory.createBase("ruleIpBased", Boolean.class);
@@ -40,10 +40,10 @@ public abstract class _Endpoint extends BaseDataObject {
     public static final ListProperty<EndpointMetric> ENDPOINT_METRIC = PropertyFactory.createList("endpointMetric", EndpointMetric.class);
     public static final ListProperty<EndpointParameter> ENDPOINTPARAMETERS = PropertyFactory.createList("endpointparameters", EndpointParameter.class);
 
-    protected String fqmn;
     protected String httpMethod;
     protected long id;
     protected boolean isPatternPath;
+    protected String methodSignature;
     protected String path;
     protected int ruleBanTimeInSeconds;
     protected boolean ruleIpBased;
@@ -54,16 +54,6 @@ public abstract class _Endpoint extends BaseDataObject {
 
     protected Object endpointMetric;
     protected Object endpointparameters;
-
-    public void setFqmn(String fqmn) {
-        beforePropertyWrite("fqmn", this.fqmn, fqmn);
-        this.fqmn = fqmn;
-    }
-
-    public String getFqmn() {
-        beforePropertyRead("fqmn");
-        return this.fqmn;
-    }
 
     public void setHttpMethod(String httpMethod) {
         beforePropertyWrite("httpMethod", this.httpMethod, httpMethod);
@@ -93,6 +83,16 @@ public abstract class _Endpoint extends BaseDataObject {
 	public boolean isIsPatternPath() {
         beforePropertyRead("isPatternPath");
         return this.isPatternPath;
+    }
+
+    public void setMethodSignature(String methodSignature) {
+        beforePropertyWrite("methodSignature", this.methodSignature, methodSignature);
+        this.methodSignature = methodSignature;
+    }
+
+    public String getMethodSignature() {
+        beforePropertyRead("methodSignature");
+        return this.methodSignature;
     }
 
     public void setPath(String path) {
@@ -198,14 +198,14 @@ public abstract class _Endpoint extends BaseDataObject {
         }
 
         switch(propName) {
-            case "fqmn":
-                return this.fqmn;
             case "httpMethod":
                 return this.httpMethod;
             case "id":
                 return this.id;
             case "isPatternPath":
                 return this.isPatternPath;
+            case "methodSignature":
+                return this.methodSignature;
             case "path":
                 return this.path;
             case "ruleBanTimeInSeconds":
@@ -236,9 +236,6 @@ public abstract class _Endpoint extends BaseDataObject {
         }
 
         switch (propName) {
-            case "fqmn":
-                this.fqmn = (String)val;
-                break;
             case "httpMethod":
                 this.httpMethod = (String)val;
                 break;
@@ -247,6 +244,9 @@ public abstract class _Endpoint extends BaseDataObject {
                 break;
             case "isPatternPath":
                 this.isPatternPath = val == null ? false : (boolean)val;
+                break;
+            case "methodSignature":
+                this.methodSignature = (String)val;
                 break;
             case "path":
                 this.path = (String)val;
@@ -291,10 +291,10 @@ public abstract class _Endpoint extends BaseDataObject {
     @Override
     protected void writeState(ObjectOutputStream out) throws IOException {
         super.writeState(out);
-        out.writeObject(this.fqmn);
         out.writeObject(this.httpMethod);
         out.writeLong(this.id);
         out.writeBoolean(this.isPatternPath);
+        out.writeObject(this.methodSignature);
         out.writeObject(this.path);
         out.writeInt(this.ruleBanTimeInSeconds);
         out.writeBoolean(this.ruleIpBased);
@@ -309,10 +309,10 @@ public abstract class _Endpoint extends BaseDataObject {
     @Override
     protected void readState(ObjectInputStream in) throws IOException, ClassNotFoundException {
         super.readState(in);
-        this.fqmn = (String)in.readObject();
         this.httpMethod = (String)in.readObject();
         this.id = in.readLong();
         this.isPatternPath = in.readBoolean();
+        this.methodSignature = (String)in.readObject();
         this.path = (String)in.readObject();
         this.ruleBanTimeInSeconds = in.readInt();
         this.ruleIpBased = in.readBoolean();

@@ -50,9 +50,9 @@ public class EndpointMetricScheduler {
     List<EndpointMetricCached> cached = EndpointMetricCacheManager.getAllData();
 
     for (EndpointMetricCached entry : cached) {
-      statisticsCommand.upsertEndpointMetrics(entry.fqmn(), entry.responseTimes(),
+      statisticsCommand.upsertEndpointMetrics(entry.methodSignature(), entry.responseTimes(),
           entry.ratelimitFailureCount(), LocalDate.now());
-      EndpointMetricCacheManager.invalidateByFqmn(entry.fqmn());
+      EndpointMetricCacheManager.invalidateByMethodSignature(entry.methodSignature());
     }
   }
 }

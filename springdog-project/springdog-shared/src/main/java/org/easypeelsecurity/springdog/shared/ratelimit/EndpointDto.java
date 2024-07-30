@@ -35,7 +35,7 @@ public class EndpointDto {
   private final Set<EndpointParameterDto> parameters = new HashSet<>();
   private long id;
   private String path;
-  private String fqmn;
+  private String methodSignature;
   private HttpMethod httpMethod;
   private Set<String> parameterNamesToEnable = new HashSet<>();
   private boolean isPatternPath;
@@ -46,17 +46,17 @@ public class EndpointDto {
   private int ruleTimeLimitInSeconds;
   private int ruleBanTimeInSeconds;
 
-  public EndpointDto(long id, String path, String fqmn, HttpMethod httpMethod,
+  public EndpointDto(long id, String path, String methodSignature, HttpMethod httpMethod,
       Set<EndpointParameterDto> parameters, boolean isPatternPath, RuleStatus ruleStatus, boolean ruleIpBased,
       boolean rulePermanentBan, int ruleRequestLimitCount, int ruleTimeLimitInSeconds,
       int ruleBanTimeInSeconds) {
     Assert.hasText(path, "Endpoint must not be null or empty");
-    Assert.hasText(fqmn, "FQMN must not be null or empty");
+    Assert.hasText(methodSignature, "Method signature must not be null or empty");
     Assert.notNull(httpMethod, "HttpMethod must not be null");
 
     this.id = id;
     this.path = path;
-    this.fqmn = fqmn;
+    this.methodSignature = methodSignature;
     this.httpMethod = httpMethod;
     if (parameters != null && !parameters.isEmpty()) {
       this.parameters.addAll(parameters);
@@ -76,9 +76,9 @@ public class EndpointDto {
   public EndpointDto() {
   }
 
-  public EndpointDto(String path, String fqmn, HttpMethod httpMethod, boolean isPatternPath) {
+  public EndpointDto(String path, String methodSignature, HttpMethod httpMethod, boolean isPatternPath) {
     this.path = path;
-    this.fqmn = fqmn;
+    this.methodSignature = methodSignature;
     this.httpMethod = httpMethod;
     this.isPatternPath = isPatternPath;
   }
@@ -165,14 +165,14 @@ public class EndpointDto {
     }
 
     return path.equals(that.path) &&
-        fqmn.equals(that.fqmn) && httpMethod == that.httpMethod &&
+        methodSignature.equals(that.methodSignature) && httpMethod == that.httpMethod &&
         Objects.equals(parameters, that.parameters);
   }
 
   @Override
   public int hashCode() {
     int result = path.hashCode();
-    result = 31 * result + fqmn.hashCode();
+    result = 31 * result + methodSignature.hashCode();
     result = 31 * result + httpMethod.hashCode();
     result = 31 * result + Objects.hashCode(parameters);
     return result;
@@ -203,25 +203,36 @@ public class EndpointDto {
   }
 
   /**
-   * Get the fully qualified method name.
-   * (ex) org.easypeelsecurity.springdog.autoconfigure.controller.parser.ControllerParser.parseController
+   * Get the method signature.
+   * (e.g) java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)
    *
    * @return the fully qualified method name
    */
+  public String getMethodSignature() {
+    return this.methodSignature;
+  }
+
+  /**
+   * Get the fully qualified method name.
+   */
   public String getFqmn() {
-    return this.fqmn;
+    Assert.isTrue(this.methodSignature.contains(".") && this.methodSignature.contains("("),
+        "May not be a valid method signature");
+
+    int firstSpaceIndex = this.methodSignature.indexOf(" ");
+    return this.methodSignature.substring(firstSpaceIndex + 1);
   }
 
   /**
    * Get the fully qualified class name.
-   * (ex) org.easypeelsecurity.springdog.autoconfigure.controller.parser.ControllerParser
-   *
-   * @return the fully qualified class name
    */
   public String getFqcn() {
-    Assert.isTrue(this.fqmn.lastIndexOf(".") != -1, "FQMN must contain '.'");
+    Assert.isTrue(this.methodSignature.contains(".") && this.methodSignature.contains("("),
+        "May not be a valid method signature");
 
-    return this.fqmn.substring(0, this.fqmn.lastIndexOf("."));
+    String fqmn = this.getFqmn();
+    String onlyMethod = fqmn.substring(0, fqmn.indexOf("("));
+    return onlyMethod.substring(0, onlyMethod.lastIndexOf("."));
   }
 
   /**
@@ -231,16 +242,16 @@ public class EndpointDto {
    * @return the method name
    */
   public String getMethodName() {
-    Assert.isTrue(this.fqmn.lastIndexOf(".") != -1, "FQMN must contain '.'");
-
-    return this.fqmn.substring(this.fqmn.lastIndexOf(".") + 1);
+    String fqmn = this.getFqmn();
+    String fqcn = this.getFqcn();
+    return fqmn.replace(fqcn, "").substring(1);
   }
 
   /**
    * Setter.
    */
-  public void setFqmn(String fqmn) {
-    this.fqmn = fqmn;
+  public void setMethodSignature(String methodSignature) {
+    this.methodSignature = methodSignature;
   }
 
   /**
@@ -321,7 +332,7 @@ public class EndpointDto {
 
     private long id;
     private String path;
-    private String fqmn;
+    private String methodSignature;
     private HttpMethod httpMethod;
     private Set<EndpointParameterDto> parameters = new HashSet<>();
     private boolean isPatternPath;
@@ -342,8 +353,8 @@ public class EndpointDto {
       return this;
     }
 
-    public Builder fqmn(String fqmn) {
-      this.fqmn = fqmn;
+    public Builder methodSignature(String methodSignature) {
+      this.methodSignature = methodSignature;
       return this;
     }
 
@@ -393,7 +404,8 @@ public class EndpointDto {
     }
 
     public EndpointDto build() {
-      return new EndpointDto(id, path, fqmn, httpMethod, parameters, isPatternPath, ruleStatus, ruleIpBased,
+      return new EndpointDto(id, path, methodSignature, httpMethod, parameters, isPatternPath, ruleStatus,
+          ruleIpBased,
           rulePermanentBan, ruleRequestLimitCount, ruleTimeLimitInSeconds, ruleBanTimeInSeconds);
     }
   }

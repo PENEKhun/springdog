@@ -21,11 +21,11 @@ import java.util.Arrays;
 /**
  * EndpointMetricCached.
  *
- * @param fqmn                  full qualified method name
+ * @param methodSignature       methodSignature
  * @param responseTimes         response times
  * @param ratelimitFailureCount failure count of the endpoint by ratelimit
  */
-public record EndpointMetricCached(String fqmn, long[] responseTimes, int ratelimitFailureCount) {
+public record EndpointMetricCached(String methodSignature, long[] responseTimes, int ratelimitFailureCount) {
 
   @Override
   public boolean equals(Object o) {
@@ -36,18 +36,18 @@ public record EndpointMetricCached(String fqmn, long[] responseTimes, int rateli
       return false;
     }
 
-    return fqmn.equals(that.fqmn);
+    return methodSignature.equals(that.methodSignature);
   }
 
   @Override
   public int hashCode() {
-    return fqmn.hashCode();
+    return methodSignature.hashCode();
   }
 
   @Override
   public String toString() {
     return "EndpointMetricCached{" +
-        "fqmn='" + fqmn + '\'' +
+        "methodSignature='" + methodSignature + '\'' +
         ", responseTimes=" + Arrays.toString(responseTimes) +
         ", ratelimitFailureCount=" + ratelimitFailureCount +
         '}';

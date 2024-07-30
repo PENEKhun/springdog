@@ -65,6 +65,7 @@ public class EndpointQuery {
 
   /**
    * Find endpoint by endpointId.
+   *
    * @return endpoint DTO
    * @throws IllegalArgumentException if endpoint not found
    */
@@ -80,15 +81,15 @@ public class EndpointQuery {
   }
 
   /**
-   * Get endpoint by fully qualified method name.
+   * Get endpoint by method signature.
    *
-   * @param fqmn fully qualified method name
+   * @param methodSignature method signature
    * @return Optional EndpointDto
    */
-  public Optional<EndpointDto> getEndpointByFqmn(String fqmn) {
+  public Optional<EndpointDto> getEndpointByMethodSignature(String methodSignature) {
     ObjectContext context = springdogRepository.newContext();
     return ObjectSelect.query(Endpoint.class)
-        .where(Endpoint.FQMN.eq(fqmn))
+        .where(Endpoint.METHOD_SIGNATURE.eq(methodSignature))
         .select(context)
         .stream()
         .map(EndpointConverter::toDto)

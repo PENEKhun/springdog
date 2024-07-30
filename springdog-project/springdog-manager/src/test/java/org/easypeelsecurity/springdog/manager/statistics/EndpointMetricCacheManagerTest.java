@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.easypeelsecurity.springdog.manager.statistics;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,17 +37,19 @@ class EndpointMetricCacheManagerTest {
   @DisplayName("Should add response time for a specific endpoint")
   void addResponseTimeSuccessfully() {
     // given
-    String fqmn = "com.example.endpoint.method";
+    String methodSignature =
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)";
     long responseTime = 123L;
     long responseTime2 = 456L;
 
     // when
-    EndpointMetricCacheManager.addResponseTime(fqmn, responseTime);
-    EndpointMetricCacheManager.addResponseTime(fqmn, responseTime2);
+    EndpointMetricCacheManager.addResponseTime(methodSignature, responseTime);
+    EndpointMetricCacheManager.addResponseTime(methodSignature, responseTime2);
 
     // then
     EndpointMetricCached result = EndpointMetricCacheManager.getAllData().stream()
-        .filter(cached -> cached.fqmn().equals("com.example.endpoint.method"))
+        .filter(cached -> cached.methodSignature().equals(
+            "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)"))
         .findFirst().get();
     assertThat(result).isNotNull();
     assertThat(result.responseTimes()).containsExactlyInAnyOrder(responseTime, responseTime2);
@@ -56,14 +59,15 @@ class EndpointMetricCacheManagerTest {
   @DisplayName("Should increment failure count for a specific endpoint")
   void incrementFailureCountSuccessfully() {
     // given
-    String fqmn = "com.example.endpoint.method";
+    String methodSignature =
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example(java.lang.String)";
 
     // when
-    EndpointMetricCacheManager.incrementFailureCount(fqmn);
+    EndpointMetricCacheManager.incrementFailureCount(methodSignature);
 
     // then
     List<EndpointMetricCached> data = EndpointMetricCacheManager.getAllData();
-    assertThat(data).anyMatch(cached -> cached.fqmn().equals(fqmn) &&
+    assertThat(data).anyMatch(cached -> cached.methodSignature().equals(methodSignature) &&
         cached.ratelimitFailureCount() == 1);
   }
 
@@ -71,10 +75,12 @@ class EndpointMetricCacheManagerTest {
   @DisplayName("Should get all cache data")
   void getAllDataSuccessfully() {
     // given
-    String fqmn1 = "com.example.endpoint.method1";
-    String fqmn2 = "com.example.endpoint.method2";
-    EndpointMetricCacheManager.addResponseTime(fqmn1, 100L);
-    EndpointMetricCacheManager.incrementFailureCount(fqmn2);
+    String methodSignature1 =
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example1(java.lang.String)";
+    String methodSignature2 =
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example2(java.lang.String)";
+    EndpointMetricCacheManager.addResponseTime(methodSignature1, 100L);
+    EndpointMetricCacheManager.incrementFailureCount(methodSignature2);
 
     // when
     List<EndpointMetricCached> data = EndpointMetricCacheManager.getAllData();
@@ -82,26 +88,27 @@ class EndpointMetricCacheManagerTest {
     // then
     assertThat(data).hasSize(2);
     assertThat(data).extracting(
-            EndpointMetricCached::fqmn, EndpointMetricCached::responseTimes,
+            EndpointMetricCached::methodSignature, EndpointMetricCached::responseTimes,
             EndpointMetricCached::ratelimitFailureCount)
         .containsExactlyInAnyOrder(
-            tuple(fqmn1, new long[] {100L}, 0),
-            tuple(fqmn2, new long[] {}, 1)
+            tuple(methodSignature1, new long[] {100L}, 0),
+            tuple(methodSignature2, new long[] {}, 1)
         );
   }
 
   @Test
-  @DisplayName("Should invalidate cache by fully qualified method name")
-  void invalidateByFqmnSuccessfully() {
+  @DisplayName("Should invalidate cache by method signature")
+  void invalidateByMethodSignatureSuccessfully() {
     // given
-    String fqmn = "com.example.endpoint.method";
-    EndpointMetricCacheManager.addResponseTime(fqmn, 123L);
+    String methodSignature =
+        "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.example1(java.lang.String)";
+    EndpointMetricCacheManager.addResponseTime(methodSignature, 123L);
 
     // when
-    EndpointMetricCacheManager.invalidateByFqmn(fqmn);
+    EndpointMetricCacheManager.invalidateByMethodSignature(methodSignature);
 
     // then
     List<EndpointMetricCached> data = EndpointMetricCacheManager.getAllData();
-    assertThat(data).noneMatch(cached -> cached.fqmn().equals(fqmn));
+    assertThat(data).noneMatch(cached -> cached.methodSignature().equals(methodSignature));
   }
 }

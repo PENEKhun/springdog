@@ -165,9 +165,9 @@
         <div class="alert alert-info" th:text="${endpoint.path}"></div>
         <strong>Request Type:</strong>
         <div class="alert alert-info" th:text="${endpoint.httpMethod}"></div>
-        <strong>Fully qualified method name:</strong>
-        <div class="alert alert-info" th:text="${endpoint.fqmn}"></div>
-        <input th:field="*{fqmn}" type="hidden"/>
+        <strong>Endpoint Method Signature:</strong>
+        <div class="alert alert-info" th:text="${endpoint.methodSignature}"></div>
+        <input th:field="*{methodSignature}" type="hidden"/>
         <input th:field="*{id}" type="hidden"/>
       </div>
     </div>

@@ -18,6 +18,7 @@ package org.easypeelsecurity.springdog.manager.ratelimit;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -41,6 +42,7 @@ import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
 import org.easypeelsecurity.springdog.shared.util.IpAddressUtil;
+import org.easypeelsecurity.springdog.shared.util.MethodSignatureParser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,13 +78,12 @@ public class RatelimitInterceptor implements HandlerInterceptor {
     if (handler instanceof HandlerMethod handlerMethod) {
       Object controller = handlerMethod.getBean();
       Class<?> controllerClass = controller.getClass();
-      String functionName = handlerMethod.getMethod().getName();
-      String fqmn = controllerClass.getName() + "." + functionName;
+      String methodSignature = MethodSignatureParser.parse(handlerMethod);
       if (shouldSkipRequest(request, controllerClass)) {
         return true;
       }
 
-      EndpointDto endpoint = getEndpoint(fqmn)
+      EndpointDto endpoint = getEndpoint(methodSignature)
           .orElseThrow(() -> new IllegalStateException("Endpoint not found"));
       if (!RuleStatus.ACTIVE.equals(endpoint.getRuleStatus())) {
         return true;
@@ -93,7 +94,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
         int banTimeSeconds =
             endpoint.isRulePermanentBan() ? Integer.MAX_VALUE : endpoint.getRuleBanTimeInSeconds();
         applyRatelimitResponse(response, String.valueOf(banTimeSeconds));
-        EndpointMetricCacheManager.incrementFailureCount(fqmn);
+        EndpointMetricCacheManager.incrementFailureCount(methodSignature);
         return false;
       }
 
@@ -104,10 +105,10 @@ public class RatelimitInterceptor implements HandlerInterceptor {
     return true;
   }
 
-  private Optional<EndpointDto> getEndpoint(String fqmn) {
-    EndpointDto endpoint = RuleCache.findEndpointByFqmn(fqmn)
+  private Optional<EndpointDto> getEndpoint(String methodSignature) {
+    EndpointDto endpoint = RuleCache.findEndpointByMethodSignature(methodSignature)
         .orElseGet(() -> {
-          Optional<EndpointDto> item = endpointQuery.getEndpointByFqmn(fqmn);
+          Optional<EndpointDto> item = endpointQuery.getEndpointByMethodSignature(methodSignature);
           if (item.isEmpty()) {
             return null;
           } else {
@@ -137,7 +138,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
 
   private String generateRequestHash(HttpServletRequest request, EndpointDto endpoint) {
     StringBuilder result = new StringBuilder();
-    result.append(endpoint.getFqmn()).append("\n");
+    result.append(endpoint.getMethodSignature()).append("\n");
 
     if (endpoint.isRuleIpBased()) {
       result.append(IpAddressUtil.getClientIp(request)).append("\n");
@@ -158,26 +159,35 @@ public class RatelimitInterceptor implements HandlerInterceptor {
       JsonNode requestBody = getRequestBodyAsJson(request);
       // FIXME: json 말고도 다른 타입도 처리해야함
       // FIXME: 성능을 위해선 일단 Object라면 Object의 FQCN정도는 저장하고... 이를 불러와서 직렬화 할필요가 있어보임.
-      Arrays.stream(Class.forName(endpoint.getFqcn()).getDeclaredMethods())
-          .filter(method -> method.getName().equals(endpoint.getMethodName()))
-          .forEach(method -> Arrays.stream(method.getParameters())
-              .filter(param -> param.isAnnotationPresent(RequestBody.class))
-              .map(Parameter::getType)
-              .forEach(obj -> Arrays.stream(obj.getDeclaredFields())
-                  .sorted(Comparator.comparing(Field::getName))
-                  .forEach(field -> {
-                    String value = request.getParameter(field.getName());
-                    if (value == null && requestBody != null && requestBody.has(field.getName())) {
-                      value = requestBody.get(field.getName()).asText();
-                    }
-                    if (value != null) {
-                      result.append(field.getName()).append("=").append(value).append("\n");
-                    }
-                  })));
+
+      Class<?> clazz = Class.forName(endpoint.getFqcn());
+      Method[] methods = clazz.getDeclaredMethods();
+
+      for (Method method : methods) {
+        // TODO: 성능 개선 포인트
+        if (!method.toString().contains(endpoint.getMethodSignature())) {
+          continue;
+        }
+
+        Parameter[] parameters = method.getParameters();
+
+        for (Parameter parameter : parameters) {
+          if (!parameter.isAnnotationPresent(RequestBody.class)) {
+            continue;
+          }
+
+          Class<?> paramType = parameter.getType();
+          Field[] fields = paramType.getDeclaredFields();
+          Arrays.sort(fields, Comparator.comparing(Field::getName));
+
+          processFields(fields, request, requestBody, result);
+        }
+      }
+
       // TODO: REAL HASHlize
       return result.toString();
     } catch (ClassNotFoundException e) {
-      logger.warning("Failed to generate request hash" + e.getMessage());
+      logger.warning("Failed to generate request hash. " + e.getMessage());
       throw new RuntimeException(e);
     }
   }
@@ -188,6 +198,21 @@ public class RatelimitInterceptor implements HandlerInterceptor {
     } catch (IOException e) {
       logger.warning("Failed to read request body as json" + e.getMessage());
       return null;
+    }
+  }
+
+  private void processFields(Field[] fields, HttpServletRequest request, JsonNode requestBody,
+      StringBuilder result) {
+    for (Field field : fields) {
+      String value = request.getParameter(field.getName());
+
+      if (value == null && requestBody != null && requestBody.has(field.getName())) {
+        value = requestBody.get(field.getName()).asText();
+      }
+
+      if (value != null) {
+        result.append(field.getName()).append("=").append(value).append("\n");
+      }
     }
   }
 }

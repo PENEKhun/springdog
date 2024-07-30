@@ -7,10 +7,10 @@
 	<property name="defaultSchema" value="APP"/>
 	<db-entity name="ENDPOINT" schema="APP">
 		<db-attribute name="ENDPOINT_METRIC_ID" type="BIGINT"/>
-		<db-attribute name="FQMN" type="VARCHAR" isMandatory="true" length="255"/>
 		<db-attribute name="HTTPMETHOD" type="VARCHAR" isMandatory="true" length="10"/>
 		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isMandatory="true" length="19"/>
 		<db-attribute name="ISPATTERNPATH" type="BOOLEAN" isMandatory="true" length="1"/>
+		<db-attribute name="METHOD_SIGNATURE" type="VARCHAR" isMandatory="true" length="255"/>
 		<db-attribute name="PATH" type="VARCHAR" isMandatory="true" length="255"/>
 		<db-attribute name="RULEBANTIMEINSECONDS" type="INTEGER" isMandatory="true"/>
 		<db-attribute name="RULEIPBASED" type="BOOLEAN" isMandatory="true" length="1"/>
@@ -25,9 +25,9 @@
 		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isGenerated="true" isMandatory="true" length="19"/>
 		<db-attribute name="ISRESOLVED" type="BOOLEAN" isMandatory="true" length="1"/>
 		<db-attribute name="REFLECTED_VERSION" type="TIMESTAMP" isMandatory="true"/>
-		<db-attribute name="TARGETFQMN" type="VARCHAR" isMandatory="true" length="255"/>
 		<db-attribute name="TARGETMETHOD" type="VARCHAR" isMandatory="true" length="30"/>
 		<db-attribute name="TARGETPATH" type="VARCHAR" isMandatory="true" length="255"/>
+		<db-attribute name="TARGET_METHOD_SIGNATURE" type="VARCHAR" isMandatory="true" length="255"/>
 	</db-entity>
 	<db-entity name="ENDPOINTPARAMETER" schema="APP">
 		<db-attribute name="ENABLED" type="BOOLEAN" isMandatory="true" length="1"/>
@@ -42,10 +42,10 @@
 		<db-attribute name="ID" type="BIGINT" isMandatory="true" length="19"/>
 	</db-entity>
 	<obj-entity name="Endpoint" className="org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint" dbEntityName="ENDPOINT">
-		<obj-attribute name="fqmn" type="java.lang.String" db-attribute-path="FQMN"/>
 		<obj-attribute name="httpMethod" type="java.lang.String" db-attribute-path="HTTPMETHOD"/>
 		<obj-attribute name="id" type="long" db-attribute-path="ID"/>
 		<obj-attribute name="isPatternPath" type="boolean" db-attribute-path="ISPATTERNPATH"/>
+		<obj-attribute name="methodSignature" type="java.lang.String" db-attribute-path="METHOD_SIGNATURE"/>
 		<obj-attribute name="path" type="java.lang.String" db-attribute-path="PATH"/>
 		<obj-attribute name="ruleBanTimeInSeconds" type="int" db-attribute-path="RULEBANTIMEINSECONDS"/>
 		<obj-attribute name="ruleIpBased" type="boolean" db-attribute-path="RULEIPBASED"/>
@@ -59,8 +59,8 @@
 		<obj-attribute name="detailString" type="java.lang.String" db-attribute-path="DETAILSTRING"/>
 		<obj-attribute name="id" type="long" db-attribute-path="ID"/>
 		<obj-attribute name="isResolved" type="boolean" db-attribute-path="ISRESOLVED"/>
-		<obj-attribute name="targetFqmn" type="java.lang.String" db-attribute-path="TARGETFQMN"/>
 		<obj-attribute name="targetMethod" type="java.lang.String" db-attribute-path="TARGETMETHOD"/>
+		<obj-attribute name="targetMethodSignature" type="java.lang.String" db-attribute-path="TARGET_METHOD_SIGNATURE"/>
 		<obj-attribute name="targetPath" type="java.lang.String" db-attribute-path="TARGETPATH"/>
 	</obj-entity>
 	<obj-entity name="EndpointParameter" className="org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointParameter" dbEntityName="ENDPOINTPARAMETER">
@@ -109,6 +109,7 @@
 		<usePrimitives>true</usePrimitives>
 	</dbImport>
 	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
+		<excludeEntities>EndpointChangelog,EndpointParameter,EndpointVersionControl</excludeEntities>
 		<destDir>../java</destDir>
 		<mode>entity</mode>
 		<template>templates/v4_1/subclass.vm</template>

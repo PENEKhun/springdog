@@ -52,6 +52,7 @@ import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionCont
 import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
 import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
 import org.easypeelsecurity.springdog.shared.util.Assert;
+import org.easypeelsecurity.springdog.shared.util.MethodSignatureParser;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.configuration.CayenneRuntime;
@@ -88,11 +89,11 @@ public class ControllerParser {
 
   private EndpointDto getEndpointDto(HandlerMethod method, String endPoint, HttpMethod httpMethod,
       boolean isPatternPath) {
-    String fqmn = method.getBeanType().getPackageName() + "." + method.getBeanType().getSimpleName() + "." +
-        method.getMethod().getName();
+    String methodSignature =
+        MethodSignatureParser.parse(method);
 
     EndpointDto endpoint = new EndpointDto.Builder()
-        .fqmn(fqmn)
+        .methodSignature(methodSignature)
         .path(endPoint)
         .httpMethod(httpMethod)
         .isPatternPath(isPatternPath).build();
@@ -162,7 +163,7 @@ public class ControllerParser {
             .forEach(disappearedActiveEndpoint -> {
               EndpointChangelog changelog = context.newObject(EndpointChangelog.class);
               changelog.setChangeType(ENABLED_ENDPOINT_WAS_DELETED);
-              changelog.setTargetFqmn(disappearedActiveEndpoint.getFqmn());
+              changelog.setTargetMethodSignature(disappearedActiveEndpoint.getMethodSignature());
               changelog.setTargetMethod(disappearedActiveEndpoint.getHttpMethod().name());
               changelog.setTargetPath(disappearedActiveEndpoint.getPath());
               changelog.setDetailString(
@@ -184,7 +185,7 @@ public class ControllerParser {
 
               EndpointChangelog changeLog = context.newObject(EndpointChangelog.class);
               changeLog.setChangeType(ENABLED_PARAMETER_WAS_DELETED);
-              changeLog.setTargetFqmn(endpoint.getFqmn());
+              changeLog.setTargetMethodSignature(endpoint.getMethodSignature());
               changeLog.setTargetMethod(endpoint.getHttpMethod().name());
               changeLog.setTargetPath(endpoint.getPath());
               changeLog.setDetailString(
