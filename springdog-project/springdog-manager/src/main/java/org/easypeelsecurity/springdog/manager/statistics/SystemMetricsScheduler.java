@@ -67,19 +67,22 @@ public class SystemMetricsScheduler {
     statisticsCommand.storeSystemMetrics(cpuUsagePercent, memoryUsagePercent, diskUsagePercent);
     List<EmailContent> emailMessages = new ArrayList<>();
     if (systemWatchProperties.isEnabled()) {
-      if (cpuUsagePercent > systemWatchProperties.getCpuThreshold()) {
+      if (cpuUsagePercent > systemWatchProperties.getCpuThreshold() &&
+          systemWatchProperties.getCpuThreshold() != 0) {
         EmailContent emailContent = new SystemWatchEmailContent();
         ContentParameters parameters = new SystemWatchParameters("CPU", cpuUsagePercent);
         emailContent.setParameters(parameters);
         emailMessages.add(emailContent);
       }
-      if (memoryUsagePercent > systemWatchProperties.getMemoryThreshold()) {
+      if (memoryUsagePercent > systemWatchProperties.getMemoryThreshold() &&
+          systemWatchProperties.getMemoryThreshold() != 0) {
         EmailContent emailContent = new SystemWatchEmailContent();
         ContentParameters parameters = new SystemWatchParameters("Memory", memoryUsagePercent);
         emailContent.setParameters(parameters);
         emailMessages.add(emailContent);
       }
-      if (diskUsagePercent > systemWatchProperties.getDiskThreshold()) {
+      if (diskUsagePercent > systemWatchProperties.getDiskThreshold() &&
+          systemWatchProperties.getDiskThreshold() != 0) {
         EmailContent emailContent = new SystemWatchEmailContent();
         ContentParameters parameters = new SystemWatchParameters("Disk", diskUsagePercent);
         emailContent.setParameters(parameters);
