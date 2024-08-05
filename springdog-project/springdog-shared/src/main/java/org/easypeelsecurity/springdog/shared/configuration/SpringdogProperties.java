@@ -18,10 +18,8 @@ package org.easypeelsecurity.springdog.shared.configuration;
 
 import jakarta.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 import org.easypeelsecurity.springdog.shared.util.Assert;
 
@@ -31,16 +29,23 @@ import org.slf4j.LoggerFactory;
 /**
  * Springdog configuration.
  */
-@Configuration
 @ConfigurationProperties(prefix = "springdog")
-@EnableConfigurationProperties(SpringdogAgentProperties.class)
+@EnableConfigurationProperties(value = {SpringdogAgentProperties.class, NotificationGmailProperties.class,
+    SystemWatchProperties.class})
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
 public class SpringdogProperties {
 
   private final Logger logger = LoggerFactory.getLogger(SpringdogProperties.class);
+  private final SpringdogAgentProperties agentProperties;
+  private final NotificationGmailProperties notificationProperties;
+  private final SystemWatchProperties systemWatchProperties;
 
-  @Autowired
-  private SpringdogAgentProperties agentProperties;
+  public SpringdogProperties(SpringdogAgentProperties agentProperties,
+      NotificationGmailProperties notificationProperties, SystemWatchProperties systemWatchProperties) {
+    this.agentProperties = agentProperties;
+    this.notificationProperties = notificationProperties;
+    this.systemWatchProperties = systemWatchProperties;
+  }
 
   @PostConstruct
   public void init() {
