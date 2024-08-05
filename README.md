@@ -40,15 +40,36 @@ springdog:
     username: admin
     password: admin
     externalAccess: false
+  system-watch:
+    enabled: true
+    cpuThreshold: 80
+    memoryThreshold: 80
+    diskThreshold: 80
+  notification:
+    gmail:
+      enabled: false
+      recipient:
+      username:
+      password:
 ```
 
-| Name                | Required | Description                                                                                                                                                                                                                           | Default   | Value Sets |
-|---------------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| **springdog.agent** | //////// | The Springdog agent configuration.                                                                                                                                                                                                    | ////////  | ////////   |
-| basePath            | x        | The base path for the agent. Used to access the springdog agent from a deployed server, such as `{{host}}/springdog`. The basePath used with this option should never be used as the controller mapping address for your application. | springdog |
-| username            | x        | The username for the Springdog agent. Empty fields are not allowed.                                                                                                                                                                   | admin     |
-| password            | x        | The password for the Springdog agent. Empty fields are not allowed.                                                                                                                                                                   | admin     |
-| externalAccess      | x        | Whether to allow external access to the Springdog agent. If `false`, access from external IPs is not allowed.                                                                                                                         | false     |
+| Name                             | Required   | Description                                                                                                                                                                                                                           | Default   | Value Sets         |
+|----------------------------------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|--------------------|
+| **springdog.agent**              | ////////   | The Springdog agent configuration.                                                                                                                                                                                                    | ////////  | ////////           |
+| basePath                         | x          | The base path for the agent. Used to access the springdog agent from a deployed server, such as `{{host}}/springdog`. The basePath used with this option should never be used as the controller mapping address for your application. | springdog |
+| username                         | x          | The username for the Springdog agent. Empty fields are not allowed.                                                                                                                                                                   | admin     |
+| password                         | x          | The password for the Springdog agent. Empty fields are not allowed.                                                                                                                                                                   | admin     |
+| externalAccess                   | x          | Whether to allow external access to the Springdog agent. If `false`, access from external IPs is not allowed.                                                                                                                         | false     | `true` or `false`  |
+| **springdog.notification.gmail** | ////////   | The Springdog Gmail notification configuration.                                                                                                                                                                                       | ////////  | ////////           |
+| enabled                          | x          | Whether to enable Gmail notifications.                                                                                                                                                                                                | false     | `true` or `false`  |
+| recipient                        | △(enabled) | The recipient's email address.                                                                                                                                                                                                        |           |
+| username                         | △(enabled) | The Gmail username.                                                                                                                                                                                                                   |           |
+| password                         | △(enabled) | The Gmail password.                                                                                                                                                                                                                   |           |
+| **springdog.system-watch**       | ////////   | The Springdog system watch configuration.                                                                                                                                                                                             | ////////  | ////////           |
+| enabled                          | x          | Whether to enable system watch.                                                                                                                                                                                                       | true      | `true` or `false`  |
+| cpuThreshold                     | △(enabled) | The CPU usage threshold. If the CPU usage exceeds this value, a notification will be sent.                                                                                                                                            | 0.0       | `0.0 < x <= 100.0` |
+| memoryThreshold                  | △(enabled) | The memory usage threshold. If the memory usage exceeds this value, a notification will be sent.                                                                                                                                      | 0.0       | `0.0 < x <= 100.0` |
+| diskThreshold                    | △(enabled) | The disk usage threshold. If the disk usage exceeds this value, a notification will be sent.                                                                                                                                          | 0.0       | `0.0 < x <= 100.0` |
 
 ## Contributing
 
