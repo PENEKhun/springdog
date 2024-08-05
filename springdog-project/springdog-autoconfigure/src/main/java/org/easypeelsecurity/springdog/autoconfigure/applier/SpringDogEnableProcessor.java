@@ -67,7 +67,8 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
           new SpringdogAgentSecurityApplier(),
           new SpringdogManagerApplier(),
           new SpringdogAutoConfigurationApplier(),
-          new SpringdogSharedApplier()
+          new SpringdogSharedApplier(),
+          new SpringdogNotificationApplier()
       );
 
       generatedCodes.forEach(generator -> generator.writeTo(fullPackageName, processingEnv));

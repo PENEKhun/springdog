@@ -4,6 +4,13 @@ springdog:
     username: custom-username
     password: custom-password
     externalAccess: true
+  system-watch:
+    cpuThreshold: 11.1
+  notification:
+    gmail:
+      enabled: false
+      username: asd
+      password: asd
 #
 #logging:
 #  level:
