@@ -3,23 +3,23 @@ plugins {
     id "io.github.goooler.shadow" version "${shadowVersion}"
 }
 
-dependencies {
-    implementation "com.github.ben-manes.caffeine:caffeine:${caffeineVersion}"
-    implementation project(":springdog-project:springdog-notification")
-    api project(":springdog-project:springdog-shared")
-    compileOnly("org.apache.cayenne:cayenne-server:${cayenneVersion}") {
-        exclude group: 'org.slf4j', module: 'slf4j'
-    }
-    implementation "commons-io:commons-io:2.16.1"
-
+repositories {
+    mavenCentral()
 }
 
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-mail:${springbootVersion}"
+    implementation project(":springdog-project:springdog-shared")
+    testImplementation "org.jsoup:jsoup:${jsoupVersion}"
+}
+
+
 mavenPublishing {
-    coordinates(rootPackageName, "springdog-manager", springDogVersion)
+    coordinates(rootPackageName, "springdog-notification", springDogVersion)
 
     pom {
-        name = "SpringDog Manager"
-        description = "Bark bark!"
+        name = "SpringDog Notification"
+        description = "The notification service for SpringDog"
         inceptionYear = "2024"
         url = ""
 
