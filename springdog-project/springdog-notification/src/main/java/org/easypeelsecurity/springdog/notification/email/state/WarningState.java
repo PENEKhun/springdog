@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.notification.email;
+package org.easypeelsecurity.springdog.notification.email.state;
+
+import org.easypeelsecurity.springdog.notification.email.MetricContext;
 
 /**
  * Represents the warning state of a system metric.
  * In this state, the metric is above the threshold.
  */
-public class WarningState implements MetricState {
+public class WarningState<T extends Comparable<T>> implements MetricState<T> {
   private final String metricName;
-  private final MetricContext context;
+  private final MetricContext<String, T> context;
 
   /**
    * Constructs a new WarningState.
    *
    * @param metricName The name of the metric.
-   * @param context The context in which this state exists.
+   * @param context    The context in which this state exists.
    */
   public WarningState(String metricName, MetricContext context) {
     this.metricName = metricName;
@@ -40,9 +42,11 @@ public class WarningState implements MetricState {
    * If the current value falls below or equals the threshold, transitions to NormalState.
    */
   @Override
-  public void checkThreshold(double currentValue, double threshold) {
-    if (currentValue <= threshold) {
-      context.setState(new NormalState(metricName, context));
+  public void checkThreshold(T currentValue, T threshold) {
+    boolean underThreshold = currentValue.compareTo(threshold) < 0;
+
+    if (underThreshold) {
+      context.setState(new NormalState<>(metricName, context));
       context.sendResolvedNotification(metricName, currentValue);
     }
   }

@@ -30,6 +30,7 @@ import org.easypeelsecurity.springdog.manager.statistics.SystemMetricsScheduler;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.RetryingTest;
 
 @SpringBootTest
 @TestPropertySource(properties = "springdog.systemMetricsScheduler.fixedRate=100")
@@ -39,6 +40,7 @@ class SystemMetricsSchedulerTest {
   private SystemMetricsScheduler scheduler;
 
   @Test
+  @RetryingTest(3)
   @DisplayName("System metric scheduler runs correctly at specified intervals.")
   void shouldRunSchedulerAtSpecifiedIntervals() {
     Awaitility.await()

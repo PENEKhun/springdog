@@ -36,6 +36,7 @@ allprojects {
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
         testImplementation "org.apache.cayenne:cayenne-server:${cayenneVersion}"
+        testImplementation "org.junit-pioneer:junit-pioneer:${junitPioneerVersion}"
     }
 
     test {
