@@ -16,19 +16,11 @@
 
 package org.easypeelsecurity.springdog.manager.statistics;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import org.easypeelsecurity.springdog.notification.email.EmailService;
-import org.easypeelsecurity.springdog.notification.email.content.ContentParameters;
-import org.easypeelsecurity.springdog.notification.email.content.EmailContent;
-import org.easypeelsecurity.springdog.notification.email.content.systemwatch.SystemWatchEmailContent;
-import org.easypeelsecurity.springdog.notification.email.content.systemwatch.SystemWatchParameters;
-import org.easypeelsecurity.springdog.shared.configuration.SystemWatchProperties;
+import org.easypeelsecurity.springdog.notification.SystemWatchNotificationManager;
 
 /**
  * Scheduler to monitor system usage.
@@ -40,17 +32,15 @@ import org.easypeelsecurity.springdog.shared.configuration.SystemWatchProperties
 public class SystemMetricsScheduler {
 
   private final StatisticsCommand statisticsCommand;
-  private final SystemWatchProperties systemWatchProperties;
-  private final EmailService emailService;
+  private final SystemWatchNotificationManager systemWatchNotificationManager;
 
   /**
    * Constructor.
    */
   public SystemMetricsScheduler(StatisticsCommand statisticsCommand,
-      SystemWatchProperties systemWatchProperties, EmailService emailService) {
+      SystemWatchNotificationManager systemWatchNotificationManager) {
     this.statisticsCommand = statisticsCommand;
-    this.systemWatchProperties = systemWatchProperties;
-    this.emailService = emailService;
+    this.systemWatchNotificationManager = systemWatchNotificationManager;
   }
 
   /**
@@ -65,33 +55,6 @@ public class SystemMetricsScheduler {
     double diskUsagePercent = systemUsageMonitor.diskUsagePercent();
 
     statisticsCommand.storeSystemMetrics(cpuUsagePercent, memoryUsagePercent, diskUsagePercent);
-    List<EmailContent> emailMessages = new ArrayList<>();
-    if (systemWatchProperties.isEnabled()) {
-      if (cpuUsagePercent > systemWatchProperties.getCpuThreshold() &&
-          systemWatchProperties.getCpuThreshold() != 0) {
-        EmailContent emailContent = new SystemWatchEmailContent();
-        ContentParameters parameters = new SystemWatchParameters("CPU", cpuUsagePercent);
-        emailContent.setParameters(parameters);
-        emailMessages.add(emailContent);
-      }
-      if (memoryUsagePercent > systemWatchProperties.getMemoryThreshold() &&
-          systemWatchProperties.getMemoryThreshold() != 0) {
-        EmailContent emailContent = new SystemWatchEmailContent();
-        ContentParameters parameters = new SystemWatchParameters("Memory", memoryUsagePercent);
-        emailContent.setParameters(parameters);
-        emailMessages.add(emailContent);
-      }
-      if (diskUsagePercent > systemWatchProperties.getDiskThreshold() &&
-          systemWatchProperties.getDiskThreshold() != 0) {
-        EmailContent emailContent = new SystemWatchEmailContent();
-        ContentParameters parameters = new SystemWatchParameters("Disk", diskUsagePercent);
-        emailContent.setParameters(parameters);
-        emailMessages.add(emailContent);
-      }
-
-      if (!emailMessages.isEmpty()) {
-        emailService.sendMails(emailMessages.toArray(new EmailContent[0]));
-      }
-    }
+    systemWatchNotificationManager.checkMetrics(cpuUsagePercent, memoryUsagePercent, diskUsagePercent);
   }
 }

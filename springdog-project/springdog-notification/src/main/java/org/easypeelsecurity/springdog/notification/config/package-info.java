@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.notification.email.content.systemwatch;
-
-import org.easypeelsecurity.springdog.notification.email.content.ContentParameters;
-
 /**
- * Parameters for SystemWatch alerts.
+ * Contains configuration classes for the notification module.
  */
-public record SystemWatchParameters(String triggerTarget, double usage) implements ContentParameters {
-}
 
+package org.easypeelsecurity.springdog.notification.config;
