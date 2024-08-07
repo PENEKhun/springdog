@@ -44,11 +44,11 @@ public interface SystemUsageMetrics {
   Double systemCpuUsagePercent();
 
   /**
-   * Retrieves the current heap memory usage as a percentage of the maximum available.
+   * Retrieves the current system memory usage as a percentage of the maximum available.
    *
-   * @return the used heap memory as a percentage, or -1 if not available
+   * @return the used system memory as a percentage, or -1 if not available
    */
-  Double heapMemoryUsagePercent();
+  Double getSystemMemoryUsagePercent();
 
   /**
    * Retrieves the current disk usage as a percentage of the total disk space.

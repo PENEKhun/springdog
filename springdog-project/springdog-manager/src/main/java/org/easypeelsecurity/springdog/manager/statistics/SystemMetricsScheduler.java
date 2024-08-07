@@ -61,7 +61,7 @@ public class SystemMetricsScheduler {
     SystemUsageMonitor systemUsageMonitor = new SystemUsageMonitor();
 
     double cpuUsagePercent = systemUsageMonitor.systemCpuUsagePercent();
-    double memoryUsagePercent = systemUsageMonitor.heapMemoryUsagePercent();
+    double memoryUsagePercent = systemUsageMonitor.getSystemMemoryUsagePercent();
     double diskUsagePercent = systemUsageMonitor.diskUsagePercent();
 
     statisticsCommand.storeSystemMetrics(cpuUsagePercent, memoryUsagePercent, diskUsagePercent);
