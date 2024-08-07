@@ -16,6 +16,8 @@
 
 package org.easypeelsecurity.springdog.notification;
 
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -79,6 +81,7 @@ class SystemWatchNotificationManagerTest {
   
   @Test
   void checkMetrics_AllBelowThreshold() {
+    when(properties.isEnabled()).thenReturn(true);
     manager.checkMetrics(70.0, 80.0, 75.0);
 
     verify(cpuContext).checkMetric(70.0, 80.0);
@@ -88,6 +91,7 @@ class SystemWatchNotificationManagerTest {
 
   @Test
   void checkMetrics_CpuAboveThreshold() {
+    when(properties.isEnabled()).thenReturn(true);
     manager.checkMetrics(85.0, 80.0, 75.0);
 
     verify(cpuContext).checkMetric(85.0, 80.0);
@@ -97,6 +101,7 @@ class SystemWatchNotificationManagerTest {
 
   @Test
   void checkMetrics_MemoryAboveThreshold() {
+    when(properties.isEnabled()).thenReturn(true);
     manager.checkMetrics(70.0, 95.0, 75.0);
 
     verify(cpuContext).checkMetric(70.0, 80.0);
@@ -106,6 +111,7 @@ class SystemWatchNotificationManagerTest {
 
   @Test
   void checkMetrics_DiskAboveThreshold() {
+    when(properties.isEnabled()).thenReturn(true);
     manager.checkMetrics(70.0, 80.0, 90.0);
 
     verify(cpuContext).checkMetric(70.0, 80.0);
@@ -115,10 +121,23 @@ class SystemWatchNotificationManagerTest {
 
   @Test
   void checkMetrics_AllAboveThreshold() {
+    when(properties.isEnabled()).thenReturn(true);
     manager.checkMetrics(90.0, 95.0, 95.0);
 
     verify(cpuContext).checkMetric(90.0, 80.0);
     verify(memoryContext).checkMetric(95.0, 90.0);
     verify(diskContext).checkMetric(95.0, 85.0);
+  }
+
+  @Test
+  void testCheckMetrics_Disabled() {
+    when(properties.isEnabled()).thenReturn(false);
+
+    manager.checkMetrics(85.0, 70.0, 95.0);
+
+    // Verify that checkMetric was not called for any metric
+    verify(cpuContext, never()).checkMetric(anyDouble(), anyDouble());
+    verify(memoryContext, never()).checkMetric(anyDouble(), anyDouble());
+    verify(diskContext, never()).checkMetric(anyDouble(), anyDouble());
   }
 }

@@ -66,6 +66,10 @@ public class SystemWatchNotificationManager {
    * @param diskUsage   The current disk usage.
    */
   public void checkMetrics(double cpuUsage, double memoryUsage, double diskUsage) {
+    if (!properties.isEnabled()) {
+      return;
+    }
+
     metricContexts.get("CPU").checkMetric(cpuUsage, properties.getCpuThreshold());
     metricContexts.get("Memory").checkMetric(memoryUsage, properties.getMemoryThreshold());
     metricContexts.get("Disk").checkMetric(diskUsage, properties.getDiskThreshold());
