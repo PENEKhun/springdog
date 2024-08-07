@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.notification.email;
+package org.easypeelsecurity.springdog.notification.email.state;
 
 /**
  * Represents the state of a system metric in the SystemWatch.
  * This interface defines the contract for different states a metric can be in.
  */
-public interface MetricState {
+public interface MetricState<T> {
   /**
    * Checks the current value against the threshold and potentially changes the state.
    *
    * @param currentValue The current value of the metric.
    * @param threshold The threshold value for the metric.
    */
-  void checkThreshold(double currentValue, double threshold);
+  void checkThreshold(T currentValue, T threshold);
 
   /**
    * Gets the name of the metric this state is associated with.

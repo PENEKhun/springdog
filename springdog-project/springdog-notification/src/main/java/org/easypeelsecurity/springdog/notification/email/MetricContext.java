@@ -16,13 +16,16 @@
 
 package org.easypeelsecurity.springdog.notification.email;
 
+import org.easypeelsecurity.springdog.notification.email.state.MetricState;
+import org.easypeelsecurity.springdog.notification.email.state.NormalState;
+
 /**
  * Manages the context for a single metric in the SystemWatch.
  * This class handles state transitions and notifications for a metric.
  */
-public class MetricContext {
-  private MetricState state;
-  private final SystemWatchEmailNotification emailNotification;
+public class MetricContext<K, V extends Comparable<V>> {
+  private MetricState<V> state;
+  private final AbstractEmailNotification<K, V> emailNotification;
 
   /**
    * Constructs a new MetricContext.
@@ -30,8 +33,8 @@ public class MetricContext {
    * @param metricName The name of the metric.
    * @param emailNotification The email notification service to use.
    */
-  public MetricContext(String metricName, SystemWatchEmailNotification emailNotification) {
-    this.state = new NormalState(metricName, this);
+  public MetricContext(String metricName, AbstractEmailNotification<K, V> emailNotification) {
+    this.state = new NormalState<>(metricName, this);
     this.emailNotification = emailNotification;
   }
 
@@ -40,7 +43,7 @@ public class MetricContext {
    *
    * @param state The new state to set.
    */
-  public void setState(MetricState state) {
+  public void setState(MetricState<V> state) {
     this.state = state;
   }
 
@@ -50,7 +53,7 @@ public class MetricContext {
    * @param currentValue The current value of the metric.
    * @param threshold The threshold value for the metric.
    */
-  public void checkMetric(double currentValue, double threshold) {
+  public void checkMetric(V currentValue, V threshold) {
     state.checkThreshold(currentValue, threshold);
   }
 
@@ -60,7 +63,7 @@ public class MetricContext {
    * @param metricName The name of the metric.
    * @param value The current value of the metric.
    */
-  public void sendWarningNotification(String metricName, double value) {
+  public void sendWarningNotification(K metricName, V value) {
     emailNotification.setCause(metricName, value);
     emailNotification.send();
   }
@@ -71,7 +74,7 @@ public class MetricContext {
    * @param metricName The name of the metric.
    * @param value The current value of the metric.
    */
-  public void sendResolvedNotification(String metricName, double value) {
+  public void sendResolvedNotification(K metricName, V value) {
     emailNotification.setRecovery(metricName, value);
     emailNotification.send();
   }

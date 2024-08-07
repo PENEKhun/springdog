@@ -31,7 +31,7 @@ import org.easypeelsecurity.springdog.shared.configuration.SystemWatchProperties
  */
 @Service
 public class SystemWatchNotificationManager {
-  private final Map<String, MetricContext> metricContexts;
+  private final Map<String, MetricContext<String, Double>> metricContexts;
   private final SystemWatchProperties properties;
   private final SystemWatchEmailNotification emailNotification;
 
