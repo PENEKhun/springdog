@@ -31,7 +31,7 @@ TODO: fill with screenshots.
 
 ## Options
 
-Below is a list of keys/default values for all settings.
+For detailed configurations, you can use the `springdog Dashboard`, and for other minor configurations, you can use the following.
 
 ```yaml
 springdog:
@@ -40,17 +40,20 @@ springdog:
     username: admin
     password: admin
     externalAccess: false
-  system-watch:
-    enabled: true
-    cpuThreshold: 80
-    memoryThreshold: 80
-    diskThreshold: 80
   notification:
     gmail:
       enabled: false
       recipient:
       username:
       password:
+  system-watch:
+    enabled: false
+    cpuThreshold: 80 # percentage
+    memoryThreshold: 80 # percentage
+    diskThreshold: 80 # percentage
+  slow-response:
+    enabled: false
+    threshold: 1000 # ms
 ```
 
 ### springdog.agent
@@ -66,18 +69,21 @@ springdog:
 
 ### springdog.notification.gmail
 
-> The Springdog Gmail notification configuration.
+> [system-watch](#springdogsystem-watch), [slow-response](#springdogslow-response) notifications are
+> sent via Gmail.
 
-| Name      | Required   | Description                            | Default | Value Sets                    |
-|-----------|------------|----------------------------------------|---------|-------------------------------|
-| enabled   | x          | Whether to enable Gmail notifications. | false   | `true` or `false`             |
-| recipient | △(enabled) | The recipient's email address.         |         | Must be a valid email address |
-| username  | △(enabled) | The Gmail username.                    |         |
-| password  | △(enabled) | The Gmail password.                    |         |
+| Name      | Required   | Description                                                                                                                       | Default | Value Sets                    |
+|-----------|------------|-----------------------------------------------------------------------------------------------------------------------------------|---------|-------------------------------|
+| enabled   | x          | Whether to enable Gmail notifications.                                                                                            | false   | `true` or `false`             |
+| recipient | △(enabled) | The recipient's email address.                                                                                                    |         | Must be a valid email address |
+| username  | △(enabled) | The Gmail username.                                                                                                               |         |
+| password  | △(enabled) | The Gmail App password. details in [here](https://support.google.com/mail/thread/205453566/how-to-generate-an-app-password?hl=en) |         |
 
 ### springdog.system-watch
 
-> The Springdog system watch configuration.  
+> Monitor the system's CPU, memory, and disk usage.
+> If the usage exceeds the threshold, a notification will be sent.
+>
 > ⚠️ Threshold `0` means that is disabled.  
 > ⚠️ To receive notifications, [this](#springdognotificationgmail) option must be enabled.
 
@@ -87,6 +93,18 @@ springdog:
 | cpuThreshold    | △(enabled) | The CPU usage threshold. If the CPU usage exceeds this value, a notification will be sent.       | 0.0     | `0.0 < x <= 100.0` |
 | memoryThreshold | △(enabled) | The memory usage threshold. If the memory usage exceeds this value, a notification will be sent. | 0.0     | `0.0 < x <= 100.0` |
 | diskThreshold   | △(enabled) | The disk usage threshold. If the disk usage exceeds this value, a notification will be sent.     | 0.0     | `0.0 < x <= 100.0` |
+
+### springdog.slow-response
+
+> For all endpoints, send a notification if the response time is slower than a specified number of
+*milliseconds*.
+>
+> ⚠️ To receive notifications, [this](#springdognotificationgmail) option must be enabled.
+
+| Name        | Required   | Description                                                                                        | Default | Value Sets        |
+|-------------|------------|----------------------------------------------------------------------------------------------------|---------|-------------------|
+| enabled     | x          | Whether to enable slow response.                                                                   | false   | `true` or `false` |
+| thresholdMs | △(enabled) | The slow response threshold. If the response time exceeds this value, a notification will be sent. | 0       | `0 < x` (ms)      |
 
 ## Contributing
 
