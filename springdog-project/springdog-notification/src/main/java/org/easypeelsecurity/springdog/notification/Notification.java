@@ -14,7 +14,27 @@
  * limitations under the License.
  */
 
+package org.easypeelsecurity.springdog.notification;
+
 /**
- * Contains classes for email content.
+ * The interface Notification send.
  */
-package org.easypeelsecurity.springdog.notification.email.content;
+public interface Notification {
+
+  /**
+   * Send notification.
+   *
+   * @return the result of sending the notification
+   */
+  boolean send();
+
+  /**
+   * Gets content of the notification.
+   */
+  String getContent();
+
+  /**
+   * Gets subject of the notification.
+   */
+  String getSubject();
+}

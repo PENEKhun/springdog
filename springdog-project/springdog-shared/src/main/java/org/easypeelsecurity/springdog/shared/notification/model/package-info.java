@@ -15,6 +15,6 @@
  */
 
 /**
- * Contains classes for system watch email content.
+ * Contains classes for notification model.
  */
-package org.easypeelsecurity.springdog.notification.email.content.systemwatch;
+package org.easypeelsecurity.springdog.shared.notification.model;

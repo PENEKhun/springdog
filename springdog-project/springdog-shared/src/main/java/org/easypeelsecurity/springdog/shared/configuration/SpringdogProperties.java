@@ -20,6 +20,7 @@ import jakarta.annotation.PostConstruct;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 import org.easypeelsecurity.springdog.shared.util.Assert;
 
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Springdog configuration.
  */
+@Configuration
 @ConfigurationProperties(prefix = "springdog")
 @EnableConfigurationProperties(value = {SpringdogAgentProperties.class, NotificationGmailProperties.class,
     SystemWatchProperties.class})

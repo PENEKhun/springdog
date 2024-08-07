@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.notification.email;
+package org.easypeelsecurity.springdog.notification.config;
 
 import java.util.Properties;
 
@@ -27,20 +27,22 @@ import org.easypeelsecurity.springdog.shared.configuration.NotificationGmailProp
 
 /**
  * Configuration for Gmail notifications.
+ * TODO : 패키지 위치 변경 -> autoconfigure 같은 곳으로
  */
 @Configuration
-public class GmailNotificationConfig {
+public class NotificationGmailConfig {
   private final NotificationGmailProperties gmailProperties;
 
   /**
    * Constructor for GmailNotificationConfig.
    */
-  public GmailNotificationConfig(NotificationGmailProperties gmailProperties) {
+  public NotificationGmailConfig(NotificationGmailProperties gmailProperties) {
     this.gmailProperties = gmailProperties;
   }
 
   /**
    * Create a JavaMailSender for Gmail.
+   *
    * @return JavaMailSender
    */
   @Bean(name = "gmailNotificationSender")
