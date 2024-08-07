@@ -70,15 +70,17 @@ abstract class AbstractEmailNotification<K, V> implements Notification {
   public String getContent() {
     return """
         <html>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            .header { background-color: #f2f2f2; padding: 10px;
-             border-radius: 5px; text-align: center; }
-            .content { margin-top: 20px; line-height: 1.6;}
-            .alert { color: #d9534f; font-weight: bold; }
-            .footer { margin-top: 30px; font-size: 12px; color: #888888;
-             border-top: 1px solid #ddd; padding-top: 10px; }
-           </style>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              .header { background-color: #f2f2f2; padding: 10px;
+               border-radius: 5px; text-align: center; }
+              .content { margin-top: 20px; line-height: 1.6;}
+              .alert { color: #d9534f; font-weight: bold; }
+              .footer { margin-top: 30px; font-size: 12px; color: #888888;
+               border-top: 1px solid #ddd; padding-top: 10px; }
+            </style>
+          </head>
           <body>
             <h1>Notification</h1>
               %s
