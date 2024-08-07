@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.notification.email.content;
-
 /**
- * Email content parameters.
+ * Contains classes for sending notifications.
  */
-public interface ContentParameters {}
+
+package org.easypeelsecurity.springdog.notification;
