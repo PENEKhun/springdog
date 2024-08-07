@@ -78,7 +78,7 @@ class SystemWatchNotificationManagerTest {
     );
     metricContextsField.set(manager, contexts);
   }
-  
+
   @Test
   void checkMetrics_AllBelowThreshold() {
     when(properties.isEnabled()).thenReturn(true);
