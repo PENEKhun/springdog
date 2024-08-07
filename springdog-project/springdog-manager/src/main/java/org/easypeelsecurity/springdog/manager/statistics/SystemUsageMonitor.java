@@ -16,11 +16,14 @@
 
 package org.easypeelsecurity.springdog.manager.statistics;
 
-import java.io.File;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryUsage;
-import java.lang.management.OperatingSystemMXBean;
+import java.util.List;
+
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HardwareAbstractionLayer;
+import oshi.software.os.FileSystem;
+import oshi.software.os.OSFileStore;
 
 /**
  * Monitor system usage.
@@ -28,33 +31,46 @@ import java.lang.management.OperatingSystemMXBean;
  * @author PENEKhun
  */
 public class SystemUsageMonitor implements SystemUsageMetrics {
+  private final SystemInfo systemInfo;
+  private final HardwareAbstractionLayer hardware;
 
-  @Override
-  public Double systemCpuUsagePercent() {
-    OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
-    if (osBean instanceof com.sun.management.OperatingSystemMXBean operatingSystemMXBean) {
-      double cpuLoad = operatingSystemMXBean.getCpuLoad();
-      if (!Double.isNaN(cpuLoad) && cpuLoad >= 0.0 && cpuLoad <= 1.0) {
-        return formatDouble(cpuLoad * 100);
-      }
-    }
-    return 0.0;
+  /**
+   * Constructor.
+   */
+  public SystemUsageMonitor() {
+    this.systemInfo = new SystemInfo();
+    this.hardware = systemInfo.getHardware();
   }
 
   @Override
-  public Double heapMemoryUsagePercent() {
-    MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
-    MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
-    long usedMemory = heapMemoryUsage.getUsed();
-    long maxMemory = heapMemoryUsage.getMax();
-    return formatDouble((double) usedMemory / maxMemory) * 100;
+  public Double getSystemMemoryUsagePercent() {
+    GlobalMemory memory = hardware.getMemory();
+    long totalMemory = memory.getTotal();
+    long availableMemory = memory.getAvailable();
+    double usedMemoryPercent = (double) (totalMemory - availableMemory) / totalMemory * 100;
+    return formatDouble(usedMemoryPercent);
+  }
+
+  @Override
+  public Double systemCpuUsagePercent() {
+    CentralProcessor processor = hardware.getProcessor();
+    double[] loadAverage = processor.getSystemLoadAverage(1);
+    return formatDouble(loadAverage[0]);
   }
 
   @Override
   public Double diskUsagePercent() {
-    File root = new File("/");
-    long totalSpace = root.getTotalSpace();
-    long freeSpace = root.getFreeSpace();
-    return formatDouble((double) (totalSpace - freeSpace) / totalSpace) * 100;
+    FileSystem fileSystem = systemInfo.getOperatingSystem().getFileSystem();
+    List<OSFileStore> fileStores = fileSystem.getFileStores();
+    long totalSpace = 0;
+    long usedSpace = 0;
+    for (OSFileStore store : fileStores) {
+      totalSpace += store.getTotalSpace();
+      usedSpace += (store.getTotalSpace() - store.getUsableSpace());
+    }
+    if (totalSpace == 0) {
+      return null;
+    }
+    return formatDouble((double) usedSpace / totalSpace * 100);
   }
 }

@@ -11,7 +11,7 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j'
     }
     implementation "commons-io:commons-io:2.16.1"
-
+    implementation "com.github.oshi:oshi-core:6.4.5"
 }
 
 mavenPublishing {
