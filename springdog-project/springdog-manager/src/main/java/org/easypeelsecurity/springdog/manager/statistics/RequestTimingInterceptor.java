@@ -25,6 +25,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import org.easypeelsecurity.springdog.notification.SlowResponseEmailNotificationManager;
+import org.easypeelsecurity.springdog.notification.email.SlowResponseEmailNotification.SlowResponse;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.util.MethodSignatureParser;
 
@@ -42,12 +44,15 @@ public class RequestTimingInterceptor implements HandlerInterceptor {
   private final Logger logger = Logger.getLogger(RequestTimingInterceptor.class.getName());
   private static final String SKIP_REQUEST_TIMING_CALC = "SKIP_REQUEST_TIMING_CALC";
   private static final String START_TIME_REQUEST_TIMING = "START_TIME_REQUEST_TIMING";
+  private final SlowResponseEmailNotificationManager notificationManager;
 
   /**
    * Constructor.
    */
-  public RequestTimingInterceptor(SpringdogProperties springdogProperties) {
+  public RequestTimingInterceptor(SpringdogProperties springdogProperties,
+      SlowResponseEmailNotificationManager notificationManager) {
     this.springdogProperties = springdogProperties;
+    this.notificationManager = notificationManager;
   }
 
   /**
@@ -87,6 +92,12 @@ public class RequestTimingInterceptor implements HandlerInterceptor {
     HandlerMethod handlerMethod = (HandlerMethod) handler;
     String methodSignature = MethodSignatureParser.parse(handlerMethod);
     EndpointMetricCacheManager.addResponseTime(methodSignature, responseTime);
+    notificationManager.checkSlowResponse(
+        new SlowResponse.Builder()
+            .endpointPath(request.getRequestURI())
+            .endpointMethod(request.getMethod())
+            .currentResponseTime(responseTime).build()
+    );
   }
 
   private boolean shouldSkipRequest(HttpServletRequest request, Class<?> controllerClass) {

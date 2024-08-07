@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 @Configuration
 @ConfigurationProperties(prefix = "springdog")
 @EnableConfigurationProperties(value = {SpringdogAgentProperties.class, NotificationGmailProperties.class,
-    SystemWatchProperties.class})
+    SystemWatchProperties.class, SlowResponseProperties.class})
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
 public class SpringdogProperties {
 
@@ -41,12 +41,15 @@ public class SpringdogProperties {
   private final SpringdogAgentProperties agentProperties;
   private final NotificationGmailProperties notificationProperties;
   private final SystemWatchProperties systemWatchProperties;
+  private final SlowResponseProperties slowResponseProperties;
 
   public SpringdogProperties(SpringdogAgentProperties agentProperties,
-      NotificationGmailProperties notificationProperties, SystemWatchProperties systemWatchProperties) {
+      NotificationGmailProperties notificationProperties, SystemWatchProperties systemWatchProperties,
+      SlowResponseProperties slowResponseProperties) {
     this.agentProperties = agentProperties;
     this.notificationProperties = notificationProperties;
     this.systemWatchProperties = systemWatchProperties;
+    this.slowResponseProperties = slowResponseProperties;
   }
 
   @PostConstruct

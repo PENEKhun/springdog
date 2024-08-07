@@ -24,6 +24,7 @@ import org.easypeelsecurity.springdog.manager.agent.AgentExternalAccessIntercept
 import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.manager.ratelimit.RatelimitInterceptor;
 import org.easypeelsecurity.springdog.manager.statistics.RequestTimingInterceptor;
+import org.easypeelsecurity.springdog.notification.SlowResponseEmailNotificationManager;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 
 /**
@@ -34,20 +35,24 @@ public class SpringdogHandlerInterceptorApplier implements WebMvcConfigurer {
 
   private final EndpointQuery endpointQuery;
   private final SpringdogProperties springdogProperties;
+  private final SlowResponseEmailNotificationManager slowResponseEmailNotificationManager;
 
   /**
    * Constructor.
    */
   public SpringdogHandlerInterceptorApplier(EndpointQuery endpointQuery,
-      SpringdogProperties springdogProperties) {
+      SpringdogProperties springdogProperties,
+      SlowResponseEmailNotificationManager slowResponseEmailNotificationManager) {
     this.endpointQuery = endpointQuery;
     this.springdogProperties = springdogProperties;
+    this.slowResponseEmailNotificationManager = slowResponseEmailNotificationManager;
   }
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new RatelimitInterceptor(this.endpointQuery, this.springdogProperties));
     registry.addInterceptor(new AgentExternalAccessInterceptor(this.springdogProperties));
-    registry.addInterceptor(new RequestTimingInterceptor(this.springdogProperties));
+    registry.addInterceptor(
+        new RequestTimingInterceptor(this.springdogProperties, this.slowResponseEmailNotificationManager));
   }
 }
