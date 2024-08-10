@@ -12,6 +12,7 @@
     .chart-container {
       position: relative;
       height: 250px;
+      width: 100%;
     }
 
     @media (min-width: 1200px) {
@@ -70,8 +71,10 @@
   <script th:inline="javascript">
     /*<![CDATA[*/
     let recentSystemMetrics = [[${recentSystemMetrics}]].reverse();
-    let todayEndpointMetrics = [[${todayEndpointMetrics}]];
+    let recentEndpointMetrics = [[${recentEndpointMetrics}]].reverse();
     /*]]>*/
+
+    console.log(recentEndpointMetrics)
 
     const labels = recentSystemMetrics.map(
         metric => new Date(metric.timestamp).toLocaleTimeString());
@@ -85,35 +88,31 @@
         metric => (metric.diskUsagePercent !== null && !isNaN(metric.diskUsagePercent)
             && metric.diskUsagePercent !== 0) ? metric.diskUsagePercent : null);
 
-    const totalVisitCount = todayEndpointMetrics.reduce((sum, item) => sum + item.visitCount, 0);
-    const totalAverageResponseTime = todayEndpointMetrics.reduce(
-        (sum, item) => sum + item.averageResponseMilliseconds, 0);
-
     window.onload = function () {
 
       const ctx = document.getElementById('endpointMetricsChart').getContext('2d');
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ['Total Metrics'],
+          labels: recentEndpointMetrics.map(item => item.baseDate),
           datasets: [
             {
               label: 'Visit Count',
-              data: [totalVisitCount],
-              backgroundColor: 'rgba(54, 162, 235, 0.2)',
-              borderColor: 'rgba(54, 162, 235, 1)',
-              borderWidth: 1,
-              yAxisID: 'y',
-              fill: false
+              data: recentEndpointMetrics.map(item => item.visitCount),
+              borderColor: 'rgb(75, 192, 192)',
+              tension: 0.1
             },
             {
               label: 'Average Response Time (ms)',
-              data: [totalAverageResponseTime],
-              backgroundColor: 'rgba(75, 192, 192, 0.2)',
-              borderColor: 'rgba(75, 192, 192, 1)',
-              borderWidth: 1,
-              yAxisID: 'y1',
-              fill: false
+              data: recentEndpointMetrics.map(item => item.averageResponseMilliseconds),
+              borderColor: 'rgb(255, 99, 132)',
+              tension: 0.1
+            },
+            {
+              label: 'Rate Limit Failures',
+              data: recentEndpointMetrics.map(item => item.ratelimitFailureCount),
+              borderColor: 'rgb(54, 162, 235)',
+              tension: 0.1
             }
           ]
         },
@@ -121,27 +120,26 @@
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            y: {
-              type: 'linear',
-              position: 'left',
-              beginAtZero: true,
+            x: {
               title: {
                 display: true,
-                text: 'Visit Count'
+                text: 'Date'
               }
             },
-            y1: {
-              type: 'linear',
-              position: 'right',
+            y: {
               beginAtZero: true,
               title: {
                 display: true,
-                text: 'Average Response Time (ms)'
-              },
-              grid: {
-                drawOnChartArea: false
+                text: 'Value'
               }
             }
+          },
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'Endpoint Metrics'
           }
         }
       });
@@ -217,8 +215,10 @@
         }
       });
 
-      const topTrafficMetrics = todayEndpointMetrics.sort((a, b) => b.visitCount - a.visitCount).slice(0, 3);
-      const topFail = todayEndpointMetrics.sort((a, b) => b.ratelimitFailureCount - a.ratelimitFailureCount).slice(0, 3);
+      const topTrafficMetrics = recentEndpointMetrics.sort(
+          (a, b) => b.visitCount - a.visitCount).slice(0, 3);
+      const topFail = recentEndpointMetrics.sort(
+          (a, b) => b.ratelimitFailureCount - a.ratelimitFailureCount).slice(0, 3);
 
       const dailyTopTraffic = document.getElementById('dailyTopTraffic');
       topTrafficMetrics.forEach(metric => {
@@ -242,7 +242,8 @@
         dailyFail.appendChild(listItem);
       });
 
-      const slowestEndpoints = todayEndpointMetrics.sort((a, b) => b.averageResponseMilliseconds - a.averageResponseMilliseconds).slice(0, 3);
+      const slowestEndpoints = recentEndpointMetrics.sort(
+          (a, b) => b.averageResponseMilliseconds - a.averageResponseMilliseconds).slice(0, 3);
       const dailySlowestEndpoints = document.getElementById('dailySlowestEndpoints');
       slowestEndpoints.forEach(metric => {
         const listItem = document.createElement('li');

@@ -87,7 +87,7 @@ public class SpringdogAgentView {
     model.addAttribute("totalEndpointCountNotActive", totalEndpointCount - activeCount);
     List<SystemMetricDto> recentSystemMetrics = statisticsQuery.getRecentSystemMetrics(50);
     model.addAttribute("recentSystemMetrics", recentSystemMetrics);
-    model.addAttribute("todayEndpointMetrics", statisticsQuery.getEndpointMetrics(LocalDate.now()));
+    model.addAttribute("recentEndpointMetrics", statisticsQuery.getEndpointMetrics(7));
 
     return "/templates/content/main.html";
   }
