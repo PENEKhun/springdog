@@ -31,6 +31,7 @@ import org.easypeelsecurity.springdog.shared.statistics.model.SystemMetric;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.configuration.CayenneRuntime;
+import org.apache.cayenne.query.EJBQLQuery;
 import org.apache.cayenne.query.ObjectSelect;
 
 /**
@@ -106,6 +107,7 @@ public class StatisticsQuery {
         .limit(limit)
         .select(context)
         .stream()
+        // TODO: Refactor this to use a converter
         .map(metric -> new EndpointMetricDto(
             metric.getEndpoint().getPath(),
             metric.getEndpoint().getHttpMethod(),
@@ -117,21 +119,28 @@ public class StatisticsQuery {
   }
 
   /**
-   * Get endpoint metrics for a specific baseDate.
+   * Get endpoint metrics for a recent date.
    */
-  public List<EndpointMetricDto> getEndpointMetrics(LocalDate baseDate) {
+  public List<EndpointMetricDto> getEndpointMetrics(int limit) {
     ObjectContext context = springdogRepository.newContext();
-    return ObjectSelect.query(EndpointMetric.class)
-        .where(EndpointMetric.METRIC_DATE.eq(baseDate))
-        .select(context)
-        .stream()
-        .map(metric -> new EndpointMetricDto(
-            metric.getEndpoint().getPath(),
-            metric.getEndpoint().getHttpMethod(),
-            metric.getPageView(),
-            metric.getAverageResponseMs(),
-            metric.getFailureWithRatelimit(),
-            baseDate))
+
+    EJBQLQuery query = new EJBQLQuery("""
+        SELECT SUM(em.pageView), AVG(em.averageResponseMs), SUM(em.failureWithRatelimit), em.metricDate
+        FROM EndpointMetric em
+        GROUP BY em.metricDate
+        ORDER BY em.metricDate DESC
+        """);
+    query.setFetchLimit(limit);
+    List<Object[]> results = context.performQuery(query);
+    // TODO: Refactor this to use a converter & Change anothor class to use likes... DailyEndpointMetricDto
+    return results.stream()
+        .map(row -> new EndpointMetricDto(
+            "",
+            "",
+            ((Number) row[0]).longValue(),
+            ((Number) row[1]).longValue(),
+            ((Number) row[2]).longValue(),
+            (LocalDate) row[3]))
         .toList();
   }
 }
