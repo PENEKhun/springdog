@@ -88,7 +88,10 @@ public class SpringdogAgentView {
     List<SystemMetricDto> recentSystemMetrics = statisticsQuery.getRecentSystemMetrics(50);
     model.addAttribute("recentSystemMetrics", recentSystemMetrics);
     model.addAttribute("recentEndpointMetrics", statisticsQuery.getEndpointMetrics(7));
-
+    model.addAttribute("dailyTopTraffic", statisticsQuery.getEndpointMetricsByPageView(3, LocalDate.now()));
+    model.addAttribute("dailyTopFailure", statisticsQuery.getEndpointMetricsByFailure(3, LocalDate.now()));
+    model.addAttribute("dailySlowestEndpoints",
+        statisticsQuery.getEndpointMetricsByResponseDuration(3, LocalDate.now()));
     return "/templates/content/main.html";
   }
 

@@ -119,6 +119,79 @@ public class StatisticsQuery {
   }
 
   /**
+   * Get endpoint metrics by page view.
+   *
+   * @param limit        the maximum number of endpoint metrics to retrieve
+   * @param specificDate the date to retrieve metrics for
+   */
+  public List<EndpointMetricDto> getEndpointMetricsByPageView(int limit, LocalDate specificDate) {
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(EndpointMetric.class)
+        .where(EndpointMetric.METRIC_DATE.eq(specificDate))
+        .orderBy(EndpointMetric.METRIC_DATE.desc().then(EndpointMetric.PAGE_VIEW.desc()))
+        .limit(limit)
+        .select(context)
+        .stream()
+        .map(metric -> new EndpointMetricDto(
+            metric.getEndpoint().getPath(),
+            metric.getEndpoint().getHttpMethod(),
+            metric.getPageView(),
+            metric.getAverageResponseMs(),
+            metric.getFailureWithRatelimit(),
+            metric.getMetricDate()))
+        .toList();
+  }
+
+  /**
+   * Get endpoint metrics by failure.
+   *
+   * @param limit        the maximum number of endpoint metrics to retrieve
+   * @param specificDate the date to retrieve metrics for
+   */
+  public List<EndpointMetricDto> getEndpointMetricsByFailure(int limit, LocalDate specificDate) {
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(EndpointMetric.class)
+        .where(EndpointMetric.METRIC_DATE.eq(specificDate))
+        .orderBy(EndpointMetric.METRIC_DATE.desc().then(EndpointMetric.FAILURE_WITH_RATELIMIT.desc()))
+        .limit(limit)
+        .select(context)
+        .stream()
+        .map(metric -> new EndpointMetricDto(
+            metric.getEndpoint().getPath(),
+            metric.getEndpoint().getHttpMethod(),
+            metric.getPageView(),
+            metric.getAverageResponseMs(),
+            metric.getFailureWithRatelimit(),
+            metric.getMetricDate()))
+        .toList();
+  }
+
+
+  /**
+   * Get endpoint metrics by response duration.
+   *
+   * @param limit        the maximum number of endpoint metrics to retrieve
+   * @param specificDate the date to retrieve metrics for
+   */
+  public List<EndpointMetricDto> getEndpointMetricsByResponseDuration(int limit, LocalDate specificDate) {
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(EndpointMetric.class)
+        .where(EndpointMetric.METRIC_DATE.eq(specificDate))
+        .orderBy(EndpointMetric.METRIC_DATE.desc().then(EndpointMetric.AVERAGE_RESPONSE_MS.desc()))
+        .limit(limit)
+        .select(context)
+        .stream()
+        .map(metric -> new EndpointMetricDto(
+            metric.getEndpoint().getPath(),
+            metric.getEndpoint().getHttpMethod(),
+            metric.getPageView(),
+            metric.getAverageResponseMs(),
+            metric.getFailureWithRatelimit(),
+            metric.getMetricDate()))
+        .toList();
+  }
+
+  /**
    * Get endpoint metrics for a recent date.
    */
   public List<EndpointMetricDto> getEndpointMetrics(int limit) {
