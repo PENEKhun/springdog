@@ -107,7 +107,7 @@
 		<usePrimitives>true</usePrimitives>
 	</dbImport>
 	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
-		<excludeEntities>EndpointChangelog,EndpointParameter,EndpointVersionControl</excludeEntities>
+		<excludeEntities>EndpointParameter,EndpointVersionControl</excludeEntities>
 		<destDir>../java</destDir>
 		<mode>entity</mode>
 		<template>templates/v4_1/subclass.vm</template>

@@ -24,25 +24,25 @@ public abstract class _EndpointMetric extends BaseDataObject {
 
     public static final String ID_PK_COLUMN = "ID";
 
-    public static final NumericProperty<Integer> AVERAGE_RESPONSE_MS = PropertyFactory.createNumeric("averageResponseMs", Integer.class);
+    public static final NumericProperty<Long> AVERAGE_RESPONSE_MS = PropertyFactory.createNumeric("averageResponseMs", Long.class);
     public static final NumericProperty<Long> FAILURE_WITH_RATELIMIT = PropertyFactory.createNumeric("failureWithRatelimit", Long.class);
     public static final DateProperty<LocalDate> METRIC_DATE = PropertyFactory.createDate("metricDate", LocalDate.class);
     public static final NumericProperty<Long> PAGE_VIEW = PropertyFactory.createNumeric("pageView", Long.class);
     public static final EntityProperty<Endpoint> ENDPOINT = PropertyFactory.createEntity("endpoint", Endpoint.class);
 
-    protected int averageResponseMs;
+    protected long averageResponseMs;
     protected long failureWithRatelimit;
     protected LocalDate metricDate;
     protected long pageView;
 
     protected Object endpoint;
 
-    public void setAverageResponseMs(int averageResponseMs) {
+    public void setAverageResponseMs(long averageResponseMs) {
         beforePropertyWrite("averageResponseMs", this.averageResponseMs, averageResponseMs);
         this.averageResponseMs = averageResponseMs;
     }
 
-    public int getAverageResponseMs() {
+    public long getAverageResponseMs() {
         beforePropertyRead("averageResponseMs");
         return this.averageResponseMs;
     }
@@ -115,7 +115,7 @@ public abstract class _EndpointMetric extends BaseDataObject {
 
         switch (propName) {
             case "averageResponseMs":
-                this.averageResponseMs = val == null ? 0 : (int)val;
+                this.averageResponseMs = val == null ? 0 : (long)val;
                 break;
             case "failureWithRatelimit":
                 this.failureWithRatelimit = val == null ? 0 : (long)val;
@@ -145,7 +145,7 @@ public abstract class _EndpointMetric extends BaseDataObject {
     @Override
     protected void writeState(ObjectOutputStream out) throws IOException {
         super.writeState(out);
-        out.writeInt(this.averageResponseMs);
+        out.writeLong(this.averageResponseMs);
         out.writeLong(this.failureWithRatelimit);
         out.writeObject(this.metricDate);
         out.writeLong(this.pageView);
@@ -155,7 +155,7 @@ public abstract class _EndpointMetric extends BaseDataObject {
     @Override
     protected void readState(ObjectInputStream in) throws IOException, ClassNotFoundException {
         super.readState(in);
-        this.averageResponseMs = in.readInt();
+        this.averageResponseMs = in.readLong();
         this.failureWithRatelimit = in.readLong();
         this.metricDate = (LocalDate)in.readObject();
         this.pageView = in.readLong();

@@ -6,7 +6,7 @@
 	<property name="defaultPackage" value="org.easypeelsecurity.springdog.shared.statistics.model"/>
 	<property name="defaultSchema" value="APP"/>
 	<db-entity name="ENDPOINT_METRIC" schema="APP">
-		<db-attribute name="AVERAGE_RESPONSE_MS" type="INTEGER" isMandatory="true"/>
+		<db-attribute name="AVERAGE_RESPONSE_MS" type="BIGINT" isMandatory="true"/>
 		<db-attribute name="ENDPOINT_ID" type="BIGINT" isMandatory="true"/>
 		<db-attribute name="FAILURE_WITH_RATELIMIT" type="BIGINT" isMandatory="true"/>
 		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isGenerated="true" isMandatory="true"/>
@@ -21,7 +21,7 @@
 		<db-attribute name="TIMESTAMP" type="TIMESTAMP" isMandatory="true"/>
 	</db-entity>
 	<obj-entity name="EndpointMetric" className="org.easypeelsecurity.springdog.shared.statistics.model.EndpointMetric" dbEntityName="ENDPOINT_METRIC">
-		<obj-attribute name="averageResponseMs" type="int" db-attribute-path="AVERAGE_RESPONSE_MS"/>
+		<obj-attribute name="averageResponseMs" type="long" db-attribute-path="AVERAGE_RESPONSE_MS"/>
 		<obj-attribute name="failureWithRatelimit" type="long" db-attribute-path="FAILURE_WITH_RATELIMIT"/>
 		<obj-attribute name="metricDate" type="java.time.LocalDate" db-attribute-path="METRIC_DATE"/>
 		<obj-attribute name="pageView" type="long" db-attribute-path="PAGE_VIEW"/>
