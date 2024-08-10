@@ -31,6 +31,7 @@ import org.easypeelsecurity.springdog.shared.statistics.model.SystemMetric;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.configuration.CayenneRuntime;
+import org.apache.cayenne.exp.property.NumericProperty;
 import org.apache.cayenne.query.EJBQLQuery;
 import org.apache.cayenne.query.ObjectSelect;
 
@@ -119,82 +120,71 @@ public class StatisticsQuery {
   }
 
   /**
-   * Get endpoint metrics by page view.
+   * Retrieves a list of endpoint metrics based on specified criteria.
    *
-   * @param limit        the maximum number of endpoint metrics to retrieve
-   * @param specificDate the date to retrieve metrics for
+   * @param limit        The maximum number of results to return
+   * @param specificDate The specific date for which to retrieve metrics
+   * @param sortType     The type of sorting to apply to the results
+   * @return A list of EndpointMetricDto objects containing the requested metrics
+   */
+  public List<EndpointMetricDto> getEndpointMetrics(int limit, LocalDate specificDate,
+      MetricsSortType sortType) {
+    ObjectContext context = springdogRepository.newContext();
+    return ObjectSelect.query(EndpointMetric.class)
+        .where(EndpointMetric.METRIC_DATE.eq(specificDate))
+        .orderBy(EndpointMetric.METRIC_DATE.desc())
+        .orderBy(sortType.getProperty().desc())
+        .limit(limit)
+        .select(context)
+        .stream()
+        // TODO: Refactor this to use a converter
+        .map(metric -> new EndpointMetricDto(
+            metric.getEndpoint().getPath(),
+            metric.getEndpoint().getHttpMethod(),
+            metric.getPageView(),
+            metric.getAverageResponseMs(),
+            metric.getFailureWithRatelimit(),
+            metric.getMetricDate()))
+        .toList();
+  }
+
+  /**
+   * Retrieves endpoint metrics sorted by page view in descending order for a specific date.
+   *
+   * @param limit        The maximum number of endpoint metrics to retrieve.
+   * @param specificDate The date for which to retrieve the metrics.
+   * @return A list of EndpointMetricDto objects sorted by page view in descending order.
    */
   public List<EndpointMetricDto> getEndpointMetricsByPageView(int limit, LocalDate specificDate) {
-    ObjectContext context = springdogRepository.newContext();
-    return ObjectSelect.query(EndpointMetric.class)
-        .where(EndpointMetric.METRIC_DATE.eq(specificDate))
-        .orderBy(EndpointMetric.METRIC_DATE.desc().then(EndpointMetric.PAGE_VIEW.desc()))
-        .limit(limit)
-        .select(context)
-        .stream()
-        .map(metric -> new EndpointMetricDto(
-            metric.getEndpoint().getPath(),
-            metric.getEndpoint().getHttpMethod(),
-            metric.getPageView(),
-            metric.getAverageResponseMs(),
-            metric.getFailureWithRatelimit(),
-            metric.getMetricDate()))
-        .toList();
+    return getEndpointMetrics(limit, specificDate, MetricsSortType.PAGE_VIEW);
   }
 
   /**
-   * Get endpoint metrics by failure.
+   * Retrieves endpoint metrics sorted by failure count in descending order for a specific date.
    *
-   * @param limit        the maximum number of endpoint metrics to retrieve
-   * @param specificDate the date to retrieve metrics for
+   * @param limit        The maximum number of endpoint metrics to retrieve.
+   * @param specificDate The date for which to retrieve the metrics.
+   * @return A list of EndpointMetricDto objects sorted by failure count in descending order.
    */
   public List<EndpointMetricDto> getEndpointMetricsByFailure(int limit, LocalDate specificDate) {
-    ObjectContext context = springdogRepository.newContext();
-    return ObjectSelect.query(EndpointMetric.class)
-        .where(EndpointMetric.METRIC_DATE.eq(specificDate))
-        .orderBy(EndpointMetric.METRIC_DATE.desc().then(EndpointMetric.FAILURE_WITH_RATELIMIT.desc()))
-        .limit(limit)
-        .select(context)
-        .stream()
-        .map(metric -> new EndpointMetricDto(
-            metric.getEndpoint().getPath(),
-            metric.getEndpoint().getHttpMethod(),
-            metric.getPageView(),
-            metric.getAverageResponseMs(),
-            metric.getFailureWithRatelimit(),
-            metric.getMetricDate()))
-        .toList();
+    return getEndpointMetrics(limit, specificDate, MetricsSortType.FAILURE);
   }
 
-
   /**
-   * Get endpoint metrics by response duration.
+   * Retrieves endpoint metrics sorted by average response duration in descending order for a specific date.
    *
-   * @param limit        the maximum number of endpoint metrics to retrieve
-   * @param specificDate the date to retrieve metrics for
+   * @param limit        The maximum number of endpoint metrics to retrieve.
+   * @param specificDate The date for which to retrieve the metrics.
+   * @return A list of EndpointMetricDto objects sorted by average response duration in descending order.
    */
   public List<EndpointMetricDto> getEndpointMetricsByResponseDuration(int limit, LocalDate specificDate) {
-    ObjectContext context = springdogRepository.newContext();
-    return ObjectSelect.query(EndpointMetric.class)
-        .where(EndpointMetric.METRIC_DATE.eq(specificDate))
-        .orderBy(EndpointMetric.METRIC_DATE.desc().then(EndpointMetric.AVERAGE_RESPONSE_MS.desc()))
-        .limit(limit)
-        .select(context)
-        .stream()
-        .map(metric -> new EndpointMetricDto(
-            metric.getEndpoint().getPath(),
-            metric.getEndpoint().getHttpMethod(),
-            metric.getPageView(),
-            metric.getAverageResponseMs(),
-            metric.getFailureWithRatelimit(),
-            metric.getMetricDate()))
-        .toList();
+    return getEndpointMetrics(limit, specificDate, MetricsSortType.RESPONSE_DURATION);
   }
 
   /**
    * Get endpoint metrics for a recent date.
    */
-  public List<EndpointMetricDto> getEndpointMetrics(int limit) {
+  public List<EndpointMetricDto> getEndpointMetricStatistics(int limit) {
     ObjectContext context = springdogRepository.newContext();
 
     EJBQLQuery query = new EJBQLQuery("""
@@ -215,5 +205,22 @@ public class StatisticsQuery {
             ((Number) row[2]).longValue(),
             (LocalDate) row[3]))
         .toList();
+  }
+
+  @SuppressWarnings({"checkstyle:MissingJavadocMethod", "checkstyle:MissingJavadocType"})
+  public enum MetricsSortType {
+    PAGE_VIEW(EndpointMetric.PAGE_VIEW),
+    FAILURE(EndpointMetric.FAILURE_WITH_RATELIMIT),
+    RESPONSE_DURATION(EndpointMetric.AVERAGE_RESPONSE_MS);
+
+    private final NumericProperty<Long> property;
+
+    MetricsSortType(NumericProperty<Long> property) {
+      this.property = property;
+    }
+
+    public NumericProperty<Long> getProperty() {
+      return property;
+    }
   }
 }
