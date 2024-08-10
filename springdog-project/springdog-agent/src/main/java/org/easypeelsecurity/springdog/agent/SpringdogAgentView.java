@@ -76,7 +76,7 @@ public class SpringdogAgentView {
     return "redirect:" + properties.computeAbsolutePath("/login?logout");
   }
 
-  @GetMapping("/")
+  @GetMapping({"/", ""})
   public String home(Model model) {
     model.addAttribute("endpointChangeLog",
         versionControlQuery.getAllChangeLogsNotResolved());
