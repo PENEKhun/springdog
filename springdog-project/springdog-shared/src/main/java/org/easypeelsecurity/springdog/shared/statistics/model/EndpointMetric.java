@@ -47,7 +47,7 @@ public class EndpointMetric extends _EndpointMetric {
   }
 
   @Override
-  public void setAverageResponseMs(int averageResponseMs) {
+  public void setAverageResponseMs(long averageResponseMs) {
     if (averageResponseMs < 0) {
       throw new IllegalArgumentException("average response time must be a positive number");
     }
