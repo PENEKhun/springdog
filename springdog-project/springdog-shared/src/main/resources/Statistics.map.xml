@@ -35,9 +35,21 @@
 	</obj-entity>
 	<db-relationship name="endpoint" source="ENDPOINT_METRIC" target="ENDPOINT">
 		<db-attribute-pair source="ENDPOINT_ID" target="ID"/>
-		<db-attribute-pair source="ID" target="ENDPOINT_METRIC_ID"/>
 	</db-relationship>
 	<obj-relationship name="endpoint" source="EndpointMetric" target="Endpoint" deleteRule="Nullify" db-relationship-path="endpoint"/>
+	<dbImport xmlns="http://cayenne.apache.org/schema/10/dbimport">
+		<tableTypes>
+			<tableType>TABLE</tableType>
+			<tableType>VIEW</tableType>
+		</tableTypes>
+		<forceDataMapCatalog>false</forceDataMapCatalog>
+		<forceDataMapSchema>false</forceDataMapSchema>
+		<namingStrategy>org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator</namingStrategy>
+		<skipPrimaryKeyLoading>false</skipPrimaryKeyLoading>
+		<skipRelationshipsLoading>false</skipRelationshipsLoading>
+		<useJava7Types>false</useJava7Types>
+		<usePrimitives>true</usePrimitives>
+	</dbImport>
 	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
 		<excludeEntities>SystemMetric</excludeEntities>
 		<destDir>../java</destDir>

@@ -6,7 +6,6 @@
 	<property name="defaultPackage" value="org.easypeelsecurity.springdog.shared.ratelimit.model"/>
 	<property name="defaultSchema" value="APP"/>
 	<db-entity name="ENDPOINT" schema="APP">
-		<db-attribute name="ENDPOINT_METRIC_ID" type="BIGINT"/>
 		<db-attribute name="HTTPMETHOD" type="VARCHAR" isMandatory="true" length="10"/>
 		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isMandatory="true" length="19"/>
 		<db-attribute name="ISPATTERNPATH" type="BOOLEAN" isMandatory="true" length="1"/>
@@ -22,7 +21,7 @@
 	<db-entity name="ENDPOINTCHANGELOG" schema="APP">
 		<db-attribute name="CHANGETYPE" type="VARCHAR" isMandatory="true" length="255"/>
 		<db-attribute name="DETAILSTRING" type="VARCHAR" length="255"/>
-		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isGenerated="true" isMandatory="true" length="19"/>
+		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isMandatory="true" length="19"/>
 		<db-attribute name="ISRESOLVED" type="BOOLEAN" isMandatory="true" length="1"/>
 		<db-attribute name="REFLECTED_VERSION" type="TIMESTAMP" isMandatory="true"/>
 		<db-attribute name="TARGETMETHOD" type="VARCHAR" isMandatory="true" length="30"/>
@@ -74,11 +73,10 @@
 		<obj-attribute name="id" type="long" db-attribute-path="ID"/>
 		<pre-persist method-name="onPrePersist"/>
 	</obj-entity>
-	<db-relationship name="endpointMetric" source="ENDPOINT" target="ENDPOINT_METRIC" toMany="true">
-		<db-attribute-pair source="ID" target="ENDPOINT_ID"/>
-		<db-attribute-pair source="ENDPOINT_METRIC_ID" target="ID"/>
-	</db-relationship>
 	<db-relationship name="endpointparameters" source="ENDPOINT" target="ENDPOINTPARAMETER" toMany="true">
+		<db-attribute-pair source="ID" target="ENDPOINT_ID"/>
+	</db-relationship>
+	<db-relationship name="untitledRel" source="ENDPOINT" target="ENDPOINT_METRIC" toMany="true">
 		<db-attribute-pair source="ID" target="ENDPOINT_ID"/>
 	</db-relationship>
 	<db-relationship name="reflectedVersion" source="ENDPOINTCHANGELOG" target="ENDPOINTVERSIONCONTROL">
@@ -90,7 +88,7 @@
 	<db-relationship name="changelogs" source="ENDPOINTVERSIONCONTROL" target="ENDPOINTCHANGELOG" toMany="true">
 		<db-attribute-pair source="DATEOFVERSION" target="REFLECTED_VERSION"/>
 	</db-relationship>
-	<obj-relationship name="endpointMetric" source="Endpoint" target="EndpointMetric" deleteRule="Cascade" db-relationship-path="endpointMetric"/>
+	<obj-relationship name="endpointMetrics" source="Endpoint" target="EndpointMetric" deleteRule="Deny" db-relationship-path="untitledRel"/>
 	<obj-relationship name="endpointparameters" source="Endpoint" target="EndpointParameter" deleteRule="Cascade" db-relationship-path="endpointparameters"/>
 	<obj-relationship name="reflectedVersion" source="EndpointChangelog" target="EndpointVersionControl" deleteRule="Nullify" db-relationship-path="reflectedVersion"/>
 	<obj-relationship name="endpoint" source="EndpointParameter" target="Endpoint" deleteRule="Cascade" db-relationship-path="endpoint"/>
