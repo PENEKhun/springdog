@@ -83,8 +83,12 @@ public class RatelimitInterceptor implements HandlerInterceptor {
         return true;
       }
 
-      EndpointDto endpoint = getEndpoint(methodSignature)
-          .orElseThrow(() -> new IllegalStateException("Endpoint not found"));
+      Optional<EndpointDto> optionalEndpoint = getValidEndpoint(methodSignature);
+      if (optionalEndpoint.isEmpty()) {
+        return true;
+      }
+      EndpointDto endpoint = optionalEndpoint.get();
+
       if (!RuleStatus.ACTIVE.equals(endpoint.getRuleStatus())) {
         return true;
       }
@@ -105,7 +109,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
     return true;
   }
 
-  private Optional<EndpointDto> getEndpoint(String methodSignature) {
+  private Optional<EndpointDto> getValidEndpoint(String methodSignature) {
     EndpointDto endpoint = RuleCache.findEndpointByMethodSignature(methodSignature)
         .orElseGet(() -> {
           Optional<EndpointDto> item = endpointQuery.getEndpointByMethodSignature(methodSignature);
