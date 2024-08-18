@@ -5,54 +5,7 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <script th:inline="javascript">
-    /*<![CDATA[*/
-    let endpoints = [[${endpoints}]];
-    /*]]>*/
-
-    console.log(endpoints);
-
-    $(document).ready(function () {
-
-      new DataTable('#table', {
-        columns: [
-          {title: 'index', data: 'id', visible: false},
-          {title: 'path', data: 'path'},
-          {title: 'method signature', data: 'methodSignature'},
-          {title: 'Http method', data: 'httpMethod'},
-          {
-            title: 'status',
-            data: 'ruleStatus',
-            render: function (data) {
-              switch (data) {
-                case 'NOT_CONFIGURED':
-                  return '<span class="badge bg-warning">Not configured</span>';
-                case 'ACTIVE':
-                  return '<span class="badge bg-success">ACTIVE</span>';
-                default:
-                  return '<span class="badge bg-danger">INACTIVE</span>';
-              }
-            }
-          },
-          // TODO: support it
-          // {title: 'Last modified', data: 'updatedAt'},
-          {
-            title: 'Actions',
-            data: 'id',
-            render: function (data, type, row, meta) {
-              return '<button class="btn btn-primary btn-sm" onclick="configure(\'' + data
-                  + '\')" title="Configure"><i class="bi bi-gear-fill"></i></button> ' +
-                  '<button class="btn btn-info btn-sm" onclick="analyze(\'' + data
-                  + '\')" title="Analyze"><i class="bi bi-bar-chart-line-fill"></i></button>';
-            }
-          }
-        ],
-        data: [
-          ...endpoints
-        ],
-      });
-    });
-
+  <script>
     function configure(idx) {
       window.location.href = window.location.pathname + '/' + idx;
     }
@@ -60,6 +13,10 @@
     function analyze(idx) {
       window.location.href = window.location.pathname + '/' + idx + '/analytics';
     }
+
+    $(document).ready(function () {
+      $('#table').DataTable();
+    });
   </script>
   <title>Manage</title>
 </head>
@@ -70,8 +27,36 @@
     <li class="breadcrumb-item active">Manage</li>
   </ol>
 
-  <table id="table">
 
+  <table id="table" class="table">
+    <thead>
+    <tr>
+      <th>Path</th>
+      <th>Method Signature</th>
+      <th>HTTP Method</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="endpoint : ${endpoints}">
+      <td th:text="${endpoint.path}"></td>
+      <td th:text="${endpoint.methodSignature}"></td>
+      <td th:text="${endpoint.httpMethod}"></td>
+      <td>
+          <span th:class="${'badge ' + (endpoint.ruleStatus == 'NOT_CONFIGURED' ? 'bg-warning' : (endpoint.ruleStatus == 'ACTIVE' ? 'bg-success' : 'bg-danger'))}"
+                th:text="${endpoint.ruleStatus == 'NOT_CONFIGURED' ? 'Not configured' : endpoint.ruleStatus}"></span>
+      </td>
+      <td>
+        <button class="btn btn-primary btn-sm" th:onclick="'configure(\'' + ${endpoint.id} + '\')'" title="Configure">
+          <i class="bi bi-gear-fill"></i>
+        </button>
+        <button class="btn btn-info btn-sm" th:onclick="'analyze(\'' + ${endpoint.id} + '\')'" title="Analyze">
+          <i class="bi bi-bar-chart-line-fill"></i>
+        </button>
+      </td>
+    </tr>
+    </tbody>
   </table>
 </div>
 

@@ -1,0 +1,6 @@
+springdog:
+  agent:
+    basePath: springdog
+    username: username
+    password: password
+    externalAccess: true
