@@ -155,7 +155,7 @@ class AgentTests {
       // Fill in the form
       HtmlTextInput usernameInput = loginForm.getInputByName("username");
       HtmlPasswordInput passwordInput = loginForm.getInputByName("password");
-      HtmlSubmitInput submitButton = loginForm.getFirstByXPath("//input[@type='submit']");
+      HtmlButton submitButton = loginForm.getFirstByXPath("//button[@type='submit']");
       usernameInput.type(username);
       passwordInput.type(password);
 
