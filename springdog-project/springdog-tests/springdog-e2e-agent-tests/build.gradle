@@ -1,0 +1,55 @@
+plugins {
+    id "java"
+}
+
+compileJava {
+    dependsOn ':springdog-project:springdog-starter:jar'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(':springdog-project:springdog-starter')
+    annotationProcessor project(':springdog-project:springdog-starter')
+    implementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
+    testImplementation "org.springframework.security:spring-security-test:${springVersion}"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
+    testImplementation group: 'org.htmlunit', name: 'htmlunit', version: '4.4.0'
+    testImplementation "org.seleniumhq.selenium:htmlunit3-driver:4.23.0"
+}
+
+test {
+    doLast {
+        tasks.named("jacocoTestReport") {
+            it.sourceDirectories.from(
+                    project(":springdog-project:springdog-manager").sourceSets.main.java.srcDirs,
+                    project(":springdog-project:springdog-autoconfigure").sourceSets.main.java.srcDirs,
+                    project(":springdog-project:springdog-agent").sourceSets.main.java.srcDirs
+            )
+            it.classDirectories.from(
+                    project(":springdog-project:springdog-manager").sourceSets.main.output,
+                    project(":springdog-project:springdog-autoconfigure").sourceSets.main.output,
+                    project(":springdog-project:springdog-agent").sourceSets.main.output
+            )
+        }
+    }
+}
+
+tasks.register('deleteEmbeddedDatabase', Delete) {
+    def dir = file("${projectDir}/springdog-embedded-database")
+    if (dir.exists() && dir.isDirectory()) {
+        println "Deleting directory and its contents: $dir"
+        delete dir.listFiles()
+        delete dir
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    dependsOn('deleteEmbeddedDatabase')
+}
