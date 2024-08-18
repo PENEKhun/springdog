@@ -31,6 +31,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -39,12 +41,12 @@ class SecurityTests {
   @Autowired
   private MockMvc mockMvc;
 
-  @Test
+  @ParameterizedTest
+  @CsvSource({
+      "/springdog/", "/springdog"
+  })
   @DisplayName("Should connect to Springdog agent successfully even with user security configuration")
-  void connectToSpringdogAgentWithUserSecurityConfigSuccessfully() throws Exception {
-    // given
-    String agentPath = "/springdog/";
-
+  void connectToSpringdogAgentWithUserSecurityConfigSuccessfully(String agentPath) throws Exception {
     // when & then
     mockMvc.perform(get(agentPath))
         .andExpect(status().is3xxRedirection())
