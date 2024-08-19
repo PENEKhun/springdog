@@ -19,10 +19,16 @@ dependencies {
 
     implementation "org.ow2.asm:asm:${asmVersion}"
     implementation "org.ow2.asm:asm-commons:${asmVersion}"
+    implementation "org.flywaydb:flyway-core:${flywayVersion}"
+    runtimeOnly "org.flywaydb:flyway-database-derby:${flywayVersion}"
 
     compileOnly project(":springdog-project:springdog-agent")
     compileOnly project(":springdog-project:springdog-manager")
     implementation project(":springdog-project:springdog-shared")
+
+    implementation("org.apache.cayenne:cayenne-server:${cayenneVersion}") {
+        exclude group: 'org.slf4j', module: 'slf4j'
+    }
 
     testImplementation project(":springdog-project:springdog-shared")
     testImplementation project(":springdog-project:springdog-manager")
