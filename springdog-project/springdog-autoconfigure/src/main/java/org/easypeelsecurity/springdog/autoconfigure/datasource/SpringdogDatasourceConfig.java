@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.manager.ratelimit;
+package org.easypeelsecurity.springdog.autoconfigure.datasource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 import org.apache.cayenne.configuration.server.ServerRuntime;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configuration for Springdog datasource.
  */
 @Configuration
 public class SpringdogDatasourceConfig {
+  Logger logger = LoggerFactory.getLogger(SpringdogDatasourceConfig.class);
 
   /**
    * Bean for accessing Springdog datasource.
@@ -34,10 +40,26 @@ public class SpringdogDatasourceConfig {
    */
   @Bean(name = "springdogRepository")
   public ServerRuntime springdogRepository() {
+    logger.info("Springdog datasource configuration started");
     return ServerRuntime.builder()
         .jdbcDriver("org.apache.derby.jdbc.EmbeddedDriver")
         .url("jdbc:derby:springdog-embedded-database;create=true")
         .addConfig("cayenne-springdog.xml")
         .build();
+  }
+
+  /**
+   * Bean for migrating Springdog database.
+   */
+  @Bean(name = "springdogFlyway", initMethod = "migrate")
+  @DependsOn("springdogRepository")
+  public Flyway flyway() {
+    logger.info("Springdog datasource flyway migration started");
+    FluentConfiguration config = new FluentConfiguration();
+    config.dataSource("jdbc:derby:springdog-embedded-database;create=true", null, null);
+    config.baselineOnMigrate(true);
+    config.baselineVersion("0");
+    config.locations("classpath:db/migration/springdog");
+    return new Flyway(config);
   }
 }
