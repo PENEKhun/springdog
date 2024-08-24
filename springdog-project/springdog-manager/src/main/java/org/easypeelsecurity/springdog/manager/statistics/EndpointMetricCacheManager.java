@@ -25,6 +25,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
  * Manages the cache for endpoint metrics.
+ *
+ * @author PENEKhun
  */
 public abstract class EndpointMetricCacheManager {
 

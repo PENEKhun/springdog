@@ -36,12 +36,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
+import org.easypeelsecurity.springdog.domain.ratelimit.EndpointService;
+import org.easypeelsecurity.springdog.domain.ratelimit.converter.EndpointConverter;
+import org.easypeelsecurity.springdog.domain.ratelimit.model.Endpoint;
 import org.easypeelsecurity.springdog.manager.ratelimit.RatelimitCache;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
+import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
+import org.easypeelsecurity.springdog.shared.enums.RuleStatus;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.configuration.CayenneRuntime;
@@ -57,7 +57,7 @@ class RatelimitBlockingTest {
   @Autowired
   ExampleController exampleController;
   @Autowired
-  EndpointCommand endpointCommand;
+  EndpointService endpointService;
   @Autowired
   @Qualifier("springdogRepository")
   CayenneRuntime springdogRepository;
@@ -83,7 +83,7 @@ class RatelimitBlockingTest {
     targetApi.setRuleTimeLimitInSeconds(100);
     targetApi.setRuleBanTimeInSeconds(100);
     targetApi.setRuleStatus(RuleStatus.ACTIVE);
-    endpointCommand.updateRule(targetApi);
+    endpointService.updateRule(targetApi);
 
     // enable ratelimit (2)
     EndpointDto targetApi2 = EndpointConverter.toDto(
@@ -96,7 +96,7 @@ class RatelimitBlockingTest {
     targetApi2.setRuleTimeLimitInSeconds(100);
     targetApi2.setRuleBanTimeInSeconds(100);
     targetApi2.setRuleStatus(RuleStatus.ACTIVE);
-    endpointCommand.updateRule(targetApi2);
+    endpointService.updateRule(targetApi2);
   }
 
   @Test

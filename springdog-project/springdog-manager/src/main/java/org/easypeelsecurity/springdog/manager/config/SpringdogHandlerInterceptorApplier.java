@@ -20,8 +20,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import org.easypeelsecurity.springdog.domain.ratelimit.EndpointService;
 import org.easypeelsecurity.springdog.manager.agent.AgentExternalAccessInterceptor;
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
 import org.easypeelsecurity.springdog.manager.ratelimit.RatelimitInterceptor;
 import org.easypeelsecurity.springdog.manager.statistics.RequestTimingInterceptor;
 import org.easypeelsecurity.springdog.notification.SlowResponseEmailNotificationManager;
@@ -29,28 +29,30 @@ import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 
 /**
  * Configuration for Springdog handler interceptors.
+ *
+ * @author PENEKhun
  */
 @Configuration
 public class SpringdogHandlerInterceptorApplier implements WebMvcConfigurer {
 
-  private final EndpointQuery endpointQuery;
+  private final EndpointService endpointService;
   private final SpringdogProperties springdogProperties;
   private final SlowResponseEmailNotificationManager slowResponseEmailNotificationManager;
 
   /**
    * Constructor.
    */
-  public SpringdogHandlerInterceptorApplier(EndpointQuery endpointQuery,
+  public SpringdogHandlerInterceptorApplier(EndpointService endpointService,
       SpringdogProperties springdogProperties,
       SlowResponseEmailNotificationManager slowResponseEmailNotificationManager) {
-    this.endpointQuery = endpointQuery;
+    this.endpointService = endpointService;
     this.springdogProperties = springdogProperties;
     this.slowResponseEmailNotificationManager = slowResponseEmailNotificationManager;
   }
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(new RatelimitInterceptor(this.endpointQuery, this.springdogProperties));
+    registry.addInterceptor(new RatelimitInterceptor(this.endpointService, this.springdogProperties));
     registry.addInterceptor(new AgentExternalAccessInterceptor(this.springdogProperties));
     registry.addInterceptor(
         new RequestTimingInterceptor(this.springdogProperties, this.slowResponseEmailNotificationManager));

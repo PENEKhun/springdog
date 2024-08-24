@@ -18,13 +18,15 @@ package org.easypeelsecurity.springdog.manager.ratelimit;
 
 import java.time.LocalDateTime;
 
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
+import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
  * Ratelimit cache instance.
+ *
+ * @author PENEKhun
  */
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
 public final class RatelimitCache {

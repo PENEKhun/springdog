@@ -61,14 +61,16 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
       String agentBasePath = propertiesLoader.getPropertyOrDefault("springdog.agent.basePath", "springdog");
 
       List<CodeGenerator> generatedCodes = Arrays.asList(
-          new SpringdogAgentApplier(agentBasePath),
+          new SpringdogStorageApplier(),
           new SpringdogDynamicTemplateResolver(),
           new SpringdogBannerPrinter(),
           new SpringdogAgentSecurityApplier(),
           new SpringdogManagerApplier(),
           new SpringdogAutoConfigurationApplier(),
           new SpringdogSharedApplier(),
-          new SpringdogNotificationApplier()
+          new SpringdogNotificationApplier(),
+          new SpringdogDomainApplier(),
+          new SpringdogAgentApplier(agentBasePath)
       );
 
       generatedCodes.forEach(generator -> generator.writeTo(fullPackageName, processingEnv));

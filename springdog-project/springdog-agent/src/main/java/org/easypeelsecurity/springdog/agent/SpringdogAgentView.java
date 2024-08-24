@@ -19,7 +19,6 @@ package org.easypeelsecurity.springdog.agent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,14 +32,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
-import org.easypeelsecurity.springdog.manager.ratelimit.VersionControlQuery;
-import org.easypeelsecurity.springdog.manager.statistics.StatisticsQuery;
+import org.easypeelsecurity.springdog.domain.ratelimit.EndpointService;
+import org.easypeelsecurity.springdog.domain.statistics.StatisticsService;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
-import org.easypeelsecurity.springdog.shared.statistics.SystemMetricDto;
+import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
 import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
@@ -51,15 +46,11 @@ public class SpringdogAgentView {
 
   SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
   @Autowired
-  private EndpointQuery rateLimitQuery;
+  private StatisticsService statisticsService;
   @Autowired
-  private EndpointCommand rateLimitCommand;
+  private EndpointService endpointService;
   @Autowired
   private SpringdogProperties properties;
-  @Autowired
-  private VersionControlQuery versionControlQuery;
-  @Autowired
-  private StatisticsQuery statisticsQuery;
 
   @GetMapping("/login")
   public String login() {
@@ -78,33 +69,32 @@ public class SpringdogAgentView {
 
   @GetMapping({"/", ""})
   public String home(Model model) {
+    // TODO: changeLog
     model.addAttribute("endpointChangeLog",
-        versionControlQuery.getAllChangeLogsNotResolved());
-    int totalEndpointCount = statisticsQuery.totalEndpointCount();
-    model.addAttribute("totalEndpointCount", totalEndpointCount);
-    int activeCount = statisticsQuery.totalEndpointCountByStatus(RuleStatus.ACTIVE.name());
-    model.addAttribute("totalEndpointCountActive", activeCount);
-    model.addAttribute("totalEndpointCountNotActive", totalEndpointCount - activeCount);
-    List<SystemMetricDto> recentSystemMetrics = statisticsQuery.getRecentSystemMetrics(50);
-    model.addAttribute("recentSystemMetrics", recentSystemMetrics);
-    model.addAttribute("recentEndpointMetrics", statisticsQuery.getEndpointMetricStatistics(7));
-    model.addAttribute("dailyTopTraffic", statisticsQuery.getEndpointMetricsByPageView(3, LocalDate.now()));
-    model.addAttribute("dailyTopFailure", statisticsQuery.getEndpointMetricsByFailure(3, LocalDate.now()));
-    model.addAttribute("dailySlowestEndpoints",
-        statisticsQuery.getEndpointMetricsByResponseDuration(3, LocalDate.now()));
+        new ArrayList<>()); // versionControlQuery.getAllChangeLogsNotResolved()
+
+    var dashboard = statisticsService.getDashboardResponse(LocalDate.now());
+    model.addAttribute("totalEndpointCount", dashboard.totalEndpointCount());
+    model.addAttribute("totalEndpointCountActive", dashboard.totalActiveEndpointCount());
+    model.addAttribute("totalEndpointCountNotActive", dashboard.totalInactiveEndpointCount());
+    model.addAttribute("recentSystemMetrics", dashboard.recentSystemMetrics());
+    model.addAttribute("recentEndpointMetrics", dashboard.dailyEndpointMetrics());
+    model.addAttribute("dailyTopTraffic", dashboard.dailyTopTrafficEndpoints());
+    model.addAttribute("dailyTopFailure", dashboard.dailyTopFailEndpoints());
+    model.addAttribute("dailySlowestEndpoints", dashboard.dailySlowestEndpoints());
     return "/templates/content/main.html";
   }
 
   @GetMapping("/rate-limit")
   public String rateLimitManage(Model model) {
-    Set<EndpointDto> endpoints = rateLimitQuery.findAll();
+    List<EndpointDto> endpoints = endpointService.findAllEndpoints();
     model.addAttribute("endpoints", endpoints);
     return "/templates/content/rate-limit/manage.html";
   }
 
   @GetMapping("/rate-limit/{endpointId}")
   public String viewRateLimitSpecific(@PathVariable(name = "endpointId") long endpointId, Model model) {
-    EndpointDto endpointDto = rateLimitQuery.findEndpoint(endpointId);
+    EndpointDto endpointDto = endpointService.findEndpoint(endpointId);
     model.addAttribute("endpoint", endpointDto);
     List<String> headers = new ArrayList<>();
     headers.add("X-Auth-Token");
@@ -116,9 +106,9 @@ public class SpringdogAgentView {
   @GetMapping("/rate-limit/{endpointId}/analytics")
   public String viewRateLimitSpecificAnalytics(@PathVariable(name = "endpointId") long endpointId,
       Model model) {
-    EndpointDto endpointDto = rateLimitQuery.findEndpoint(endpointId);
+    EndpointDto endpointDto = endpointService.findEndpoint(endpointId);
     model.addAttribute("endpoint", endpointDto);
-    model.addAttribute("statics", statisticsQuery.getRecentEndpointMetrics(endpointId, 10));
+    model.addAttribute("statics", statisticsService.getRecentEndpointMetric(endpointId, 10));
 
     return "/templates/content/rate-limit/actions/analytics.html";
   }
@@ -128,7 +118,7 @@ public class SpringdogAgentView {
       @ModelAttribute("endpoint") EndpointDto endpointDto, Model model) {
     try {
       Assert.isEqual(endpointId, endpointDto.getId(), "Invalid request");
-      rateLimitCommand.updateRule(endpointDto);
+      endpointService.updateRule(endpointDto);
     } catch (Exception e) {
       model.addAttribute("result", false);
       model.addAttribute("message", e.getMessage());

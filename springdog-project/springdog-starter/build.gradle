@@ -6,17 +6,29 @@ plugins {
 compileJava {
     dependsOn ':springdog-project:springdog-agent:jar'
     dependsOn ':springdog-project:springdog-autoconfigure:jar'
-    dependsOn ':springdog-project:springdog-manager:jar'
+    dependsOn ':springdog-project:springdog-shared:jar'
 }
 
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// TODO: relocate
+
 dependencies {
-    api project(path: ':springdog-project:springdog-manager', configuration: 'shadow')
     api project(path: ':springdog-project:springdog-autoconfigure', configuration: 'shadow')
     api project(path: ':springdog-project:springdog-agent', configuration: 'shadow')
-//    implementation 'org.thymeleaf:thymeleaf-spring6:3.1.2.RELEASE'
+    api project(path: ':springdog-project:springdog-manager', configuration: 'shadow')
+    implementation project(path: ':springdog-project:springdog-domain', configuration: 'shadow')
+    implementation project(path: ':springdog-project:springdog-storage', configuration: 'shadow')
+    implementation project(path: ':springdog-project:springdog-shared', configuration: 'shadow')
+    implementation project(path: ':springdog-project:springdog-notification', configuration: 'shadow')
+
     // starter-thymeleaf
-    implementation "org.springframework.boot:spring-boot-starter-thymeleaf:${springbootVersion}"
-    implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}"
+//    implementation "org.springframework.boot:spring-boot-starter-thymeleaf:${springbootVersion}"
+//    implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}") {
+//        exclude group: 'nz.net.ultraq.thymeleaf', module: 'thymeleaf-layout-dialect-extensions'
+//    }
 }
 
 mavenPublishing {

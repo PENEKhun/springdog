@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import org.easypeelsecurity.springdog.domain.statistics.StatisticsService;
 import org.easypeelsecurity.springdog.notification.SystemWatchNotificationManager;
 
 /**
@@ -31,22 +32,22 @@ import org.easypeelsecurity.springdog.notification.SystemWatchNotificationManage
 @EnableScheduling
 public class SystemMetricsScheduler {
 
-  private final StatisticsCommand statisticsCommand;
+  private final StatisticsService statisticsService;
   private final SystemWatchNotificationManager systemWatchNotificationManager;
 
   /**
    * Constructor.
    */
-  public SystemMetricsScheduler(StatisticsCommand statisticsCommand,
+  public SystemMetricsScheduler(StatisticsService statisticsService,
       SystemWatchNotificationManager systemWatchNotificationManager) {
-    this.statisticsCommand = statisticsCommand;
+    this.statisticsService = statisticsService;
     this.systemWatchNotificationManager = systemWatchNotificationManager;
   }
 
   /**
    * Store system metrics.
    */
-  @Scheduled(fixedRateString = "${springdog.systemMetricsScheduler.fixedRate:300000}")
+  @Scheduled(fixedRateString = "${springdog.systemMetricsScheduler.fixedRate:20000}") // TODO: 시간 변경
   public void storeSystemsMetrics() {
     SystemUsageMonitor systemUsageMonitor = new SystemUsageMonitor();
 
@@ -54,7 +55,7 @@ public class SystemMetricsScheduler {
     double memoryUsagePercent = systemUsageMonitor.getSystemMemoryUsagePercent();
     double diskUsagePercent = systemUsageMonitor.diskUsagePercent();
 
-    statisticsCommand.storeSystemMetrics(cpuUsagePercent, memoryUsagePercent, diskUsagePercent);
+    statisticsService.storeSystemMetrics(cpuUsagePercent, memoryUsagePercent, diskUsagePercent);
     systemWatchNotificationManager.checkMetrics(cpuUsagePercent, memoryUsagePercent, diskUsagePercent);
   }
 }

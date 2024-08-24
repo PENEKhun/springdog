@@ -20,9 +20,14 @@ import jakarta.annotation.PostConstruct;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * System watch properties.
  */
+@Setter
+@Getter
 @ConfigurationProperties(prefix = "springdog.system-watch")
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
 public class SystemWatchProperties {
@@ -39,37 +44,5 @@ public class SystemWatchProperties {
         throw new IllegalArgumentException(commonMessage);
       }
     }
-  }
-
-  public double getCpuThreshold() {
-    return cpuThreshold;
-  }
-
-  public double getMemoryThreshold() {
-    return memoryThreshold;
-  }
-
-  public double getDiskThreshold() {
-    return diskThreshold;
-  }
-
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  public void setCpuThreshold(double cpuThreshold) {
-    this.cpuThreshold = cpuThreshold;
-  }
-
-  public void setMemoryThreshold(double memoryThreshold) {
-    this.memoryThreshold = memoryThreshold;
-  }
-
-  public void setDiskThreshold(double diskThreshold) {
-    this.diskThreshold = diskThreshold;
-  }
-
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
   }
 }

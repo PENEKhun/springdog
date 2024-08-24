@@ -36,11 +36,13 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import org.easypeelsecurity.springdog.domain.ratelimit.EndpointService;
+import org.easypeelsecurity.springdog.domain.ratelimit.RuleCache;
 import org.easypeelsecurity.springdog.manager.statistics.EndpointMetricCacheManager;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
+import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
+import org.easypeelsecurity.springdog.shared.dto.EndpointParameterDto;
+import org.easypeelsecurity.springdog.shared.enums.RuleStatus;
 import org.easypeelsecurity.springdog.shared.util.IpAddressUtil;
 import org.easypeelsecurity.springdog.shared.util.MethodSignatureParser;
 
@@ -49,12 +51,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Interceptor for ratelimit.
+ *
+ * @author PENEKhun
  */
 
 @Service
 public class RatelimitInterceptor implements HandlerInterceptor {
 
-  private final EndpointQuery endpointQuery;
+  private final EndpointService endpointService;
   private final SpringdogProperties springdogProperties;
   private final Logger logger = Logger.getLogger(RatelimitInterceptor.class.getName());
   private final ObjectMapper objectMapper = new ObjectMapper();
@@ -63,8 +67,8 @@ public class RatelimitInterceptor implements HandlerInterceptor {
    * Constructor.
    */
 
-  public RatelimitInterceptor(EndpointQuery endpointQuery, SpringdogProperties springdogProperties) {
-    this.endpointQuery = endpointQuery;
+  public RatelimitInterceptor(EndpointService endpointService, SpringdogProperties springdogProperties) {
+    this.endpointService = endpointService;
     this.springdogProperties = springdogProperties;
   }
 
@@ -112,12 +116,12 @@ public class RatelimitInterceptor implements HandlerInterceptor {
   private Optional<EndpointDto> getValidEndpoint(String methodSignature) {
     EndpointDto endpoint = RuleCache.findEndpointByMethodSignature(methodSignature)
         .orElseGet(() -> {
-          Optional<EndpointDto> item = endpointQuery.getEndpointByMethodSignature(methodSignature);
-          if (item.isEmpty()) {
+          EndpointDto item = endpointService.getEndpointByMethodSignature(methodSignature);
+          if (item == null) {
             return null;
           } else {
-            RuleCache.cachingRule(item.get());
-            return item.get();
+            RuleCache.cachingRule(item);
+            return item;
           }
         });
     return Optional.ofNullable(endpoint);

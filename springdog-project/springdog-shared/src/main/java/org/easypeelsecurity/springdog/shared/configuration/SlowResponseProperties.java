@@ -20,9 +20,14 @@ import jakarta.annotation.PostConstruct;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Slow response properties.
  */
+@Setter
+@Getter
 @ConfigurationProperties(prefix = "springdog.slow-response")
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
 public class SlowResponseProperties {
@@ -37,21 +42,5 @@ public class SlowResponseProperties {
         throw new IllegalArgumentException("To enable SlowResponse, you must enter a threshold.");
       }
     }
-  }
-
-  public long getThresholdMs() {
-    return thresholdMs;
-  }
-
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  public void setThresholdMs(long thresholdMs) {
-    this.thresholdMs = thresholdMs;
-  }
-
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
   }
 }

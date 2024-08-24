@@ -18,19 +18,19 @@ package org.easypeelsecurity.springdogtest.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-import static org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod.DELETE;
-import static org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod.GET;
-import static org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod.POST;
-import static org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod.PUT;
+import static org.easypeelsecurity.springdog.shared.enums.HttpMethod.DELETE;
+import static org.easypeelsecurity.springdog.shared.enums.HttpMethod.GET;
+import static org.easypeelsecurity.springdog.shared.enums.HttpMethod.POST;
+import static org.easypeelsecurity.springdog.shared.enums.HttpMethod.PUT;
 
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
+import org.easypeelsecurity.springdog.domain.ratelimit.EndpointService;
+import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
+import org.easypeelsecurity.springdog.shared.dto.EndpointParameterDto;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,13 +44,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 class ControllerParseAndSaveTest {
 
   @Autowired
-  EndpointQuery endpointQuery;
+  EndpointService endpointService;
 
   @Test
   @DisplayName("should parse well for a variety of mappings.")
   void parsingTest() {
     // given & when
-    var endpoints = endpointQuery.findAll();
+    var endpoints = endpointService.findAllEndpoints();
 
     // then
     assertThat(endpoints)
@@ -86,7 +86,7 @@ class ControllerParseAndSaveTest {
   })
   void parameterParsedWell(String methodSignature, @ConvertWith(StringToArrayConverter.class) String[] params) {
     // given
-    var endpoint = endpointQuery.getEndpointByMethodSignature(methodSignature).get();
+    var endpoint = endpointService.getEndpointByMethodSignature(methodSignature);
     Set<EndpointParameterDto> parameters = endpoint.getParameters();
 
     // when & then

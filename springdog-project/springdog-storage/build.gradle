@@ -1,0 +1,64 @@
+plugins {
+    id "com.vanniktech.maven.publish" version "${mavenPublishVersion}"
+    id "io.github.goooler.shadow" version "${shadowVersion}"
+}
+
+shadowJar {
+    mergeServiceFiles {
+        setPath("META-INF/services/org.flywaydb.core.extensibility.Plugin") // https://github.com/flyway/flyway/issues/3482#issuecomment-1493367875
+    }
+}
+
+dependencies {
+    compileOnly "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+    implementation "org.apache.derby:derby:${derbyVersion}"
+    implementation "org.apache.derby:derbytools:${derbyVersion}"
+    implementation "org.flywaydb:flyway-core:${flywayVersion}"
+    runtimeOnly "org.flywaydb:flyway-database-derby:${flywayVersion}"
+    compileOnly project(":springdog-project:springdog-domain")
+    compileOnly project(":springdog-project:springdog-shared")
+    compileOnly("org.apache.cayenne:cayenne-server:${cayenneVersion}") {
+        exclude group: 'org.slf4j', module: 'slf4j'
+    }
+
+    testImplementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
+}
+
+mavenPublishing {
+    coordinates(rootPackageName, "springdog-storage", springDogVersion)
+
+    pom {
+        name = "SpringDog Storage"
+        description = "It contains the embedded database related code needed to run springdog."
+        inceptionYear = "2024"
+        url = ""
+
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+
+        developers {
+            developer {
+                id = "PENEKhun"
+                name = "MoonSeonghun"
+                email = "penekhun@gmail.com"
+                url = "https://github.com/PENEKhun"
+                group = "Owner"
+                organization {
+                    name = "easypeel-security"
+                    url = "https://github.com/easypeel-security"
+                }
+            }
+        }
+
+        scm {
+            connection = "scm:git:git://github.com/PENEKhun/springdog.git"
+            developerConnection = "scm:git:ssh://github.com/PENEKhun/springdog.git"
+            url = "https://github.com/PENEKhun/springdog"
+        }
+    }
+}
