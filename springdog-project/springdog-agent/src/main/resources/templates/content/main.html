@@ -309,9 +309,9 @@
                   class="list-group-item d-flex justify-content-between align-items-center">
                 <span th:class="'method-icon method-' + ${metric.method.toLowerCase()}"
                       th:text="${metric.method}"></span>
-                <span th:text="${metric.path}"></span>
+                <span th:text="${metric.endpoint}"></span>
                 <span class="badge bg-danger rounded-pill"
-                      th:text="${metric.ratelimitFailureCount}"></span>
+                      th:text="${metric.count}"></span>
             </ul>
           </div>
         </div>
@@ -327,8 +327,8 @@
                   class="list-group-item d-flex justify-content-between align-items-center">
                 <span th:class="'method-icon method-' + ${metric.method.toLowerCase()}"
                       th:text="${metric.method}"></span>
-                <span th:text="${metric.path}"></span>
-                <span class="badge bg-primary rounded-pill" th:text="${metric.visitCount}"></span>
+                <span th:text="${metric.endpoint}"></span>
+                <span class="badge bg-primary rounded-pill" th:text="${metric.count}"></span>
               </li>
             </ul>
           </div>
@@ -345,9 +345,9 @@
                   class="list-group-item d-flex justify-content-between align-items-center">
                 <span th:class="'method-icon method-' + ${metric.method.toLowerCase()}"
                       th:text="${metric.method}"></span>
-                <span th:text="${metric.path}"></span>
+                <span th:text="${metric.endpoint}"></span>
                 <span class="badge bg-danger rounded-pill"
-                      th:text="${metric.averageResponseMilliseconds} + ' ms'"></span>
+                      th:text="${metric.averageResponseTime} + ' ms'"></span>
             </ul>
           </div>
         </div>
