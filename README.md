@@ -1,29 +1,49 @@
-# <img src="https://github.com/PENEKhun/springdog/assets/13290706/33c52782-f6b8-442a-9b6f-ae93b50376d4" align="right" width="100">Springdog
+# <img src="https://github.com/PENEKhun/springdog/assets/13290706/33c52782-f6b8-442a-9b6f-ae93b50376d4" align="right" width="100">springdog
 
 [![Build Status](https://github.com/PENEKhun/springdog/actions/workflows/build-push-main.yml/badge.svg)](https://github.com/PENEKhun/springdog/actions/workflows/build-push-main.yml)
 [![Codecov](https://codecov.io/gh/PENEKhun/springdog/graph/badge.svg?token=AQ1A6SAJTY)](https://codecov.io/gh/PENEKhun/springdog)
 [![Maven Central](https://img.shields.io/maven-central/v/org.easypeelsecurity/springdog-starter.svg?label=Maven%20Central&color=)](https://mvnrepository.com/artifact/org.easypeelsecurity/springdog-starter)
-[![JavaDoc](https://javadoc.io/badge2/org.easypeelsecurity/springdog-starter/javadoc.svg)](https://javadoc.io/doc/org.easypeelsecurity/springdog-starter)
+[![JavaDoc](https://javadoc.io/badge2/org.easypeelsecurity/springdog-domain/javadoc.svg)](https://javadoc.io/doc/org.easypeelsecurity/)
 [![License](https://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 Add security configuration to your Spring application effortlessly by simply adding a Springdog.
 **No additional code configuration is required!**
 
-> Since it's still in beta, the software currently has limited features. If you're interested in
-> following the project's progress, please press the ⭐ button to stay updated.
-
 ## Requirements
 
 > ⚠️ **Requires Spring Boot 3.x**
 
-## Dependencies
+## Quick Start
 
-It hasn't been deployed yet, please be patient.
+1. Add the Springdog dependency to your `build.gradle` or `pom.xml`.
 
-<!-- ```groovy
-implementation "org.easypeelsecurity:springdog-starter:${springdogVersion}"
-annotationProcessor "org.easypeelsecurity:springdog-starter:${springdogVersion}"
-``` -->
+    ```groovy
+    dependencies {
+        // Fill in the version with the latest version.
+        implementation "org.easypeelsecurity:springdog-starter:${springdogVersion}"
+        annotationProcessor "org.easypeelsecurity:springdog-starter:${springdogVersion}"
+    }
+    ```
+
+2. Enable the Springdog agent by adding the `@SpringDogEnable` annotation to your main class.
+
+    ```java
+    
+    @SpringDogEnable // Add this annotation to your main class or configuration class.
+    @SpringBootApplication
+    public class YourMainApplication {
+      public static void main(String[] args) {
+        SpringApplication.run(YourMainApplication.class, args);
+      }
+    }
+    ```
+
+3. Run your application and access the Springdog agent in your browser.
+
+   ```http request
+   GET http://localhost:8080/springdog
+   // Host and port may vary depending on your application configuration.
+   ```
 
 ## Overview
 
@@ -31,7 +51,8 @@ TODO: fill with screenshots.
 
 ## Options
 
-For detailed configurations, you can use the `springdog Dashboard`, and for other minor configurations, you can use the following.
+For detailed configurations, you can use the `springdog Dashboard`, and for other minor
+configurations, you can use the following.
 
 ```yaml
 springdog:
