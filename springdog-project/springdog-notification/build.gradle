@@ -9,8 +9,9 @@ repositories {
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-mail:${springbootVersion}"
-    implementation project(":springdog-project:springdog-shared")
+    compileOnly project(":springdog-project:springdog-shared")
     testImplementation "org.jsoup:jsoup:${jsoupVersion}"
+    testImplementation project(":springdog-project:springdog-shared")
 }
 
 

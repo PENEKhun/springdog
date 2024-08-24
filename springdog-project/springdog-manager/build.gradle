@@ -6,10 +6,8 @@ plugins {
 dependencies {
     implementation "com.github.ben-manes.caffeine:caffeine:${caffeineVersion}"
     implementation project(":springdog-project:springdog-notification")
-    api project(":springdog-project:springdog-shared")
-    compileOnly("org.apache.cayenne:cayenne-server:${cayenneVersion}") {
-        exclude group: 'org.slf4j', module: 'slf4j'
-    }
+    implementation project(":springdog-project:springdog-domain")
+    implementation project(":springdog-project:springdog-shared")
     implementation "commons-io:commons-io:2.16.1"
     implementation "com.github.oshi:oshi-core:6.6.2"
 }

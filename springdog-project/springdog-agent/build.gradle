@@ -14,13 +14,15 @@ dependencies {
     implementation "org.thymeleaf.extras:thymeleaf-extras-springsecurity${thymeleafSecurityVersion}"
     implementation "org.springframework.boot:spring-boot-devtools:${springbootVersion}"
 
-    implementation 'org.thymeleaf:thymeleaf-spring6:3.1.2.RELEASE'
-    implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}"
+    implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}") {
+        exclude group: 'nz.net.ultraq.thymeleaf', module: 'thymeleaf-layout-dialect-extensions'
+    }
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
     testImplementation "org.springframework.security:spring-security-test:${springVersion}"
 
-    implementation project(":springdog-project:springdog-manager")
-    implementation project(":springdog-project:springdog-shared")
+    implementation project(":springdog-project:springdog-domain")
+    compileOnly project(":springdog-project:springdog-shared")
+    testImplementation project(":springdog-project:springdog-shared")
 }
 
 mavenPublishing {

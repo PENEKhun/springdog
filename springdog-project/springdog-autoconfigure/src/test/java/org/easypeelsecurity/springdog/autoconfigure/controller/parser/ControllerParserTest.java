@@ -23,8 +23,8 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import jakarta.annotation.PostConstruct;
 
@@ -34,13 +34,11 @@ import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondit
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
+import org.easypeelsecurity.springdog.domain.ratelimit.VersionControlService;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
+import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
+import org.easypeelsecurity.springdog.shared.enums.HttpMethod;
 
-import org.apache.cayenne.configuration.CayenneRuntime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,13 +52,7 @@ class ControllerParserTest {
   RequestMappingHandlerMapping handlerMapping;
 
   @Mock
-  EndpointQuery endpointQuery;
-
-  @Mock
-  EndpointCommand endpointCommand;
-
-  @Mock
-  CayenneRuntime springdogRepository;
+  VersionControlService versionControlService;
 
   @Mock
   SpringdogProperties properties;
@@ -71,7 +63,7 @@ class ControllerParserTest {
   void setUp() {
     MockitoAnnotations.openMocks(this);
     controllerParser =
-        new ControllerParser(handlerMapping, endpointQuery, endpointCommand, springdogRepository, properties);
+        new ControllerParser(handlerMapping, versionControlService, properties);
   }
 
   @Test
@@ -87,7 +79,7 @@ class ControllerParserTest {
     handlerMethods.put(requestMappingInfo, handlerMethod);
 
     // when
-    Set<EndpointDto> result = controllerParser.parseController(handlerMethods, "/exclude");
+    List<EndpointDto> result = controllerParser.parseController(handlerMethods, "/exclude");
 
     // then
     assertThat(result.toArray())
@@ -110,7 +102,7 @@ class ControllerParserTest {
     handlerMethods.put(requestMappingInfo, handlerMethod);
 
     // when
-    Set<EndpointDto> result = controllerParser.parseController(handlerMethods, "/exclude");
+    List<EndpointDto> result = controllerParser.parseController(handlerMethods, "/exclude");
 
     // then
     assertThat(result.size()).isZero();

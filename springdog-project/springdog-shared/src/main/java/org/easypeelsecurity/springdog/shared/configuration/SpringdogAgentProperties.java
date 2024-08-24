@@ -18,9 +18,14 @@ package org.easypeelsecurity.springdog.shared.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Springdog agent properties.
  */
+@Setter
+@Getter
 @ConfigurationProperties(prefix = "springdog.agent")
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
 class SpringdogAgentProperties {
@@ -29,36 +34,4 @@ class SpringdogAgentProperties {
   private String username = "admin";
   private String password = "admin";
   private boolean externalAccess;
-
-  public String getBasePath() {
-    return basePath;
-  }
-
-  public void setBasePath(String basePath) {
-    this.basePath = basePath;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public boolean isExternalAccess() {
-    return externalAccess;
-  }
-
-  public void setExternalAccess(boolean externalAccess) {
-    this.externalAccess = externalAccess;
-  }
 }

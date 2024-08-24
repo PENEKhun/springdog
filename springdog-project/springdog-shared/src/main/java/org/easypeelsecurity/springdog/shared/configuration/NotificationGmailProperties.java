@@ -20,9 +20,14 @@ import jakarta.annotation.PostConstruct;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Springdog email notification properties.
  */
+@Setter
+@Getter
 @ConfigurationProperties(prefix = "springdog.notification.gmail")
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
 public class NotificationGmailProperties {
@@ -55,37 +60,5 @@ public class NotificationGmailProperties {
     String regex = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" +
         "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     return email.matches(regex);
-  }
-
-  public String getRecipient() {
-    return recipient;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  public void setRecipient(String recipient) {
-    this.recipient = recipient;
   }
 }

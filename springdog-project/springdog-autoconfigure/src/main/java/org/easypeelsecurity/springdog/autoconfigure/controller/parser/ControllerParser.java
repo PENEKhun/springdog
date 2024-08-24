@@ -16,18 +16,14 @@
 
 package org.easypeelsecurity.springdog.autoconfigure.controller.parser;
 
-import static org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeType.ENABLED_ENDPOINT_WAS_DELETED;
-import static org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeType.ENABLED_PARAMETER_WAS_DELETED;
-
 import java.io.IOException;
 import java.lang.reflect.Parameter;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import jakarta.annotation.PostConstruct;
 
@@ -38,24 +34,15 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointCommand;
-import org.easypeelsecurity.springdog.manager.ratelimit.EndpointQuery;
+import org.easypeelsecurity.springdog.domain.ratelimit.VersionControlService;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointConverter;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointParameterDto;
-import org.easypeelsecurity.springdog.shared.ratelimit.EndpointVersionCompare;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.Endpoint;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangelog;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointParameterType;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointVersionControl;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.HttpMethod;
-import org.easypeelsecurity.springdog.shared.ratelimit.model.RuleStatus;
+import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
+import org.easypeelsecurity.springdog.shared.dto.EndpointParameterDto;
+import org.easypeelsecurity.springdog.shared.enums.EndpointParameterType;
+import org.easypeelsecurity.springdog.shared.enums.HttpMethod;
 import org.easypeelsecurity.springdog.shared.util.Assert;
 import org.easypeelsecurity.springdog.shared.util.MethodSignatureParser;
 
-import org.apache.cayenne.ObjectContext;
-import org.apache.cayenne.configuration.CayenneRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,21 +56,17 @@ public class ControllerParser {
 
   private final Logger logger = LoggerFactory.getLogger(ControllerParser.class);
   private final RequestMappingHandlerMapping handlerMapping;
-  private final EndpointQuery endpointQuery;
-  private final EndpointCommand endpointCommand;
+  private final VersionControlService versionControlService;
   private final SpringdogProperties properties;
-  private final CayenneRuntime springdogRepository;
 
   /**
    * Constructor.
    */
-  public ControllerParser(RequestMappingHandlerMapping handlerMapping, EndpointQuery endpointQuery,
-      EndpointCommand endpointCommand, @Qualifier("springdogRepository") CayenneRuntime springdogRepository,
-      SpringdogProperties properties) {
+  public ControllerParser(
+      @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping,
+      VersionControlService versionControlService, SpringdogProperties properties) {
     this.handlerMapping = handlerMapping;
-    this.endpointQuery = endpointQuery;
-    this.endpointCommand = endpointCommand;
-    this.springdogRepository = springdogRepository;
+    this.versionControlService = versionControlService;
     this.properties = properties;
   }
 
@@ -126,91 +109,14 @@ public class ControllerParser {
     Assert.notNull(handlerMapping, "RequestMappingHandlerMapping is required.");
     Assert.notNull(properties, "SpringdogProperties is required.");
 
-    Set<EndpointDto> parsedEndpointFromController =
+    List<EndpointDto> parsedEndpointFromController =
         parseController(handlerMapping.getHandlerMethods(), properties.computeAbsolutePath("/"));
-    ObjectContext context = springdogRepository.newContext();
-    Set<EndpointDto> endpointsOnDatabase = endpointQuery.findAll();
-
-    EndpointVersionCompare versionCompare =
-        new EndpointVersionCompare(parsedEndpointFromController.toArray(EndpointDto[]::new),
-            endpointsOnDatabase.toArray(EndpointDto[]::new));
-    String nowFullHash = versionCompare.getNewVersionHash();
-    switch (versionCompare.compare()) {
-      case SAME -> logger.info("No changes found.");
-      case FIRST_RUN -> {
-        logger.info("First run. Registering all endpoints.");
-
-        EndpointVersionControl newVersion = context.newObject(EndpointVersionControl.class);
-        newVersion.setDateOfVersion(LocalDateTime.now());
-        newVersion.setFullHashOfEndpoints(nowFullHash);
-        List<Endpoint> endpointList = parsedEndpointFromController.stream()
-            .map(item -> EndpointConverter.toEntity(context, item))
-            .toList();
-      }
-      case DIFFERENT -> {
-        logger.info("Changes found. Applying changes.");
-
-        EndpointVersionControl newVersion = context.newObject(EndpointVersionControl.class);
-        newVersion.setDateOfVersion(LocalDateTime.now());
-        newVersion.setFullHashOfEndpoints(nowFullHash);
-        Set<EndpointParameterDto> parametersOnDatabase = endpointQuery.findAllParameters();
-        Set<EndpointDto> disappearedEndpoints = endpointsOnDatabase.stream()
-            .filter(dbItem -> !parsedEndpointFromController.contains(dbItem))
-            .collect(Collectors.toSet());
-
-        disappearedEndpoints.stream()
-            .filter(dbItem -> dbItem.getRuleStatus().equals(RuleStatus.ACTIVE))
-            .forEach(disappearedActiveEndpoint -> {
-              EndpointChangelog changelog = context.newObject(EndpointChangelog.class);
-              changelog.setChangeType(ENABLED_ENDPOINT_WAS_DELETED);
-              changelog.setTargetMethodSignature(disappearedActiveEndpoint.getMethodSignature());
-              changelog.setTargetMethod(disappearedActiveEndpoint.getHttpMethod().name());
-              changelog.setTargetPath(disappearedActiveEndpoint.getPath());
-              changelog.setDetailString(
-                  "The associated Ratelimit setting was automatically cancelled.");
-              changelog.setIsResolved(false);
-              changelog.setReflectedVersion(newVersion);
-              newVersion.addToChangelogs(changelog);
-            });
-
-        endpointsOnDatabase.stream()
-            .flatMap(endpointDto -> endpointDto.getParameters().stream()
-                .filter(EndpointParameterDto::isEnabled)
-                .filter(param -> !parametersOnDatabase.contains(param)))
-            .forEach(disappearParam -> {
-              EndpointDto endpoint = endpointsOnDatabase.stream()
-                  .filter(item -> item.getParameters().contains(disappearParam))
-                  .findFirst()
-                  .orElseThrow();
-
-              EndpointChangelog changeLog = context.newObject(EndpointChangelog.class);
-              changeLog.setChangeType(ENABLED_PARAMETER_WAS_DELETED);
-              changeLog.setTargetMethodSignature(endpoint.getMethodSignature());
-              changeLog.setTargetMethod(endpoint.getHttpMethod().name());
-              changeLog.setTargetPath(endpoint.getPath());
-              changeLog.setDetailString(
-                  "The Ratelimit operation associated with this endpoint" +
-                      " was terminated because no enabled parameter '%s (%s)' was found."
-                          .formatted(disappearParam.getName(), disappearParam.getType()));
-              changeLog.setIsResolved(false);
-              changeLog.setReflectedVersion(newVersion);
-              endpoint.setRuleStatus(RuleStatus.INACTIVE);
-              newVersion.addToChangelogs(changeLog);
-            });
-
-        Set<EndpointDto> added = parsedEndpointFromController.stream()
-            .filter(localItem -> !endpointsOnDatabase.contains(localItem))
-            .collect(Collectors.toSet());
-        endpointCommand.applyChanges(context, added, disappearedEndpoints);
-      }
-    }
-
-    context.commitChanges();
+    versionControlService.updateVersion(parsedEndpointFromController);
   }
 
-  Set<EndpointDto> parseController(Map<RequestMappingInfo, HandlerMethod> handlerMethods,
+  List<EndpointDto> parseController(Map<RequestMappingInfo, HandlerMethod> handlerMethods,
       String excludePathPrefix) {
-    Set<EndpointDto> result = new HashSet<>();
+    List<EndpointDto> result = new ArrayList<>();
     for (Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethods.entrySet()) {
       RequestMappingInfo info = entry.getKey();
       HandlerMethod method = entry.getValue();

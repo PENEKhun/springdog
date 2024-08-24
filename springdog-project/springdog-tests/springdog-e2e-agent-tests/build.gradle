@@ -11,8 +11,8 @@ repositories {
 }
 
 dependencies {
-    api project(':springdog-project:springdog-starter')
-    annotationProcessor project(':springdog-project:springdog-starter')
+    implementation project(':springdog-project:springdog-starter')
+    annotationProcessor project(':springdog-project:springdog-autoconfigure')
     implementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"

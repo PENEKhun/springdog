@@ -23,6 +23,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import org.easypeelsecurity.springdog.domain.statistics.StatisticsService;
+
 /**
  * This class is responsible for scheduling tasks to store endpoint metrics in the database such as average
  * response times, number of failures, etc.
@@ -33,24 +35,24 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableScheduling
 public class EndpointMetricScheduler {
-  private final StatisticsCommand statisticsCommand;
+  private final StatisticsService statisticsService;
 
   /**
    * Constructor.
    */
-  public EndpointMetricScheduler(StatisticsCommand statisticsCommand) {
-    this.statisticsCommand = statisticsCommand;
+  public EndpointMetricScheduler(StatisticsService statisticsService) {
+    this.statisticsService = statisticsService;
   }
 
   /**
    * Scheduled task that saves the endpoint statistics in the database.
    */
-  @Scheduled(fixedRateString = "${springdog.endpointMetricScheduler.fixedRate:300000}")
+  @Scheduled(fixedRateString = "${springdog.endpointMetricScheduler.fixedRate:10000}")
   public void saveEndpointStatistics() {
     List<EndpointMetricCached> cached = EndpointMetricCacheManager.getAllData();
 
     for (EndpointMetricCached entry : cached) {
-      statisticsCommand.upsertEndpointMetrics(entry.methodSignature(), entry.responseTimes(),
+      statisticsService.upsertEndpointMetrics(entry.methodSignature(), entry.responseTimes(),
           entry.ratelimitFailureCount(), LocalDate.now());
       EndpointMetricCacheManager.invalidateByMethodSignature(entry.methodSignature());
     }
