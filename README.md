@@ -51,30 +51,34 @@ TODO: fill with screenshots.
 
 ## Options
 
-For detailed configurations, you can use the `springdog Dashboard`, and for other minor
-configurations, you can use the following.
+For minor configurations, you can use the following options in your application properties. For more
+detailed or advanced configurations that are not available here, you can access the Springdog agent
+directly.
+
+> ⚠️ Note: To receive notifications for [system-watch](#springdogsystem-watch) and [slow-response](#springdogslow-response) features, the gmail
+> notification option must be enabled.
 
 ```yaml
 springdog:
-  agent:
-    basePath: springdog
-    username: admin
-    password: admin
-    externalAccess: false
-  notification:
-    gmail:
+   agent:
+      basePath: springdog
+      username: admin
+      password: admin
+      externalAccess: false
+   notification:
+      gmail:
+         enabled: false
+         recipient:
+         username:
+         password:
+   system-watch:
       enabled: false
-      recipient:
-      username:
-      password:
-  system-watch:
-    enabled: false
-    cpuThreshold: 80 # percentage
-    memoryThreshold: 80 # percentage
-    diskThreshold: 80 # percentage
-  slow-response:
-    enabled: false
-    threshold: 1000 # ms
+      cpuThreshold: 80 # percentage
+      memoryThreshold: 80 # percentage
+      diskThreshold: 80 # percentage
+   slow-response:
+      enabled: false
+      threshold: 1000 # ms
 ```
 
 ### springdog.agent
@@ -105,8 +109,7 @@ springdog:
 > Monitor the system's CPU, memory, and disk usage.
 > If the usage exceeds the threshold, a notification will be sent.
 >
-> ⚠️ Threshold `0` means that is disabled.  
-> ⚠️ To receive notifications, [this](#springdognotificationgmail) option must be enabled.
+> ⚠️ Threshold `0` means that is disabled.
 
 | Name            | Required   | Description                                                                                      | Default | Value Sets         |
 |-----------------|------------|--------------------------------------------------------------------------------------------------|---------|--------------------|
@@ -119,8 +122,6 @@ springdog:
 
 > For all endpoints, send a notification if the response time is slower than a specified number of
 *milliseconds*.
->
-> ⚠️ To receive notifications, [this](#springdognotificationgmail) option must be enabled.
 
 | Name        | Required   | Description                                                                                        | Default | Value Sets        |
 |-------------|------------|----------------------------------------------------------------------------------------------------|---------|-------------------|
