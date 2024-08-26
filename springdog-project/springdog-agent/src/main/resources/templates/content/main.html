@@ -92,25 +92,28 @@
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: recentEndpointMetrics.map(item => item.baseDate),
+          labels: recentEndpointMetrics.map(item => item.date),
           datasets: [
             {
               label: 'Visit Count',
-              data: recentEndpointMetrics.map(item => item.visitCount),
+              data: recentEndpointMetrics.map(item => item.totalPageView),
               borderColor: 'rgb(75, 192, 192)',
-              tension: 0.1
+              tension: 0.1,
+              yAxisID: 'y-axis-1'
             },
             {
               label: 'Average Response Time (ms)',
-              data: recentEndpointMetrics.map(item => item.averageResponseMilliseconds),
+              data: recentEndpointMetrics.map(item => item.averageResponseTime),
               borderColor: 'rgb(255, 99, 132)',
-              tension: 0.1
+              tension: 0.1,
+              yAxisID: 'y-axis-2'
             },
             {
               label: 'Rate Limit Failures',
-              data: recentEndpointMetrics.map(item => item.ratelimitFailureCount),
+              data: recentEndpointMetrics.map(item => item.ratelimitFailCount),
               borderColor: 'rgb(54, 162, 235)',
-              tension: 0.1
+              tension: 0.1,
+              yAxisID: 'y-axis-3'
             }
           ]
         },
@@ -124,20 +127,48 @@
                 text: 'Date'
               }
             },
-            y: {
-              beginAtZero: true,
+            'y-axis-1': {
+              type: 'linear',
+              display: true,
+              position: 'left',
               title: {
                 display: true,
-                text: 'Value'
-              }
+                text: 'Visit Count'
+              },
+            },
+            'y-axis-2': {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Avg Response Time (ms)'
+              },
+              grid: {
+                drawOnChartArea: false,
+              },
+            },
+            'y-axis-3': {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Rate Limit Failures'
+              },
+              grid: {
+                drawOnChartArea: false,
+              },
+            },
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Endpoint Metrics'
             }
-          },
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: 'Endpoint Metrics'
           }
         }
       });
