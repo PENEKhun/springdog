@@ -22,7 +22,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import org.easypeelsecurity.springdog.domain.ratelimit.converter.EndpointConverter;
+import org.easypeelsecurity.springdog.domain.ratelimit.converter.VersionControlConverter;
 import org.easypeelsecurity.springdog.domain.ratelimit.model.Endpoint;
+import org.easypeelsecurity.springdog.shared.dto.EndpointChangelogDto;
 import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
 
 import org.apache.cayenne.ObjectContext;
@@ -36,14 +38,17 @@ import org.apache.cayenne.ObjectContext;
 public class EndpointService {
   private final ObjectContext context;
   private final EndpointRepository endpointRepository;
+  private final VersionControlRepository versionControlRepository;
 
   /**
    * Constructor.
    */
   public EndpointService(
-      @Qualifier("springdogContext") ObjectContext context, EndpointRepository endpointRepository) {
+      @Qualifier("springdogContext") ObjectContext context, EndpointRepository endpointRepository,
+      VersionControlRepository versionControlRepository) {
     this.context = context;
     this.endpointRepository = endpointRepository;
+    this.versionControlRepository = versionControlRepository;
   }
 
   /**
@@ -94,12 +99,30 @@ public class EndpointService {
   }
 
   /**
-   * Find {@link Endpoint} entity by method signature.
+   * Check if an endpoint exists.
    *
    * @param methodSignature The method signature
+   * @return True if the endpoint exists
+   */
+  public boolean isEndpointExist(String methodSignature) {
+    return endpointRepository.findByMethodSignatureOrNull(context, methodSignature) != null;
+  }
+
+  /**
+   * Find {@link Endpoint} entity by method signature.
+   *
+   * @param methodSignature The <strong>valid</strong> method signature
    * @return The {@link EndpointDto}
    */
   public EndpointDto getEndpointByMethodSignature(String methodSignature) {
     return EndpointConverter.toDto(endpointRepository.findByMethodSignatureOrNull(context, methodSignature));
+  }
+
+  /**
+   * Get all change logs that are not resolved.
+   */
+  public List<EndpointChangelogDto> getAllChangeLogsNotResolved() {
+    var a = versionControlRepository.findAllChangeLogsByResolved(context, false);
+    return VersionControlConverter.toChangelogDto(a);
   }
 }

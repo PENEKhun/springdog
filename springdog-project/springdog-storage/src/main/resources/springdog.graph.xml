@@ -8,7 +8,7 @@
 		<entity name="EndpointMetric" x="0.0" y="0.0" width="120.0" height="92.0"/>
 		<entity name="EndpointVersionControl" x="0.0" y="652.89" width="152.0" height="77.0"/>
 	</graph>
-	<graph type="ER" scale="0.7692307692307692">
+	<graph type="ER" scale="1.0">
 		<entity name="SYSTEM_METRIC" x="0.0" y="0.0" width="157.0" height="107.0"/>
 		<entity name="ENDPOINTPARAMETER" x="1035.72" y="0.0" width="140.0" height="107.0"/>
 		<entity name="ENDPOINT" x="1139.48" y="300.72" width="156.0" height="197.0"/>

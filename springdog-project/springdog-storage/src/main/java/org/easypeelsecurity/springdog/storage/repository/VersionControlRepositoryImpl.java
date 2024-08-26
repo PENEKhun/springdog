@@ -22,7 +22,6 @@ import org.springframework.stereotype.Repository;
 
 import org.easypeelsecurity.springdog.domain.ratelimit.VersionControlRepository;
 import org.easypeelsecurity.springdog.domain.ratelimit.model.EndpointChangelog;
-import org.easypeelsecurity.springdog.domain.ratelimit.model.EndpointVersionControl;
 
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.query.ObjectSelect;
@@ -36,13 +35,10 @@ import org.apache.cayenne.query.ObjectSelect;
 public class VersionControlRepositoryImpl implements VersionControlRepository {
 
   @Override
-  public List<EndpointChangelog> findAllChangeLogsNotResolved(ObjectContext context) {
-    return ObjectSelect.query(EndpointVersionControl.class)
-        .select(context)
-        .stream()
-        .map(EndpointVersionControl::getChangelogs)
-        .flatMap(List::stream)
-        .filter(changeLog -> !changeLog.isIsResolved())
-        .toList();
+  public List<EndpointChangelog> findAllChangeLogsByResolved(ObjectContext context, boolean isResolved) {
+    return ObjectSelect.query(EndpointChangelog.class)
+        .where(EndpointChangelog.IS_RESOLVED.eq(isResolved))
+        .orderBy(EndpointChangelog.ID.desc())
+        .select(context);
   }
 }

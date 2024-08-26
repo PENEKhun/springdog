@@ -404,7 +404,7 @@
               </tr>
               </thead>
               <tbody>
-              <!--/*@thymesVar id="endpointChangeLog" type="org.easypeelsecurity.springdog.shared.ratelimit.model.EndpointChangeLog"*/-->
+              <!--/*@thymesVar id="endpointChangeLog" type="org.easypeelsecurity.springdog.shared.dto.EndpointChangelogDto"*/-->
               <tr th:each="changeLog : ${endpointChangeLog}">
                 <td th:text="${changeLog.id}"></td>
                 <td>

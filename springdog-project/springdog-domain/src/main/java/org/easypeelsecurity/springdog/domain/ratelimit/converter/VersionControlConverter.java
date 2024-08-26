@@ -29,8 +29,11 @@ import org.easypeelsecurity.springdog.shared.enums.EndpointChangeType;
  *
  * @author PENEKhun
  */
-abstract class VersionControlConverter {
+public abstract class VersionControlConverter {
 
+  /**
+   * Converts an EndpointVersionControl entity to a VersionControlDto.
+   */
   public static VersionControlDto toVersionControlDto(EndpointVersionControl versionControl) {
     return VersionControlDto.builder()
         .id(versionControl.getId())
@@ -40,12 +43,18 @@ abstract class VersionControlConverter {
         .build();
   }
 
+  /**
+   * Converts a list of EndpointVersionControl entities to a list of VersionControlDto objects.
+   */
   public static List<VersionControlDto> toVersionControlDto(List<EndpointVersionControl> versionControls) {
     return versionControls.stream()
         .map(VersionControlConverter::toVersionControlDto)
         .toList();
   }
 
+  /**
+   * Converts an EndpointChangelog entity to an EndpointChangelogDto.
+   */
   public static EndpointChangelogDto toChangelogDto(EndpointChangelog changelog) {
     return EndpointChangelogDto.builder()
         .id(changelog.getId())
@@ -55,16 +64,21 @@ abstract class VersionControlConverter {
         .targetMethod(changelog.getTargetMethod())
         .targetMethodSignature(changelog.getTargetMethodSignature())
         .targetPath(changelog.getTargetPath())
-        .reflectedVersion(toVersionControlDto(changelog.getReflectedVersion()))
         .build();
   }
 
+  /**
+   * Converts a list of EndpointChangelog entities to a list of EndpointChangelogDto objects.
+   */
   public static List<EndpointChangelogDto> toChangelogDto(List<EndpointChangelog> changelogs) {
     return changelogs.stream()
         .map(VersionControlConverter::toChangelogDto)
         .toList();
   }
 
+  /**
+   * Converts a VersionControlDto to an EndpointVersionControl entity.
+   */
   public static EndpointVersionControl toVersionControl(VersionControlDto dto) {
     var versionControl = new EndpointVersionControl();
     versionControl.setDateOfVersion(dto.getDateOfVersion());
@@ -76,6 +90,9 @@ abstract class VersionControlConverter {
     return versionControl;
   }
 
+  /**
+   * Converts an EndpointChangelogDto to an EndpointChangelog entity.
+   */
   private static EndpointChangelog toEndpointChangelog(EndpointChangelogDto changelog) {
     var endpointChangelog = new EndpointChangelog();
     endpointChangelog.setChangeType(changelog.getChangeType().name());

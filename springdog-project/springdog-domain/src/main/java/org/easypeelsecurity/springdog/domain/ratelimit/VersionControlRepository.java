@@ -30,10 +30,11 @@ import org.apache.cayenne.ObjectContext;
 public interface VersionControlRepository {
 
   /**
-   * Find all {@link EndpointChangelog} entities.
+   * Find all {@link EndpointChangelog} entities by resolved status.
    *
-   * @param context The Cayenne ObjectContext
+   * @param context    The Cayenne ObjectContext
+   * @param isResolved The resolved status
    * @return The list of {@link EndpointChangelog} entities
    */
-  List<EndpointChangelog> findAllChangeLogsNotResolved(ObjectContext context);
+  List<EndpointChangelog> findAllChangeLogsByResolved(ObjectContext context, boolean isResolved);
 }

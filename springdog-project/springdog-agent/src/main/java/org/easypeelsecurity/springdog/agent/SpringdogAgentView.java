@@ -69,9 +69,7 @@ public class SpringdogAgentView {
 
   @GetMapping({"/", ""})
   public String home(Model model) {
-    // TODO: changeLog
-    model.addAttribute("endpointChangeLog",
-        new ArrayList<>()); // versionControlQuery.getAllChangeLogsNotResolved()
+    model.addAttribute("endpointChangeLog", endpointService.getAllChangeLogsNotResolved());
 
     var dashboard = statisticsService.getDashboardResponse(LocalDate.now());
     model.addAttribute("totalEndpointCount", dashboard.totalEndpointCount());
