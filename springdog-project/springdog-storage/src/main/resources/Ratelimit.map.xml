@@ -88,11 +88,11 @@
 	<db-relationship name="changelogs" source="ENDPOINTVERSIONCONTROL" target="ENDPOINTCHANGELOG" toMany="true">
 		<db-attribute-pair source="DATEOFVERSION" target="REFLECTED_VERSION"/>
 	</db-relationship>
-	<obj-relationship name="endpointMetrics" source="Endpoint" target="EndpointMetric" deleteRule="Deny" db-relationship-path="endpointMetrics"/>
+	<obj-relationship name="endpointMetrics" source="Endpoint" target="EndpointMetric" deleteRule="Cascade" db-relationship-path="endpointMetrics"/>
 	<obj-relationship name="endpointParameters" source="Endpoint" target="EndpointParameter" deleteRule="Cascade" db-relationship-path="endpointParameters"/>
-	<obj-relationship name="reflectedVersion" source="EndpointChangelog" target="EndpointVersionControl" deleteRule="Nullify" db-relationship-path="reflectedVersion"/>
+	<obj-relationship name="reflectedVersion" source="EndpointChangelog" target="EndpointVersionControl" deleteRule="Cascade" db-relationship-path="reflectedVersion"/>
 	<obj-relationship name="endpoint" source="EndpointParameter" target="Endpoint" deleteRule="Cascade" db-relationship-path="endpoint"/>
-	<obj-relationship name="changelogs" source="EndpointVersionControl" target="EndpointChangelog" deleteRule="Deny" db-relationship-path="changelogs"/>
+	<obj-relationship name="changelogs" source="EndpointVersionControl" target="EndpointChangelog" deleteRule="Cascade" db-relationship-path="changelogs"/>
 	<dbImport xmlns="http://cayenne.apache.org/schema/10/dbimport">
 		<tableTypes>
 			<tableType>TABLE</tableType>
@@ -107,8 +107,8 @@
 		<usePrimitives>true</usePrimitives>
 	</dbImport>
 	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
-		<excludeEntities>EndpointChangelog,EndpointParameter,EndpointVersionControl</excludeEntities>
-		<destDir>../java</destDir>
+		<excludeEntities>Endpoint,EndpointParameter</excludeEntities>
+		<destDir>../../../../springdog-domain/src/main/java</destDir>
 		<mode>entity</mode>
 		<template>templates/v4_1/subclass.vm</template>
 		<superTemplate>templates/v4_1/superclass.vm</superTemplate>
