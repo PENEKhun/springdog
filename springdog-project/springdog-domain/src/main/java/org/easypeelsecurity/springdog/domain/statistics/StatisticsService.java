@@ -70,7 +70,7 @@ public class StatisticsService {
   public DashboardResponse getDashboardResponse(LocalDate specificDate) {
     long totalEndpointCount = endpointRepository.getEndpointCount(context);
     long totalActiveEndpointCount = endpointRepository.getEndpointCountByStatus(context, ACTIVE.name());
-    List<SystemMetricDto> recentSystemMetrics = systemMetricRepository.getRecentSystemMetrics(context, 50)
+    List<SystemMetricDto> recentSystemMetrics = systemMetricRepository.getRecentSystemMetrics(context, 30)
         .stream()
         .map(metric -> new SystemMetricDto(
             metric.getCpuUsagePercent(),
@@ -84,7 +84,7 @@ public class StatisticsService {
         totalActiveEndpointCount,
         totalEndpointCount - totalActiveEndpointCount,
         recentSystemMetrics,
-        endpointMetricRepository.getDailyEndpointMetrics(context, 7),
+        endpointMetricRepository.getDailyEndpointMetrics(context, 10),
         endpointMetricRepository.getDailyTopTrafficEndpoints(context, 7, specificDate),
         endpointMetricRepository.getDailySlowestEndpoints(context, 7, specificDate),
         endpointMetricRepository.getDailyTopFailWithRatelimitEndpoints(context, 7, specificDate));
