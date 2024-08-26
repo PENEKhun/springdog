@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import org.easypeelsecurity.springdog.manager.util.RequestHandlerUtil;
 import org.easypeelsecurity.springdog.notification.SlowResponseEmailNotificationManager;
 import org.easypeelsecurity.springdog.notification.email.SlowResponseEmailNotification.SlowResponse;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
@@ -66,7 +67,7 @@ public class RequestTimingInterceptor implements HandlerInterceptor {
     if (handler instanceof HandlerMethod handlerMethod) {
       Object controller = handlerMethod.getBean();
       Class<?> controllerClass = controller.getClass();
-      if (!shouldSkipRequest(request, controllerClass)) {
+      if (!RequestHandlerUtil.shouldSkipRequest(controllerClass)) {
         request.setAttribute(SKIP_REQUEST_TIMING_CALC, false);
         return true;
       }
@@ -98,14 +99,5 @@ public class RequestTimingInterceptor implements HandlerInterceptor {
             .endpointMethod(request.getMethod())
             .currentResponseTime(responseTime).build()
     );
-  }
-
-  private boolean shouldSkipRequest(HttpServletRequest request, Class<?> controllerClass) {
-    if (controllerClass.equals(
-        org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.class)) {
-      return true;
-    }
-    String requestPath = request.getRequestURI().substring(request.getContextPath().length());
-    return requestPath.startsWith(springdogProperties.computeAbsolutePath(""));
   }
 }

@@ -39,6 +39,7 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.easypeelsecurity.springdog.domain.ratelimit.EndpointService;
 import org.easypeelsecurity.springdog.domain.ratelimit.RuleCache;
 import org.easypeelsecurity.springdog.manager.statistics.EndpointMetricCacheManager;
+import org.easypeelsecurity.springdog.manager.util.RequestHandlerUtil;
 import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
 import org.easypeelsecurity.springdog.shared.dto.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.enums.RuleStatus;
@@ -78,7 +79,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
     if (handler instanceof HandlerMethod handlerMethod) {
       Object controller = handlerMethod.getBean();
       Class<?> controllerClass = controller.getClass();
-      if (shouldSkipRequest(controllerClass)) {
+      if (RequestHandlerUtil.shouldSkipRequest(controllerClass)) {
         return true;
       }
 
@@ -121,13 +122,6 @@ public class RatelimitInterceptor implements HandlerInterceptor {
           }
         });
     return Optional.ofNullable(endpoint);
-  }
-
-  private boolean shouldSkipRequest(Class<?> controllerClass) {
-    return controllerClass.equals(
-        org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.class) ||
-        controllerClass.getSuperclass()
-            .equals(org.easypeelsecurity.springdog.agent.SpringdogAgentView.class);
   }
 
   private void applyRatelimitResponse(HttpServletResponse response, String retryAfter)
