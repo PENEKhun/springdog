@@ -8,9 +8,10 @@ dependencies {
     implementation project(":springdog-project:springdog-notification")
     implementation project(":springdog-project:springdog-domain")
     implementation project(":springdog-project:springdog-shared")
-    compileOnly project(":springdog-project:springdog-agent")
+    implementation project(":springdog-project:springdog-agent")
     implementation "commons-io:commons-io:2.16.1"
     implementation "com.github.oshi:oshi-core:6.6.2"
+    testCompileOnly "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
 }
 
 mavenPublishing {
