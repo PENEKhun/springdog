@@ -52,7 +52,7 @@ public class SpringdogHandlerInterceptorApplier implements WebMvcConfigurer {
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(new RatelimitInterceptor(this.endpointService, this.springdogProperties));
+    registry.addInterceptor(new RatelimitInterceptor(this.endpointService));
     registry.addInterceptor(new AgentExternalAccessInterceptor(this.springdogProperties));
     registry.addInterceptor(
         new RequestTimingInterceptor(this.springdogProperties, this.slowResponseEmailNotificationManager));
