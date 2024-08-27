@@ -46,7 +46,7 @@
       <td>
         <span th:class="${'badge ' + (endpoint.ruleStatus == T(org.easypeelsecurity.springdog.shared.enums.RuleStatus).NOT_CONFIGURED ? 'bg-warning' :
                                   (endpoint.ruleStatus == T(org.easypeelsecurity.springdog.shared.enums.RuleStatus).ACTIVE ? 'bg-success' : 'bg-danger'))}"
-          th:text="${endpoint.ruleStatus == T(org.easypeelsecurity.springdog.shared.enums.RuleStatus).NOT_CONFIGURED ? 'Not configured' : endpoint.ruleStatus}"></span>
+          th:text="${endpoint.ruleStatus}"></span>
       </td>
       <td>
         <button class="btn btn-primary btn-sm" th:onclick="'configure(\'' + ${endpoint.id} + '\')'" title="Configure">

@@ -147,11 +147,11 @@
             <strong>RateLimit</strong>
             <input id="statusValue" th:field="*{ruleStatus}" type="hidden"/>
             <input class="form-check-input" id="statusToggle" onchange="updateStatusValue(this)"
-                   th:checked="${endpoint.ruleStatus == T(org.easypeelsecurity.springdog.shared.enums.RuleStatus).ACTIVE.name()}"
+                   th:checked="${endpoint.ruleStatus == T(org.easypeelsecurity.springdog.shared.enums.RuleStatus).ACTIVE}"
                    type="checkbox">
             will be
             <label class="form-check-label text-decoration-underline" for="statusToggle"
-                   th:text="${endpoint.ruleStatus == T(org.easypeelsecurity.springdog.shared.enums.RuleStatus).ACTIVE.name() ? 'enabled' : 'disabled'}"></label>
+                   th:text="${endpoint.ruleStatus == T(org.easypeelsecurity.springdog.shared.enums.RuleStatus).ACTIVE ? 'enabled' : 'disabled'}"></label>
             on this Endpoint.
         </div>
       </div>
