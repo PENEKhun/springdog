@@ -10,7 +10,7 @@ dependencies {
     implementation project(":springdog-project:springdog-shared")
     implementation project(":springdog-project:springdog-agent")
     implementation "commons-io:commons-io:2.16.1"
-    implementation "com.github.oshi:oshi-core:6.6.2"
+    implementation "com.github.oshi:oshi-core:6.6.3"
     testCompileOnly "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
 }
 
