@@ -47,7 +47,8 @@ Add security configuration to your Spring application effortlessly by simply add
 
 ## Demo Video (KOR)
 
-This video shows how to use Springdog in a Spring Boot application. click the image to watch the video.
+This video shows how to use Springdog in a Spring Boot application. click the image to watch the
+video.
 [![Demo Video](http://img.youtube.com/vi/p0M_Ad0u8M8/0.jpg)](https://youtu.be/p0M_Ad0u8M8)
 
 ## Features
@@ -62,14 +63,16 @@ This video shows how to use Springdog in a Spring Boot application. click the im
 
 The system sends email notifications in the following scenarios:
 
-1. When the [pre-defined](#springdogsystem-watch) system usage threshold is exceeded or returns to normal  
-   <img src="https://github.com/user-attachments/assets/e9d575d3-bda9-4ade-b1e5-5a09eee0bded" width="50%">  
+1. When the [pre-defined](#springdogsystem-watch) system usage threshold is exceeded or returns to
+   normal  
+   <img src="https://github.com/user-attachments/assets/e9d575d3-bda9-4ade-b1e5-5a09eee0bded" width="50%">
 
-2. When the response time of a [pre-defined](#springdogslow-response) endpoint exceeds the specified threshold  
-   <img src="https://github.com/user-attachments/assets/58f59637-9693-4ebf-9e01-b1768b0b2ba8" width="30%">  
+2. When the response time of a [pre-defined](#springdogslow-response) endpoint exceeds the specified
+   threshold  
+   <img src="https://github.com/user-attachments/assets/58f59637-9693-4ebf-9e01-b1768b0b2ba8" width="30%">
 
-These notification features allow system administrators to quickly identify and respond to potential issues.
-
+These notification features allow system administrators to quickly identify and respond to potential
+issues.
 
 ## Options
 
@@ -77,30 +80,31 @@ For minor configurations, you can use the following options in your application 
 detailed or advanced configurations that are not available here, you can access the Springdog agent
 directly.
 
-> ⚠️ Note: To receive notifications for [system-watch](#springdogsystem-watch) and [slow-response](#springdogslow-response) features, the gmail
+> ⚠️ Note: To receive notifications for [system-watch](#springdogsystem-watch)
+> and [slow-response](#springdogslow-response) features, the gmail
 > notification option must be enabled.
 
 ```yaml
 springdog:
-   agent:
-      basePath: springdog
-      username: admin
-      password: admin
-      externalAccess: false
-   notification:
-      gmail:
-         enabled: false
-         recipient:
-         username:
-         password:
-   system-watch:
+  agent:
+    basePath: springdog
+    username: admin
+    password: admin
+    externalAccess: false
+  notification:
+    gmail:
       enabled: false
-      cpuThreshold: 80 # percentage
-      memoryThreshold: 80 # percentage
-      diskThreshold: 80 # percentage
-   slow-response:
-      enabled: false
-      threshold: 1000 # ms
+      recipient:
+      username:
+      password:
+  system-watch:
+    enabled: false
+    cpuThreshold: 80 # percentage
+    memoryThreshold: 80 # percentage
+    diskThreshold: 80 # percentage
+  slow-response:
+    enabled: false
+    threshold: 1000 # ms
 ```
 
 ### springdog.agent
