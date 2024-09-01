@@ -34,7 +34,6 @@ class SpringdogEnableProcessorTests {
   @DisplayName("Should generate code correctly with @SpringdogEnable annotation.")
   @CsvSource({
       "test.annotation.springdog.SpringdogAgentApplier",
-      "test.annotation.springdog.SpringdogAgentSecurityApplier",
       "test.annotation.springdog.SpringdogAutoConfigurationApplier",
       "test.annotation.springdog.SpringdogBannerPrinter",
       "test.annotation.springdog.SpringdogDynamicTemplateResolver",

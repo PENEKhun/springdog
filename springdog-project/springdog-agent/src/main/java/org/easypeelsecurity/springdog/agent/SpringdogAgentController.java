@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.manager.util;
+package org.easypeelsecurity.springdog.agent;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Utility class for request handler.
+ * Annotation for Springdog agent controller.
  */
-public abstract class RequestHandlerUtil {
-
-  /**
-   * Check if the request should be skipped.
-   * for example, error controller and our agent should be skipped.
-   */
-  public static boolean shouldSkipRequest(Class<?> controllerClass) {
-    return controllerClass.equals(
-        org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.class) ||
-        controllerClass.equals(org.easypeelsecurity.springdog.agent.SpringdogAgentView.class);
-  }
+@Retention(RetentionPolicy.RUNTIME)
+public @interface SpringdogAgentController {
 }

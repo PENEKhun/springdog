@@ -25,8 +25,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
-import org.easypeelsecurity.springdog.autoconfigure.PropertiesLoader;
-
 /**
  * Processes the SpringDogEnable annotation to enable configurations necessary for SpringDog functionalities.
  */
@@ -57,20 +55,17 @@ public class SpringDogEnableProcessor extends AbstractProcessor {
   private void generateConfigurations(RoundEnvironment roundEnv) {
     roundEnv.getElementsAnnotatedWith(SpringDogEnable.class).forEach(element -> {
       String fullPackageName = element.getEnclosingElement().toString();
-      PropertiesLoader propertiesLoader = new PropertiesLoader(processingEnv);
-      String agentBasePath = propertiesLoader.getPropertyOrDefault("springdog.agent.basePath", "springdog");
 
       List<CodeGenerator> generatedCodes = Arrays.asList(
           new SpringdogStorageApplier(),
           new SpringdogDynamicTemplateResolver(),
           new SpringdogBannerPrinter(),
-          new SpringdogAgentSecurityApplier(),
           new SpringdogManagerApplier(),
           new SpringdogAutoConfigurationApplier(),
           new SpringdogSharedApplier(),
           new SpringdogNotificationApplier(),
           new SpringdogDomainApplier(),
-          new SpringdogAgentApplier(agentBasePath)
+          new SpringdogAgentApplier()
       );
 
       generatedCodes.forEach(generator -> generator.writeTo(fullPackageName, processingEnv));

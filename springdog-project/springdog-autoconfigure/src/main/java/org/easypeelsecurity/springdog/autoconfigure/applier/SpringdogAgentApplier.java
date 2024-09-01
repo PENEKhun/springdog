@@ -18,10 +18,8 @@ package org.easypeelsecurity.springdog.autoconfigure.applier;
 
 import javax.lang.model.element.Modifier;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.easypeelsecurity.springdog.agent.SpringdogAgentView;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.TypeSpec;
@@ -32,21 +30,13 @@ import com.squareup.javapoet.TypeSpec.Builder;
  */
 public class SpringdogAgentApplier extends CodeGenerator {
 
-  private final String basePath;
-
-  @SuppressWarnings("checkstyle:MissingJavadocMethod")
-  public SpringdogAgentApplier(String basePath) {
-    this.basePath = basePath;
-  }
-
   @Override
   public Builder typeSpec() {
     return TypeSpec.classBuilder("SpringdogAgentApplier")
-        .addAnnotation(Controller.class)
-        .addModifiers(Modifier.PUBLIC)
-        .superclass(SpringdogAgentView.class)
-        .addAnnotation(AnnotationSpec.builder(RequestMapping.class)
-            .addMember(ANNOTATION_DEFAULT_FIELD, "$S", basePath)
-            .build());
+        .addAnnotation(Configuration.class)
+        .addAnnotation(AnnotationSpec.builder(ComponentScan.class)
+            .addMember("basePackages", "$S", "org.easypeelsecurity.springdog.agent")
+            .build())
+        .addModifiers(Modifier.PUBLIC);
   }
 }

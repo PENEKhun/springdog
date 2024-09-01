@@ -34,11 +34,8 @@ class RequestHandlerUtilTest {
 
   @Test
   @SuppressWarnings("checkstyle:RegexpSingleline")
-  void shouldSkipRequest_SpringdogAgentViewSubclass_ReturnsTrue() {
-    class TestSpringdogAgentView extends SpringdogAgentView {
-    }
-
-    boolean result = RequestHandlerUtil.shouldSkipRequest(TestSpringdogAgentView.class);
+  void shouldSkipRequest_Springdog_ReturnsTrue() {
+    boolean result = RequestHandlerUtil.shouldSkipRequest(SpringdogAgentView.class);
     assertThat(result).isTrue();
   }
 
