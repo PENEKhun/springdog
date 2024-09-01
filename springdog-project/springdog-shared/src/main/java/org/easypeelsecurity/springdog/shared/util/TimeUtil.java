@@ -58,6 +58,6 @@ public abstract class TimeUtil {
   /**
    * Time record.
    */
-  public record Time(int days, int hours, int minutes, int seconds) {
+  private record Time(int days, int hours, int minutes, int seconds) {
   }
 }
