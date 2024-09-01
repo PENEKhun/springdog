@@ -45,7 +45,7 @@ public class SpringdogDynamicUrlMappingConfig implements WebMvcRegistrations {
     return new CustomRequestMappingHandlerMapping(springdogProperties);
   }
 
-  private static class CustomRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
+  static class CustomRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
     private final SpringdogProperties springdogProperties;
 
     CustomRequestMappingHandlerMapping(SpringdogProperties springdogProperties) {
