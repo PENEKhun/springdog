@@ -38,6 +38,7 @@ import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 @Configuration
 public class SpringdogSecurityConfig {
 
+  public static final String SPRINGDOG_AGENT_ADMIN_ROLE = "SPRINGDOG_AGENT_ADMIN";
   private final SpringdogProperties springdogProperties;
 
   /**
@@ -56,7 +57,7 @@ public class SpringdogSecurityConfig {
     String baseAbsolutePath = springdogProperties.computeAbsolutePath("");
     http
         .securityMatcher(baseAbsolutePath + "**")
-        .authorizeHttpRequests(auth -> auth.anyRequest().hasRole("SPRINGDOG_AGENT_ADMIN"))
+        .authorizeHttpRequests(auth -> auth.anyRequest().hasRole(SPRINGDOG_AGENT_ADMIN_ROLE))
         .formLogin(formLogin -> formLogin
             .loginPage(springdogProperties.computeAbsolutePath("/login"))
             .failureUrl(springdogProperties.computeAbsolutePath("/login?error"))
@@ -90,7 +91,7 @@ public class SpringdogSecurityConfig {
     String password = springdogProperties.getAgentPassword();
     UserDetails user = User.withUsername(username)
         .password("{noop}" + password)
-        .roles("SPRINGDOG_AGENT_ADMIN")
+        .roles(SPRINGDOG_AGENT_ADMIN_ROLE)
         .build();
 
     return new InMemoryUserDetailsManager(user);

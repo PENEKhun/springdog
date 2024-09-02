@@ -8,7 +8,6 @@ shadowJar {
 }
 
 dependencies {
-//    implementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
     implementation "org.springframework.boot:spring-boot-starter-security:${springbootVersion}"
     implementation "org.thymeleaf.extras:thymeleaf-extras-springsecurity${thymeleafSecurityVersion}"
@@ -17,6 +16,7 @@ dependencies {
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutDialectVersion}") {
         exclude group: 'nz.net.ultraq.thymeleaf', module: 'thymeleaf-layout-dialect-extensions'
     }
+    testImplementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
     testImplementation "org.springframework.security:spring-security-test:${springVersion}"
 

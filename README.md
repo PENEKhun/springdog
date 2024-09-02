@@ -41,7 +41,7 @@ Add security configuration to your Spring application effortlessly by simply add
 3. Run your application and access the Springdog agent in your browser.
 
    ```http request
-   GET http://localhost:8080/springdog
+   GET http://localhost:8080/springdog/
    // Host and port may vary depending on your application configuration.
    ```
 
@@ -111,12 +111,12 @@ springdog:
 
 > The Springdog agent configuration.
 
-| Name           | Required | Description                                                                                                                                                                                                                           | Default   | Value Sets        |
-|----------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|-------------------|
-| basePath       | x        | The base path for the agent. Used to access the springdog agent from a deployed server, such as `{{host}}/springdog`. The basePath used with this option should never be used as the controller mapping address for your application. | springdog |
-| username       | x        | The username for the Springdog agent. Empty fields are not allowed.                                                                                                                                                                   | admin     |
-| password       | x        | The password for the Springdog agent. Empty fields are not allowed.                                                                                                                                                                   | admin     |
-| externalAccess | x        | Whether to allow external access to the Springdog agent. If `false`, access from external IPs is not allowed.                                                                                                                         | false     | `true` or `false` |
+| Name           | Required | Description                                                                                                                                                                                                                            | Default   | Value Sets        |
+|----------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|-------------------|
+| basePath       | x        | The base path for the agent. Used to access the springdog agent from a deployed server, such as `{{host}}/springdog/`. The basePath used with this option should never be used as the controller mapping address for your application. | springdog |
+| username       | x        | The username for the Springdog agent. Empty fields are not allowed.                                                                                                                                                                    | admin     |
+| password       | x        | The password for the Springdog agent. Empty fields are not allowed.                                                                                                                                                                    | admin     |
+| externalAccess | x        | Whether to allow external access to the Springdog agent. If `false`, access from external IPs is not allowed.                                                                                                                          | false     | `true` or `false` |
 
 ### springdog.notification.gmail
 

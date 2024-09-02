@@ -29,7 +29,6 @@ import org.htmlunit.html.HtmlButton;
 import org.htmlunit.html.HtmlForm;
 import org.htmlunit.html.HtmlPage;
 import org.htmlunit.html.HtmlPasswordInput;
-import org.htmlunit.html.HtmlSubmitInput;
 import org.htmlunit.html.HtmlTable;
 import org.htmlunit.html.HtmlTableRow;
 import org.htmlunit.html.HtmlTextInput;
@@ -37,12 +36,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AgentTests {
-  final String AGENT_ADMIN_ROLE = "SPRINGDOG_AGENT_ADMIN";
   final String AGENT_USERNAME = "username";
   final String AGENT_PASSWORD = "password";
 
@@ -66,13 +62,10 @@ class AgentTests {
     }
   }
 
-  @ParameterizedTest
-  @CsvSource({
-      "/springdog", "/springdog/"
-  })
+  @Test
   @DisplayName("Redirect to the login page when accessing the home PATH")
-  void should_redirect_to_loginPage(String homePath) throws IOException {
-    HtmlPage page = webClient.getPage("http://localhost:" + port + homePath);
+  void should_redirect_to_loginPage() throws IOException {
+    HtmlPage page = webClient.getPage("http://localhost:" + port + "/springdog/");
     assertThat(page.getUrl()).hasToString(getAgentPath("/login"));
   }
 
