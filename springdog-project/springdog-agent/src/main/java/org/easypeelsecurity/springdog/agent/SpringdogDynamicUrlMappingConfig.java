@@ -27,6 +27,7 @@ import org.easypeelsecurity.springdog.shared.util.Assert;
 /**
  * Springdog dynamic URL mapping configuration.
  * Enable agent access to the springdog path user determine at runtime.
+ * related to {@link SpringdogAgentController}
  */
 @Component
 public class SpringdogDynamicUrlMappingConfig implements WebMvcRegistrations {
