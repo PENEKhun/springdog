@@ -94,13 +94,20 @@
         label.innerText = isEnabled ? 'enabled' : 'disabled';
       });
 
+      const headerEnableInput = document.createElement("input");
+      headerEnableInput.type = "hidden";
+      headerEnableInput.name = "headerNamesToEnable";
+
       $("#headerOption").select2({
         placeholder: 'Select headers',
         "language": {
           noResults: () => "No headers found."
         },
         allowClear: true
-      })
+      }).on("change", function () {
+        const selectedData = $(this).select2("data");
+        headerEnableInput.value = selectedData.map(item => item.element.dataset.name).join(",");
+      }).trigger('change');
 
       const paramEnableInput = document.createElement("input");
       paramEnableInput.type = "hidden";
@@ -108,6 +115,7 @@
 
       const form = document.querySelector("form[name=editRule]");
       form.appendChild(paramEnableInput);
+      form.appendChild(headerEnableInput);
 
       $("#parametersOption").select2({
         placeholder: 'Select parameters',
@@ -263,7 +271,13 @@
         </div>
         <div class="mb-3 row">
           <label class="form-label" for="headerOption">Custom Header</label>
-          <select class="form-control" id="headerOption" multiple></select>
+          <select class="form-control" id="headerOption" multiple>
+            <option th:data-name="${header.name}"
+                    th:data-id="${header.id}"
+                    th:each="header : ${endpoint.headers}"
+                    th:selected="${header.isEnabled()}"
+                    th:text="${header.name}"></option>
+          </select>
         </div>
         <div class="form-check mb-3">
           <input class="form-check-input" id="ipBlock"

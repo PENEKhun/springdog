@@ -16,56 +16,44 @@
 
 package org.easypeelsecurity.springdog.shared.dto;
 
-import org.easypeelsecurity.springdog.shared.enums.EndpointParameterType;
-import org.easypeelsecurity.springdog.shared.util.Assert;
+import java.util.Objects;
 
 import lombok.Getter;
 
 /**
- * Controller parameter item.
- *
- * @author PENEKhun
+ * Endpoint's request header DTO.
  */
 @Getter
-public class EndpointParameterDto {
-
+public class EndpointHeaderDto {
   private final String name;
-  private final EndpointParameterType type;
   private final boolean enabled;
   private Long id;
 
   /**
-   * All-arg Constructor.
-   *
-   * @param name    name of parameter
-   * @param type    type of parameter
-   * @param enabled enabled or not
+   * Constructor.
    */
-  public EndpointParameterDto(String name, EndpointParameterType type, boolean enabled) {
-    Assert.hasText(name, "Name must not be null or empty");
-    Assert.notNull(type, "Type must not be null");
-
+  public EndpointHeaderDto(String name, boolean enabled) {
     this.name = name;
-    this.type = type;
     this.enabled = enabled;
   }
 
   @Override
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof EndpointParameterDto that)) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
 
-    return name.equals(that.name) && type == that.type;
+    EndpointHeaderDto that = (EndpointHeaderDto) o;
+    return name.equals(that.name) && Objects.equals(id, that.id);
   }
 
   @Override
   public int hashCode() {
     int result = name.hashCode();
-    result = 31 * result + type.hashCode();
+    result = 31 * result + Objects.hashCode(id);
     return result;
   }
 }

@@ -11,6 +11,7 @@ import org.apache.cayenne.exp.property.ListProperty;
 import org.apache.cayenne.exp.property.NumericProperty;
 import org.apache.cayenne.exp.property.PropertyFactory;
 import org.apache.cayenne.exp.property.StringProperty;
+import org.easypeelsecurity.springdog.domain.ratelimit.model.EndpointHeader;
 import org.easypeelsecurity.springdog.domain.ratelimit.model.EndpointParameter;
 import org.easypeelsecurity.springdog.domain.statistics.model.EndpointMetric;
 
@@ -37,6 +38,7 @@ public abstract class _Endpoint extends BaseDataObject {
     public static final NumericProperty<Integer> RULE_REQUEST_LIMIT_COUNT = PropertyFactory.createNumeric("ruleRequestLimitCount", Integer.class);
     public static final StringProperty<String> RULE_STATUS = PropertyFactory.createString("ruleStatus", String.class);
     public static final NumericProperty<Integer> RULE_TIME_LIMIT_IN_SECONDS = PropertyFactory.createNumeric("ruleTimeLimitInSeconds", Integer.class);
+    public static final ListProperty<EndpointHeader> ENDPOINT_HEADERS = PropertyFactory.createList("endpointHeaders", EndpointHeader.class);
     public static final ListProperty<EndpointMetric> ENDPOINT_METRICS = PropertyFactory.createList("endpointMetrics", EndpointMetric.class);
     public static final ListProperty<EndpointParameter> ENDPOINT_PARAMETERS = PropertyFactory.createList("endpointParameters", EndpointParameter.class);
 
@@ -52,6 +54,7 @@ public abstract class _Endpoint extends BaseDataObject {
     protected String ruleStatus;
     protected int ruleTimeLimitInSeconds;
 
+    protected Object endpointHeaders;
     protected Object endpointMetrics;
     protected Object endpointParameters;
 
@@ -165,6 +168,19 @@ public abstract class _Endpoint extends BaseDataObject {
         return this.ruleTimeLimitInSeconds;
     }
 
+    public void addToEndpointHeaders(EndpointHeader obj) {
+        addToManyTarget("endpointHeaders", obj, true);
+    }
+
+    public void removeFromEndpointHeaders(EndpointHeader obj) {
+        removeToManyTarget("endpointHeaders", obj, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<EndpointHeader> getEndpointHeaders() {
+        return (List<EndpointHeader>)readProperty("endpointHeaders");
+    }
+
     public void addToEndpointMetrics(EndpointMetric obj) {
         addToManyTarget("endpointMetrics", obj, true);
     }
@@ -220,6 +236,8 @@ public abstract class _Endpoint extends BaseDataObject {
                 return this.ruleStatus;
             case "ruleTimeLimitInSeconds":
                 return this.ruleTimeLimitInSeconds;
+            case "endpointHeaders":
+                return this.endpointHeaders;
             case "endpointMetrics":
                 return this.endpointMetrics;
             case "endpointParameters":
@@ -269,6 +287,9 @@ public abstract class _Endpoint extends BaseDataObject {
             case "ruleTimeLimitInSeconds":
                 this.ruleTimeLimitInSeconds = val == null ? 0 : (int)val;
                 break;
+            case "endpointHeaders":
+                this.endpointHeaders = val;
+                break;
             case "endpointMetrics":
                 this.endpointMetrics = val;
                 break;
@@ -302,6 +323,7 @@ public abstract class _Endpoint extends BaseDataObject {
         out.writeInt(this.ruleRequestLimitCount);
         out.writeObject(this.ruleStatus);
         out.writeInt(this.ruleTimeLimitInSeconds);
+        out.writeObject(this.endpointHeaders);
         out.writeObject(this.endpointMetrics);
         out.writeObject(this.endpointParameters);
     }
@@ -320,6 +342,7 @@ public abstract class _Endpoint extends BaseDataObject {
         this.ruleRequestLimitCount = in.readInt();
         this.ruleStatus = (String)in.readObject();
         this.ruleTimeLimitInSeconds = in.readInt();
+        this.endpointHeaders = in.readObject();
         this.endpointMetrics = in.readObject();
         this.endpointParameters = in.readObject();
     }

@@ -17,9 +17,9 @@
 package org.easypeelsecurity.springdog.domain.ratelimit.model;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.easypeelsecurity.springdog.domain.ratelimit.model.auto._Endpoint;
 import org.easypeelsecurity.springdog.shared.enums.RuleStatus;
@@ -39,6 +39,7 @@ public class Endpoint extends _Endpoint {
     setRulePermanentBan(false);
     setRuleIpBased(false);
     this.endpointParameters = new ArrayList<>();
+    this.endpointHeaders = new ArrayList<>();
   }
 
   @Override
@@ -54,6 +55,19 @@ public class Endpoint extends _Endpoint {
     super.removeFromEndpointParameters(obj);
   }
 
+  @Override
+  public void addToEndpointHeaders(EndpointHeader obj) {
+    Assert.notNull(obj, "EndpointHeader must not be null");
+    obj.setEndpoint(this);
+    super.addToEndpointHeaders(obj);
+  }
+
+  @Override
+  public void removeFromEndpointHeaders(EndpointHeader obj) {
+    Assert.notNull(obj, "EndpointHeader must not be null");
+    super.removeFromEndpointHeaders(obj);
+  }
+
   /**
    * Update rule.
    *
@@ -66,9 +80,16 @@ public class Endpoint extends _Endpoint {
    */
   public void updateRule(RuleStatus ruleStatus, boolean ruleIpBased, boolean rulePermanentBan,
       int ruleRequestLimitCount, int ruleTimeLimitInSeconds, int ruleBanTimeInSeconds,
-      Set<String> enableParamNames) {
+      Set<String> enableParamNames, Set<String> enableHeaderNames) {
     Assert.isNotEqual(ruleStatus, RuleStatus.NOT_CONFIGURED, "Couldn't change ruleStatus to NOT_CONFIGURED");
     Assert.isTrue(enableParamNames != null, "enableParamNames must not be null");
+    Assert.isTrue(enableHeaderNames != null, "enableHeaderNames must not be null");
+
+    ruleValidate(
+        ruleStatus.name(), ruleIpBased, rulePermanentBan, ruleRequestLimitCount,
+        ruleTimeLimitInSeconds, ruleBanTimeInSeconds, enableParamNames, enableHeaderNames,
+        this.getEndpointParameters(), this.getEndpointHeaders());
+
     setRuleStatus(ruleStatus.name());
     setRuleIpBased(ruleIpBased);
     setRulePermanentBan(rulePermanentBan);
@@ -76,25 +97,43 @@ public class Endpoint extends _Endpoint {
     setRuleTimeLimitInSeconds(ruleTimeLimitInSeconds);
     setRuleBanTimeInSeconds(ruleBanTimeInSeconds);
     getEndpointParameters().forEach(param -> param.setEnabled(enableParamNames.contains(param.getName())));
-    ruleValidate();
+    getEndpointHeaders().forEach(header -> header.setEnabled(enableHeaderNames.contains(header.getName())));
   }
 
-  private void ruleValidate() {
-    if (RuleStatus.ACTIVE.name().equals(this.ruleStatus)) {
-      if (this.ruleRequestLimitCount <= 0) {
+  private void ruleValidate(String ruleStatus, boolean ruleIpBased, boolean rulePermanentBan,
+      int ruleRequestLimitCount, int ruleTimeLimitInSeconds, int ruleBanTimeInSeconds,
+      Set<String> enableParamNames, Set<String> enableHeaderNames,
+      List<EndpointParameter> endpointParameters,
+      List<EndpointHeader> endpointHeaders) {
+    if (RuleStatus.ACTIVE.name().equals(ruleStatus)) {
+      if (ruleRequestLimitCount <= 0) {
         throw new IllegalArgumentException("Request limit count must be greater than 0");
       }
-      if (this.ruleTimeLimitInSeconds <= 0) {
+      if (ruleTimeLimitInSeconds <= 0) {
         throw new IllegalArgumentException("Time limit must be greater than 0");
       }
-      if (this.ruleBanTimeInSeconds <= 0 && !this.rulePermanentBan) {
+      if (ruleBanTimeInSeconds <= 0 && !rulePermanentBan) {
         throw new IllegalArgumentException("Ban time must be greater than 0");
       }
-      if (!this.ruleIpBased && this.getEndpointParameters().stream().filter(EndpointParameter::isEnabled)
-          .collect(Collectors.toSet()).isEmpty()) {
-        throw new IllegalArgumentException("At least one combinations must be enabled");
+      if (!ruleIpBased && (isParamNotActivated(enableParamNames, endpointParameters)
+          && isHeaderNotActivated(enableHeaderNames, endpointHeaders))) {
+        throw new IllegalArgumentException("At least one combination must be enabled");
       }
     }
+  }
+
+  private static boolean isHeaderNotActivated(Set<String> enableHeaderNames,
+      List<EndpointHeader> endpointHeaders) {
+    return endpointHeaders.stream()
+        .filter(header -> enableHeaderNames.contains(header.getName()))
+        .count() == 0;
+  }
+
+  private static boolean isParamNotActivated(Set<String> enableParamNames,
+      List<EndpointParameter> endpointParameters) {
+    return endpointParameters.stream()
+        .filter(param -> enableParamNames.contains(param.getName()))
+        .count() == 0;
   }
 
   @Override

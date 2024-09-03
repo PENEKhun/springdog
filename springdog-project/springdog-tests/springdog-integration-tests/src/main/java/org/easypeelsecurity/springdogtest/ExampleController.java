@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,6 +55,11 @@ public class ExampleController {
   @GetMapping("/get/{id}")
   public String example5(@PathVariable Integer id) {
     return "example5";
+  }
+
+  @GetMapping("/header")
+  public String example6(@RequestHeader String token1, @RequestHeader String token2) {
+    return "example6";
   }
 
   static class PostRequest {
