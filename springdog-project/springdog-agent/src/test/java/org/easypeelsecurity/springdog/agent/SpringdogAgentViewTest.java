@@ -120,7 +120,7 @@ class SpringdogAgentViewTest {
   void setRateLimitSpecific() throws Exception {
     long endpointId = 1L;
     when(endpointService.findEndpoint(endpointId)).thenReturn(
-        new EndpointDto.Builder()
+        EndpointDto.builder()
             .id(endpointId)
             .path("/test")
             .methodSignature("org.a.b.C.d()")
@@ -139,7 +139,7 @@ class SpringdogAgentViewTest {
   void viewRatelimitEndpointAnalytics() throws Exception {
     long endpointId = 1L;
     when(endpointService.findEndpoint(endpointId)).thenReturn(
-        new EndpointDto.Builder()
+        EndpointDto.builder()
             .id(endpointId)
             .path("/test")
             .methodSignature("org.a.b.C.d()")

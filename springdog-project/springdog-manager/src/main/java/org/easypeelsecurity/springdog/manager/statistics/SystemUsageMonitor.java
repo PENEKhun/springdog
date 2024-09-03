@@ -16,12 +16,16 @@
 
 package org.easypeelsecurity.springdog.manager.statistics;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.util.List;
 
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
+import oshi.hardware.NetworkIF;
 import oshi.software.os.FileSystem;
 import oshi.software.os.OSFileStore;
 
@@ -32,6 +36,7 @@ import oshi.software.os.OSFileStore;
  */
 public class SystemUsageMonitor implements SystemUsageMetrics {
   private final SystemInfo systemInfo;
+  private final MemoryMXBean memoryMXBean;
   private final HardwareAbstractionLayer hardware;
 
   /**
@@ -39,6 +44,7 @@ public class SystemUsageMonitor implements SystemUsageMetrics {
    */
   public SystemUsageMonitor() {
     this.systemInfo = new SystemInfo();
+    this.memoryMXBean = ManagementFactory.getMemoryMXBean();
     this.hardware = systemInfo.getHardware();
   }
 
@@ -72,5 +78,75 @@ public class SystemUsageMonitor implements SystemUsageMetrics {
       return null;
     }
     return formatDouble((double) usedSpace / totalSpace * 100);
+  }
+
+  @Override
+  public long getJvmHeapUsed() {
+    return memoryMXBean.getHeapMemoryUsage().getUsed();
+  }
+
+  @Override
+  public long getJvmHeapMax() {
+    return memoryMXBean.getHeapMemoryUsage().getMax();
+  }
+
+  @Override
+  public Double getJvmHeapUsagePercent() {
+    MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
+    return formatDouble((double) heapMemoryUsage.getUsed() / heapMemoryUsage.getMax() * 100);
+  }
+
+  @Override
+  public long getJvmNonHeapUsed() {
+    return memoryMXBean.getNonHeapMemoryUsage().getUsed();
+  }
+
+  @Override
+  public long getJvmNonHeapMax() {
+    return memoryMXBean.getNonHeapMemoryUsage().getMax();
+  }
+
+  @Override
+  public Double getJvmNonHeapUsagePercent() {
+    MemoryUsage nonHeapMemoryUsage = memoryMXBean.getNonHeapMemoryUsage();
+    long max = nonHeapMemoryUsage.getMax();
+    if (max < 0) {
+      return -1.0; // Max is undefined
+    }
+    return formatDouble((double) nonHeapMemoryUsage.getUsed() / max * 100);
+  }
+
+  @Override
+  public long getJvmTotalMemoryUsed() {
+    return getJvmHeapUsed() + getJvmNonHeapUsed();
+  }
+
+  @Override
+  public long getJvmTotalMemoryMax() {
+    return getJvmHeapMax() + getJvmNonHeapMax();
+  }
+
+  @Override
+  public Double getJvmTotalMemoryUsagePercent() {
+    long totalUsed = getJvmTotalMemoryUsed();
+    long totalMax = getJvmTotalMemoryMax();
+    if (totalMax <= 0) {
+      return -1.0; // Unable to calculate percentage
+    }
+    return formatDouble((double) totalUsed / totalMax * 100);
+  }
+
+  @Override
+  public long getNetworkInBytes() {
+    return hardware.getNetworkIFs().stream()
+        .mapToLong(NetworkIF::getBytesRecv)
+        .sum();
+  }
+
+  @Override
+  public long getNetworkOutBytes() {
+    return hardware.getNetworkIFs().stream()
+        .mapToLong(NetworkIF::getBytesSent)
+        .sum();
   }
 }

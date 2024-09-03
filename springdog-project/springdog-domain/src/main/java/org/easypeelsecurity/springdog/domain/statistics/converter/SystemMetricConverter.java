@@ -35,8 +35,17 @@ public abstract class SystemMetricConverter {
    * @return DTO
    */
   public static SystemMetricDto convert(SystemMetric systemMetric) {
-    return new SystemMetricDto(systemMetric.getCpuUsagePercent(), systemMetric.getMemoryUsagePercent(),
-        systemMetric.getDiskUsagePercent(), systemMetric.getTimestamp());
+    return SystemMetricDto.builder()
+        .cpuUsagePercent(systemMetric.getCpuUsagePercent())
+        .memoryUsagePercent(systemMetric.getMemoryUsagePercent())
+        .diskUsagePercent(systemMetric.getDiskUsagePercent())
+        .jvmHeapUsagePercent(systemMetric.getJvmHeapUsagePercent())
+        .jvmNonHeapUsagePercent(systemMetric.getJvmNonHeapUsagePercent())
+        .jvmTotalMemoryUsed(systemMetric.getJvmTotalMemoryUsed())
+        .networkInBytes(systemMetric.getNetworkInBytes())
+        .networkOutBytes(systemMetric.getNetworkOutBytes())
+        .timestamp(systemMetric.getTimestamp())
+        .build();
   }
 
   /**
@@ -51,6 +60,11 @@ public abstract class SystemMetricConverter {
     systemMetric.setCpuUsagePercent(systemMetricDto.getCpuUsagePercent());
     systemMetric.setMemoryUsagePercent(systemMetricDto.getMemoryUsagePercent());
     systemMetric.setDiskUsagePercent(systemMetricDto.getDiskUsagePercent());
+    systemMetric.setJvmHeapUsagePercent(systemMetricDto.getJvmHeapUsagePercent());
+    systemMetric.setJvmNonHeapUsagePercent(systemMetricDto.getJvmNonHeapUsagePercent());
+    systemMetric.setJvmTotalMemoryUsed(systemMetricDto.getJvmTotalMemoryUsed());
+    systemMetric.setNetworkInBytes(systemMetricDto.getNetworkInBytes());
+    systemMetric.setNetworkOutBytes(systemMetricDto.getNetworkOutBytes());
     systemMetric.setTimestamp(systemMetricDto.getTimestamp());
     return systemMetric;
   }

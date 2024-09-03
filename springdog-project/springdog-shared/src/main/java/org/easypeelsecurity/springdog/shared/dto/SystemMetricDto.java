@@ -18,46 +18,44 @@ package org.easypeelsecurity.springdog.shared.dto;
 
 import java.time.LocalDateTime;
 
+import lombok.Builder;
+import lombok.Getter;
+
 /**
  * System metric DTO.
  *
  * @author PENEKhun
  */
 @SuppressWarnings("all")
+@Getter
 public class SystemMetricDto {
 
   private Double cpuUsagePercent;
   private Double memoryUsagePercent;
   private Double diskUsagePercent;
+  private Double jvmHeapUsagePercent;
+  private Double jvmNonHeapUsagePercent;
+  private Long jvmTotalMemoryUsed;
+  private Long networkInBytes;
+  private Long networkOutBytes;
   private LocalDateTime timestamp;
 
-  public SystemMetricDto(double cpuUsagePercent, double memoryUsagePercent, double diskUsagePercent,
-      LocalDateTime timestamp) {
+  @Builder
+  public SystemMetricDto(Double cpuUsagePercent, Double memoryUsagePercent, Double diskUsagePercent,
+      Double jvmHeapUsagePercent, Double jvmNonHeapUsagePercent, Long jvmTotalMemoryUsed,
+      Long networkInBytes, Long networkOutBytes, LocalDateTime timestamp) {
     this.cpuUsagePercent = cpuUsagePercent;
     this.memoryUsagePercent = memoryUsagePercent;
     this.diskUsagePercent = diskUsagePercent;
-    this.timestamp = timestamp;
-  }
-
-  public SystemMetricDto(Double cpuUsagePercent, Double memoryUsagePercent, Double diskUsagePercent) {
-    this.cpuUsagePercent = cpuUsagePercent;
-    this.memoryUsagePercent = memoryUsagePercent;
-    this.diskUsagePercent = diskUsagePercent;
-  }
-
-  public Double getCpuUsagePercent() {
-    return cpuUsagePercent;
-  }
-
-  public Double getMemoryUsagePercent() {
-    return memoryUsagePercent;
-  }
-
-  public Double getDiskUsagePercent() {
-    return diskUsagePercent;
-  }
-
-  public LocalDateTime getTimestamp() {
-    return timestamp;
+    this.jvmHeapUsagePercent = jvmHeapUsagePercent;
+    this.jvmNonHeapUsagePercent = jvmNonHeapUsagePercent;
+    this.jvmTotalMemoryUsed = jvmTotalMemoryUsed;
+    this.networkInBytes = networkInBytes;
+    this.networkOutBytes = networkOutBytes;
+    if (timestamp == null) {
+      this.timestamp = LocalDateTime.now();
+    } else {
+      this.timestamp = timestamp;
+    }
   }
 }

@@ -59,17 +59,28 @@ class StatisticsServiceTest {
     double cpuUsage = 50.0;
     double memoryUsage = 60.0;
     double diskUsage = 70.0;
+    double jvmHeapUsage = 55.0;
+    double jvmNonHeapUsage = 45.0;
+    long jvmTotalMemoryUsed = 1024L * 1024L * 100; // 100 MB
+    long networkInBytes = 1024L * 1024L * 50; // 50 MB
+    long networkOutBytes = 1024L * 1024L * 30; // 30 MB
 
     SystemMetric mockSystemMetric = mock(SystemMetric.class);
     when(mockContext.newObject(SystemMetric.class)).thenReturn(mockSystemMetric);
 
     // when
-    statisticsCommand.storeSystemMetrics(cpuUsage, memoryUsage, diskUsage);
+    statisticsCommand.storeSystemMetrics(cpuUsage, memoryUsage, diskUsage, jvmHeapUsage,
+        jvmNonHeapUsage, jvmTotalMemoryUsed, networkInBytes, networkOutBytes);
 
     // then
     verify(mockSystemMetric).setCpuUsagePercent(cpuUsage);
     verify(mockSystemMetric).setMemoryUsagePercent(memoryUsage);
     verify(mockSystemMetric).setDiskUsagePercent(diskUsage);
+    verify(mockSystemMetric).setJvmHeapUsagePercent(jvmHeapUsage);
+    verify(mockSystemMetric).setJvmNonHeapUsagePercent(jvmNonHeapUsage);
+    verify(mockSystemMetric).setJvmTotalMemoryUsed(jvmTotalMemoryUsed);
+    verify(mockSystemMetric).setNetworkInBytes(networkInBytes);
+    verify(mockSystemMetric).setNetworkOutBytes(networkOutBytes);
     verify(mockContext).commitChanges();
   }
 
@@ -82,13 +93,13 @@ class StatisticsServiceTest {
 
     // when & then
     assertThrows(IllegalArgumentException.class, () -> {
-      statisticsCommand.storeSystemMetrics(invalidCpuUsage, 50.0, 50.0);
+      statisticsCommand.storeSystemMetrics(invalidCpuUsage, 50.0, 50.0, 50.0, 50.0, 50L, 50L, 50L);
     });
     assertThrows(IllegalArgumentException.class, () -> {
-      statisticsCommand.storeSystemMetrics(50.0, invalidMemoryUsage, 50.0);
+      statisticsCommand.storeSystemMetrics(50.0, invalidMemoryUsage, 50.0, 50.0, 50.0, 50L, 50L, 50L);
     });
     assertThrows(IllegalArgumentException.class, () -> {
-      statisticsCommand.storeSystemMetrics(50.0, 50.0, invalidDiskUsage);
+      statisticsCommand.storeSystemMetrics(50.0, 50.0, invalidDiskUsage, 50.0, 50.0, 50L, 50L, 50L);
     });
   }
 

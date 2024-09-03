@@ -30,7 +30,17 @@ import org.easypeelsecurity.springdog.shared.vo.DashboardResponse.DailyTopTraffi
 @SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class DashBoardResponseFixture {
   public static DashboardResponse get() {
-    SystemMetricDto systemMetric = new SystemMetricDto(10.0, 20.0, 30.0, LocalDateTime.now());
+    SystemMetricDto systemMetric = SystemMetricDto.builder()
+        .cpuUsagePercent(1.0)
+        .memoryUsagePercent(2.0)
+        .diskUsagePercent(3.0)
+        .jvmHeapUsagePercent(4.0)
+        .jvmNonHeapUsagePercent(5.0)
+        .jvmTotalMemoryUsed(6L)
+        .networkInBytes(7L)
+        .networkOutBytes(8L)
+        .timestamp(LocalDateTime.now())
+        .build();
     var dailyEndpointMetric = new DailyEndpointMetric(1, 2, 3, LocalDate.now());
     var dailyTopTrafficEndpoint = new DailyTopTrafficEndpoint("/test", "GET", 1);
     var dailySlowestEndpoint = new DailySlowestEndpoint("/test", "GET", 1);
