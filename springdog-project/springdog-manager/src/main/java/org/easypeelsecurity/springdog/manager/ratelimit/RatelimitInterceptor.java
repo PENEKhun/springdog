@@ -41,6 +41,7 @@ import org.easypeelsecurity.springdog.domain.ratelimit.RuleCache;
 import org.easypeelsecurity.springdog.manager.statistics.EndpointMetricCacheManager;
 import org.easypeelsecurity.springdog.manager.util.RequestHandlerUtil;
 import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
+import org.easypeelsecurity.springdog.shared.dto.EndpointHeaderDto;
 import org.easypeelsecurity.springdog.shared.dto.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.enums.RuleStatus;
 import org.easypeelsecurity.springdog.shared.util.IpAddressUtil;
@@ -140,7 +141,7 @@ public class RatelimitInterceptor implements HandlerInterceptor {
       result.append(IpAddressUtil.getClientIp(request)).append("\n");
     }
 
-    // to make hash from default type (such as int, String ...)
+    // TODO: to make hash from default type (such as int, String ...)
     endpoint.getParameters().stream()
         .sorted(Comparator.comparing(EndpointParameterDto::getName))
         .filter(EndpointParameterDto::isEnabled)
@@ -148,6 +149,16 @@ public class RatelimitInterceptor implements HandlerInterceptor {
           String value = request.getParameter(param.getName());
           if (value != null) {
             result.append(param.getName()).append("=").append(value).append("\n");
+          }
+        });
+
+    endpoint.getHeaders().stream()
+        .sorted(Comparator.comparing(EndpointHeaderDto::getName))
+        .filter(EndpointHeaderDto::isEnabled)
+        .forEach(header -> {
+          String value = request.getHeader(header.getName());
+          if (value != null) {
+            result.append(header.getName()).append("=").append(value).append("\n");
           }
         });
     try {

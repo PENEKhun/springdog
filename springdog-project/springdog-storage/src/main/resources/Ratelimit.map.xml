@@ -28,6 +28,12 @@
 		<db-attribute name="TARGETPATH" type="VARCHAR" isMandatory="true" length="255"/>
 		<db-attribute name="TARGET_METHOD_SIGNATURE" type="VARCHAR" isMandatory="true" length="700"/>
 	</db-entity>
+	<db-entity name="ENDPOINTHEADER" schema="APP">
+		<db-attribute name="ENDPOINT_ID" type="BIGINT" length="19"/>
+		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isMandatory="true" length="19"/>
+		<db-attribute name="enabled" type="BOOLEAN" isMandatory="true" length="1"/>
+		<db-attribute name="name" type="VARCHAR" isMandatory="true" length="100"/>
+	</db-entity>
 	<db-entity name="ENDPOINTPARAMETER" schema="APP">
 		<db-attribute name="ENABLED" type="BOOLEAN" isMandatory="true" length="1"/>
 		<db-attribute name="ENDPOINT_ID" type="BIGINT" length="19"/>
@@ -62,6 +68,10 @@
 		<obj-attribute name="targetMethodSignature" type="java.lang.String" db-attribute-path="TARGET_METHOD_SIGNATURE"/>
 		<obj-attribute name="targetPath" type="java.lang.String" db-attribute-path="TARGETPATH"/>
 	</obj-entity>
+	<obj-entity name="EndpointHeader" className="org.easypeelsecurity.springdog.domain.ratelimit.model.EndpointHeader" dbEntityName="ENDPOINTHEADER">
+		<obj-attribute name="enabled" type="boolean" db-attribute-path="enabled"/>
+		<obj-attribute name="name" type="java.lang.String" db-attribute-path="name"/>
+	</obj-entity>
 	<obj-entity name="EndpointParameter" className="org.easypeelsecurity.springdog.domain.ratelimit.model.EndpointParameter" dbEntityName="ENDPOINTPARAMETER">
 		<obj-attribute name="enabled" type="boolean" db-attribute-path="ENABLED"/>
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
@@ -73,6 +83,9 @@
 		<obj-attribute name="id" type="long" db-attribute-path="ID"/>
 		<pre-persist method-name="onPrePersist"/>
 	</obj-entity>
+	<db-relationship name="endpointHeaders" source="ENDPOINT" target="ENDPOINTHEADER" toMany="true">
+		<db-attribute-pair source="ID" target="ENDPOINT_ID"/>
+	</db-relationship>
 	<db-relationship name="endpointMetrics" source="ENDPOINT" target="ENDPOINT_METRIC" toMany="true">
 		<db-attribute-pair source="ID" target="ENDPOINT_ID"/>
 	</db-relationship>
@@ -82,15 +95,20 @@
 	<db-relationship name="reflectedVersion" source="ENDPOINTCHANGELOG" target="ENDPOINTVERSIONCONTROL">
 		<db-attribute-pair source="REFLECTED_VERSION" target="DATEOFVERSION"/>
 	</db-relationship>
+	<db-relationship name="endpoint" source="ENDPOINTHEADER" target="ENDPOINT">
+		<db-attribute-pair source="ENDPOINT_ID" target="ID"/>
+	</db-relationship>
 	<db-relationship name="endpoint" source="ENDPOINTPARAMETER" target="ENDPOINT">
 		<db-attribute-pair source="ENDPOINT_ID" target="ID"/>
 	</db-relationship>
 	<db-relationship name="changelogs" source="ENDPOINTVERSIONCONTROL" target="ENDPOINTCHANGELOG" toMany="true">
 		<db-attribute-pair source="DATEOFVERSION" target="REFLECTED_VERSION"/>
 	</db-relationship>
+	<obj-relationship name="endpointHeaders" source="Endpoint" target="EndpointHeader" deleteRule="Deny" db-relationship-path="endpointHeaders"/>
 	<obj-relationship name="endpointMetrics" source="Endpoint" target="EndpointMetric" deleteRule="Cascade" db-relationship-path="endpointMetrics"/>
 	<obj-relationship name="endpointParameters" source="Endpoint" target="EndpointParameter" deleteRule="Cascade" db-relationship-path="endpointParameters"/>
 	<obj-relationship name="reflectedVersion" source="EndpointChangelog" target="EndpointVersionControl" deleteRule="Cascade" db-relationship-path="reflectedVersion"/>
+	<obj-relationship name="endpoint" source="EndpointHeader" target="Endpoint" deleteRule="Nullify" db-relationship-path="endpoint"/>
 	<obj-relationship name="endpoint" source="EndpointParameter" target="Endpoint" deleteRule="Cascade" db-relationship-path="endpoint"/>
 	<obj-relationship name="changelogs" source="EndpointVersionControl" target="EndpointChangelog" deleteRule="Cascade" db-relationship-path="changelogs"/>
 	<dbImport xmlns="http://cayenne.apache.org/schema/10/dbimport">
@@ -107,7 +125,7 @@
 		<usePrimitives>true</usePrimitives>
 	</dbImport>
 	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
-		<excludeEntities>Endpoint,EndpointParameter</excludeEntities>
+		<excludeEntities>EndpointChangelog,EndpointParameter,EndpointVersionControl</excludeEntities>
 		<destDir>../../../../springdog-domain/src/main/java</destDir>
 		<mode>entity</mode>
 		<template>templates/v4_1/subclass.vm</template>

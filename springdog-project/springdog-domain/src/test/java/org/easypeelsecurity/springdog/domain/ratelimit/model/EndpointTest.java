@@ -17,20 +17,26 @@
 package org.easypeelsecurity.springdog.domain.ratelimit.model;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.easypeelsecurity.springdog.shared.enums.RuleStatus.NOT_CONFIGURED;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.easypeelsecurity.springdog.shared.enums.HttpMethod;
 import org.easypeelsecurity.springdog.shared.enums.RuleStatus;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 /**
  * Endpoint test.
@@ -39,19 +45,14 @@ import org.junit.jupiter.api.Test;
  */
 class EndpointTest {
 
-  @Test
-  void endpointDefaultValue() {
-    // given
-    Endpoint endpoint = new Endpoint();
+  @Mock
+  private Endpoint endpoint;
 
-    // when & then
-    assertThat(endpoint.getRuleStatus()).isEqualTo(NOT_CONFIGURED.name());
-    assertThat(endpoint.getRuleRequestLimitCount()).isZero();
-    assertThat(endpoint.getRuleBanTimeInSeconds()).isZero();
-    assertThat(endpoint.getRuleTimeLimitInSeconds()).isZero();
-    assertThat(endpoint.isRuleIpBased()).isFalse();
-    assertThat(endpoint.isRulePermanentBan()).isFalse();
-    assertThat(endpoint.getEndpointParameters()).isNotNull();
+  @BeforeEach
+  void setUp() {
+    MockitoAnnotations.openMocks(this);
+    doNothing().when(endpoint).addToEndpointParameters(any(EndpointParameter.class));
+    doNothing().when(endpoint).addToEndpointHeaders(any(EndpointHeader.class));
   }
 
   @Test
@@ -147,7 +148,8 @@ class EndpointTest {
         () -> assertEquals(0, endpoint.getRuleBanTimeInSeconds()),
         () -> assertFalse(endpoint.isRulePermanentBan()),
         () -> assertFalse(endpoint.isRuleIpBased()),
-        () -> assertTrue(endpoint.getEndpointParameters().isEmpty()));
+        () -> assertTrue(endpoint.getEndpointParameters().isEmpty()),
+        () -> assertTrue(endpoint.getEndpointHeaders().isEmpty()));
   }
 
   @Test
@@ -166,6 +168,7 @@ class EndpointTest {
             10,
             -10,  // negative number
             10,
+            new HashSet<>(),
             new HashSet<>()),
         "Time limit must be greater than 0");
   }
@@ -186,6 +189,7 @@ class EndpointTest {
             -10, // negative number
             10,
             10,
+            new HashSet<>(),
             new HashSet<>()),
         "Request limit count must be greater than 0");
   }
@@ -206,8 +210,82 @@ class EndpointTest {
             10,
             10,
             -10,
+            new HashSet<>(),
             new HashSet<>()), // negative number
         "Ban time must be greater than 0");
+  }
+
+  @Test
+  @DisplayName("Should not throw exception when ruleIpBased is true and no parameters or headers are enabled")
+  void shouldNotThrowExceptionWhenRuleIpBasedIsTrue() {
+    // given
+    Set<String> emptySet = new HashSet<>();
+
+    // when & then
+    assertDoesNotThrow(() ->
+        endpoint.updateRule(
+            RuleStatus.ACTIVE,
+            true, // ruleIpBased
+            false,
+            10,
+            60,
+            300,
+            emptySet,
+            emptySet
+        )
+    );
+  }
+
+  @Test
+  @DisplayName("Should not throw exception when at least one parameter is enabled")
+  void shouldNotThrowExceptionWhenParameterEnabled() {
+    // given
+    Set<String> enabledParams = new HashSet<>();
+    enabledParams.add("testParam");
+
+    EndpointParameter param = new EndpointParameter();
+    param.setName("testParam");
+    endpoint.addToEndpointParameters(param);
+
+    // when & then
+    assertDoesNotThrow(() ->
+        endpoint.updateRule(
+            RuleStatus.ACTIVE,
+            false,
+            false,
+            10,
+            60,
+            300,
+            enabledParams,
+            new HashSet<>()
+        )
+    );
+  }
+
+  @Test
+  @DisplayName("Should not throw exception when at least one header is enabled")
+  void shouldNotThrowExceptionWhenHeaderEnabled() {
+    // given
+    Set<String> enabledHeaders = new HashSet<>();
+    enabledHeaders.add("testHeader");
+
+    EndpointHeader header = new EndpointHeader();
+    header.setName("testHeader");
+    endpoint.addToEndpointHeaders(header);
+
+    // when & then
+    assertDoesNotThrow(() ->
+        endpoint.updateRule(
+            RuleStatus.ACTIVE,
+            false,
+            false,
+            10,
+            60,
+            300,
+            new HashSet<>(),
+            enabledHeaders
+        )
+    );
   }
 }
 

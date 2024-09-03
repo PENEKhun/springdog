@@ -38,7 +38,7 @@ class EndpointVersionCompareTest {
   void returnsFirstRunIfNoEndpoint() {
     // given
     List<EndpointDto> parsedEndpoints = new ArrayList<>(List.of(
-        new EndpointDto.Builder()
+        EndpointDto.builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
             .methodSignature("void org.epsec.app.Test()")
@@ -60,7 +60,7 @@ class EndpointVersionCompareTest {
   void returnsDifferentWhenEndpointParametersDoNotMatch() {
     // given
     List<EndpointDto> parsedEndpoints = new ArrayList<>(List.of(
-        new EndpointDto.Builder()
+        EndpointDto.builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
             .methodSignature("void org.epsec.app.Test()")
@@ -88,7 +88,7 @@ class EndpointVersionCompareTest {
   void returnsDifferentWhenEndpointPathsDoNotMatch() {
     // given
     List<EndpointDto> parsedEndpoints = new ArrayList<>(List.of(
-        new EndpointDto.Builder()
+        EndpointDto.builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
             .methodSignature("void org.epsec.app.Test()")
@@ -115,7 +115,7 @@ class EndpointVersionCompareTest {
   void returnsDifferentWhenHttpMethodDoesNotMatch() {
     // given
     List<EndpointDto> parsedEndpoints = new ArrayList<>(List.of(
-        new EndpointDto.Builder()
+        EndpointDto.builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
             .methodSignature("void org.epsec.app.Test()")
@@ -141,7 +141,7 @@ class EndpointVersionCompareTest {
   @DisplayName("Returns DIFFERENT when Method Signature does not match.")
   void returnsDifferentWhenMethodSignatureDoesNotMatch() {
     List<EndpointDto> parsedEndpoints = new ArrayList<>(List.of(
-        new EndpointDto.Builder()
+        EndpointDto.builder()
             .path("/api/v1/test")
             .httpMethod(HttpMethod.GET)
             .methodSignature("void org.epsec.app.Test()")

@@ -97,6 +97,19 @@ class RatelimitBlockingTest {
     targetApi2.setRuleBanTimeInSeconds(100);
     targetApi2.setRuleStatus(RuleStatus.ACTIVE);
     endpointService.updateRule(targetApi2);
+
+    // enable ratelimit (3)
+    EndpointDto targetApi3 = EndpointConverter.toDto(
+        ObjectSelect.query(Endpoint.class)
+            .where(Endpoint.PATH.eq(CASE3.PATH)
+                .andExp(Endpoint.HTTP_METHOD.eq(CASE3.HTTP_METHOD)))
+            .selectFirst(context));
+    targetApi3.setHeaderNamesToEnable(CASE3.HEADER_NAMES_TO_ENABLE);
+    targetApi3.setRuleRequestLimitCount(CASE3.REQUEST_LIMIT);
+    targetApi3.setRuleTimeLimitInSeconds(100);
+    targetApi3.setRuleBanTimeInSeconds(100);
+    targetApi3.setRuleStatus(RuleStatus.ACTIVE);
+    endpointService.updateRule(targetApi3);
   }
 
   @Test
@@ -224,6 +237,24 @@ class RatelimitBlockingTest {
     }
   }
 
+  @Test
+  @DisplayName("Should work correctly when request headers are enabled.")
+  void handleRequestHeaders() throws Exception {
+    // given
+    for (int i = 0; i < CASE3.REQUEST_LIMIT; i++) {
+      mockMvc.perform(get(CASE3.PATH)
+              .header("token1", "token1")
+              .header("token2", "token2"))
+          .andExpect(status().isOk());
+    }
+
+    // when & then
+    mockMvc.perform(get(CASE3.PATH)
+            .header("token1", "token1")
+            .header("token2", "token2"))
+        .andExpect(status().isTooManyRequests());
+  }
+
   private static final class CASE1 {
 
     static final String PATH = "/api/get";
@@ -238,5 +269,14 @@ class RatelimitBlockingTest {
     static final String HTTP_METHOD = "POST";
     static final int REQUEST_LIMIT = 50;
     static final Set<String> PARAMETER_NAMES_TO_ENABLE = Set.of("postRequest");
+  }
+
+  private static final class CASE3 {
+
+      static final String PATH = "/api/header";
+      static final String HTTP_METHOD = "GET";
+      static final int REQUEST_LIMIT = 50;
+      static final Set<String> HEADER_NAMES_TO_ENABLE = Set.of("token1", "token2");
+
   }
 }

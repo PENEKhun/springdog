@@ -22,8 +22,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.easypeelsecurity.springdog.domain.ratelimit.model.Endpoint;
+import org.easypeelsecurity.springdog.domain.ratelimit.model.EndpointHeader;
 import org.easypeelsecurity.springdog.domain.ratelimit.model.EndpointParameter;
 import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
+import org.easypeelsecurity.springdog.shared.dto.EndpointHeaderDto;
 import org.easypeelsecurity.springdog.shared.dto.EndpointParameterDto;
 
 /**
@@ -91,6 +93,12 @@ public class EndpointVersionCompare {
           .forEach(p -> hash.append(p.getName())
               .append(PROPERTY_DELIMITER)
               .append(p.getType()));
+
+      endpoint.getEndpointHeaders()
+          .stream()
+          .sorted(Comparator.comparing(EndpointHeader::getName))
+          .forEach(p -> hash.append(p.getName())
+              .append(PROPERTY_DELIMITER));
     }
 
     return generateSHA256Hex(hash.toString());
@@ -123,6 +131,12 @@ public class EndpointVersionCompare {
           .forEach(p -> hash.append(p.getName())
               .append(PROPERTY_DELIMITER)
               .append(p.getType()));
+
+      endpoint.getHeaders()
+          .stream()
+          .sorted(Comparator.comparing(EndpointHeaderDto::getName))
+          .forEach(p -> hash.append(p.getName())
+              .append(PROPERTY_DELIMITER));
     }
 
     return generateSHA256Hex(hash.toString());

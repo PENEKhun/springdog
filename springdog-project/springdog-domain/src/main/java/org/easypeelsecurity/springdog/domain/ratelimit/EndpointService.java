@@ -80,7 +80,7 @@ public class EndpointService {
     endpoint.updateRule(endpointDto.getRuleStatus(), endpointDto.isRuleIpBased(),
         endpointDto.isRulePermanentBan(), endpointDto.getRuleRequestLimitCount(),
         endpointDto.getRuleTimeLimitInSeconds(), endpointDto.getRuleBanTimeInSeconds(),
-        endpointDto.getParameterNamesToEnable());
+        endpointDto.getParameterNamesToEnable(), endpointDto.getHeaderNamesToEnable());
 
     RuleCache.changeRuleCached(endpoint.getMethodSignature(), EndpointConverter.toDto(endpoint));
     context.commitChanges();

@@ -29,6 +29,7 @@ import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -37,6 +38,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.easypeelsecurity.springdog.domain.ratelimit.VersionControlService;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
+import org.easypeelsecurity.springdog.shared.dto.EndpointHeaderDto;
 import org.easypeelsecurity.springdog.shared.dto.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.enums.EndpointParameterType;
 import org.easypeelsecurity.springdog.shared.enums.HttpMethod;
@@ -75,19 +77,45 @@ public class ControllerParser {
     String methodSignature =
         MethodSignatureParser.parse(method);
 
-    EndpointDto endpoint = new EndpointDto.Builder()
+    EndpointDto endpoint = EndpointDto.builder()
         .methodSignature(methodSignature)
         .path(endPoint)
         .httpMethod(httpMethod)
         .isPatternPath(isPatternPath).build();
+    Set<EndpointParameterDto> parameters = parseRequestParameters(method);
+    Set<EndpointHeaderDto> headers = parseRequestHeaders(method);
+    endpoint.addParameters(parameters);
+    endpoint.addHeaders(headers);
+    return endpoint;
+  }
+
+  private Set<EndpointHeaderDto> parseRequestHeaders(HandlerMethod method) {
+    Set<EndpointHeaderDto> headers = new HashSet<>();
+    Parameter[] parameters = method.getMethod().getParameters();
+    for (Parameter parameter : parameters) {
+      RequestHeader requestHeaderAnnotation = parameter.getAnnotation(RequestHeader.class);
+      if (requestHeaderAnnotation != null) {
+        String headerName = requestHeaderAnnotation.value();
+        if (headerName.isEmpty()) {
+          headerName = parameter.getName();
+        }
+        headers.add(new EndpointHeaderDto(headerName, false));
+      }
+    }
+    return headers;
+  }
+
+  private Set<EndpointParameterDto> parseRequestParameters(HandlerMethod method) {
     Set<EndpointParameterDto> parameters = new HashSet<>();
     try {
       String[] paramNames =
           ParameterNameExtractor.getParameterNames(method.getBeanType(), method.getMethod().getName(),
               method.getMethod().getParameterTypes());
-
       Parameter[] methodParameters = method.getMethod().getParameters();
       for (int i = 0; i < methodParameters.length; i++) {
+        if (methodParameters[i].getAnnotation(RequestHeader.class) != null) {
+          continue;
+        }
         String name =
             paramNames != null && i < paramNames.length ? paramNames[i] : methodParameters[i].getName();
         parameters.add(
@@ -97,8 +125,7 @@ public class ControllerParser {
     } catch (IOException | NoSuchMethodException e) {
       logger.error("Error while extracting parameter names.", e);
     }
-    endpoint.addParameters(parameters);
-    return endpoint;
+    return parameters;
   }
 
   /**

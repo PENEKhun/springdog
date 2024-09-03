@@ -21,8 +21,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.easypeelsecurity.springdog.domain.ratelimit.model.Endpoint;
+import org.easypeelsecurity.springdog.domain.ratelimit.model.EndpointHeader;
 import org.easypeelsecurity.springdog.domain.ratelimit.model.EndpointParameter;
 import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
+import org.easypeelsecurity.springdog.shared.dto.EndpointHeaderDto;
 import org.easypeelsecurity.springdog.shared.dto.EndpointParameterDto;
 import org.easypeelsecurity.springdog.shared.enums.HttpMethod;
 import org.easypeelsecurity.springdog.shared.enums.RuleStatus;
@@ -63,7 +65,19 @@ public class EndpointConverter {
       parameter.setEndpoint(endpoint);
       endpoint.addToEndpointParameters(parameter);
     }
+
+    for (EndpointHeaderDto header : endpointDto.getHeaders()) {
+      EndpointHeader headerItem = toEntity(context, header);
+      headerItem.setEndpoint(endpoint);
+      endpoint.addToEndpointHeaders(headerItem);
+    }
     return endpoint;
+  }
+
+  private static EndpointHeader toEntity(ObjectContext context, EndpointHeaderDto header) {
+    EndpointHeader endpointHeader = context.newObject(EndpointHeader.class);
+    endpointHeader.setName(header.getName());
+    return endpointHeader;
   }
 
   private static EndpointParameter toEntity(ObjectContext context, EndpointParameterDto endpointParameterDto) {
@@ -99,12 +113,13 @@ public class EndpointConverter {
    */
   public static EndpointDto toDto(Endpoint endpointEntity) {
     Assert.notNull(endpointEntity, "Endpoint must not be null");
-    return new EndpointDto.Builder()
+    return EndpointDto.builder()
         .id(endpointEntity.getId())
         .path(endpointEntity.getPath())
         .methodSignature(endpointEntity.getMethodSignature())
         .httpMethod(HttpMethod.valueOf(endpointEntity.getHttpMethod()))
         .parameters(toParameterDto(endpointEntity.getEndpointParameters()))
+        .headers(toHeaderDto(endpointEntity.getEndpointHeaders()))
         .isPatternPath(endpointEntity.isIsPatternPath())
         .ruleStatus(RuleStatus.of(endpointEntity.getRuleStatus()))
         .ruleIpBased(endpointEntity.isRuleIpBased())
@@ -113,6 +128,16 @@ public class EndpointConverter {
         .ruleTimeLimitInSeconds(endpointEntity.getRuleTimeLimitInSeconds())
         .ruleBanTimeInSeconds(endpointEntity.getRuleBanTimeInSeconds())
         .build();
+  }
+
+  private static Set<EndpointHeaderDto> toHeaderDto(List<EndpointHeader> endpointHeaders) {
+    if (endpointHeaders == null) {
+      return Set.of();
+    }
+    return endpointHeaders
+        .stream()
+        .map(header -> new EndpointHeaderDto(header.getName(), header.isEnabled()))
+        .collect(Collectors.toSet());
   }
 
   private static Set<EndpointParameterDto> toParameterDto(List<EndpointParameter> endpointParameters) {
