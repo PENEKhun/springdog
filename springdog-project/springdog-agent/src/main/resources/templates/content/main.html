@@ -8,6 +8,7 @@
   <title>Dashboard</title>
   <script th:src="@{/js/chart.js}"></script>
   <script th:src="@{/js/chartjs-adapter-date-fns.js}"></script>
+  <script th:src="@{/js/home.js}"></script>
   <style>
     .chart-container {
       position: relative;
@@ -51,200 +52,12 @@
       color: white;
       margin-right: 10px;
     }
-
-    .method-get {
-      background-color: #28a745; /* Green */
-    }
-
-    .method-post {
-      background-color: #007bff; /* Blue */
-    }
-
-    .method-put {
-      background-color: #ffc107; /* Yellow */
-    }
-
-    .method-delete {
-      background-color: #dc3545; /* Red */
-    }
   </style>
   <script th:inline="javascript">
     /*<![CDATA[*/
-    let recentSystemMetrics = [[${recentSystemMetrics}]].reverse();
     let recentEndpointMetrics = [[${recentEndpointMetrics}]].reverse();
+    let systemMetrics = [[${recentSystemMetrics}]];
     /*]]>*/
-
-    const labels = recentSystemMetrics.map(
-        metric => new Date(metric.timestamp).toLocaleTimeString());
-    const cpuUsageData = recentSystemMetrics.map(
-        metric => (metric.cpuUsagePercent !== null && !isNaN(metric.cpuUsagePercent)
-            && metric.cpuUsagePercent !== 0) ? metric.cpuUsagePercent : null);
-    const memoryUsageData = recentSystemMetrics.map(
-        metric => (metric.memoryUsagePercent !== null && !isNaN(metric.memoryUsagePercent)
-            && metric.memoryUsagePercent !== 0) ? metric.memoryUsagePercent : null);
-    const diskUsageData = recentSystemMetrics.map(
-        metric => (metric.diskUsagePercent !== null && !isNaN(metric.diskUsagePercent)
-            && metric.diskUsagePercent !== 0) ? metric.diskUsagePercent : null);
-
-    window.onload = function () {
-
-      const ctx = document.getElementById('endpointMetricsChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: recentEndpointMetrics.map(item => item.date),
-          datasets: [
-            {
-              label: 'Visit Count',
-              data: recentEndpointMetrics.map(item => item.totalPageView),
-              borderColor: 'rgb(75, 192, 192)',
-              tension: 0.1,
-              yAxisID: 'y-axis-1'
-            },
-            {
-              label: 'Average Response Time (ms)',
-              data: recentEndpointMetrics.map(item => item.averageResponseTime),
-              borderColor: 'rgb(255, 99, 132)',
-              tension: 0.1,
-              yAxisID: 'y-axis-2'
-            },
-            {
-              label: 'Rate Limit Failures',
-              data: recentEndpointMetrics.map(item => item.ratelimitFailCount),
-              borderColor: 'rgb(54, 162, 235)',
-              tension: 0.1,
-              yAxisID: 'y-axis-3'
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              title: {
-                display: true,
-                text: 'Date'
-              }
-            },
-            'y-axis-1': {
-              type: 'linear',
-              display: true,
-              position: 'left',
-              title: {
-                display: true,
-                text: 'Visit Count'
-              },
-            },
-            'y-axis-2': {
-              type: 'linear',
-              display: true,
-              position: 'right',
-              title: {
-                display: true,
-                text: 'Avg Response Time (ms)'
-              },
-              grid: {
-                drawOnChartArea: false,
-              },
-            },
-            'y-axis-3': {
-              type: 'linear',
-              display: true,
-              position: 'right',
-              title: {
-                display: true,
-                text: 'Rate Limit Failures'
-              },
-              grid: {
-                drawOnChartArea: false,
-              },
-            },
-          },
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            title: {
-              display: true,
-              text: 'Endpoint Metrics'
-            }
-          }
-        }
-      });
-
-      const ctx2 = document.getElementById('systemUsageChart').getContext('2d');
-      const systemUsageChart = new Chart(ctx2, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'CPU Usage (%)',
-              data: cpuUsageData,
-              backgroundColor: 'rgba(255, 206, 86, 0.2)',
-              borderColor: 'rgba(255, 206, 86, 1)',
-              borderWidth: 1
-            },
-            {
-              label: 'Memory Usage (%)',
-              data: memoryUsageData,
-              backgroundColor: 'rgba(54, 162, 235, 0.2)',
-              borderColor: 'rgba(54, 162, 235, 1)',
-              borderWidth: 1
-            },
-            {
-              label: 'Disk Usage (%)',
-              data: diskUsageData,
-              backgroundColor: 'rgba(255, 99, 132, 0.2)',
-              borderColor: 'rgba(255, 99, 132, 1)',
-              borderWidth: 1
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              ticks: {
-                callback: function (value, index, values) {
-                  return index % 5 === 0 ? this.getLabelForValue(value) : '';
-                }
-              }
-            },
-            y: {
-              beginAtZero: true,
-              max: 100,
-              title: {
-                display: true,
-                text: 'Usage (%)'
-              }
-            }
-          },
-          plugins: {
-            tooltip: {
-              callbacks: {
-                title: function (tooltipItems, data) {
-                  const index = tooltipItems[0].dataIndex;
-                  const metric = recentSystemMetrics[index];
-                  const timestamp = new Date(metric.timestamp);
-                  return timestamp.toLocaleString();
-                },
-                label: function (tooltipItem) {
-                  const metric = recentSystemMetrics[tooltipItem.dataIndex];
-                  return [
-                    `CPU Usage: ${metric.cpuUsagePercent}%`,
-                    `Memory Usage: ${metric.memoryUsagePercent}%`,
-                    `Disk Usage: ${metric.diskUsagePercent}%`
-                  ];
-                }
-              }
-            }
-          }
-        }
-      });
-    };
 
     document.addEventListener('DOMContentLoaded', function () {
       var tooltipTriggerList = [].slice.call(
@@ -252,6 +65,27 @@
       var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
       });
+
+      createChart('chart-cpu', 'CPU Usage', systemMetrics.map(metric => metric.cpuUsagePercent),
+          '%');
+      createChart('chart-memory', 'Memory Usage',
+          systemMetrics.map(metric => metric.memoryUsagePercent), '%');
+      createChart('chart-disk', 'Disk Usage', systemMetrics.map(metric => metric.diskUsagePercent),
+          '%');
+      createChart('chart-jvm-heap', 'JVM Heap Usage',
+          systemMetrics.map(metric => metric.jvmHeapUsagePercent), '%');
+      createChart('chart-jvm-non-heap', 'JVM Non-Heap Usage',
+          systemMetrics.map(metric => metric.jvmNonHeapUsagePercent), '%');
+
+      createEndpointChart('chart-visit-count', 'Visit Count',
+          recentEndpointMetrics.map(item => item.totalPageView), 'Visits');
+      createEndpointChart('chart-response-time', 'Avg Response Time',
+          recentEndpointMetrics.map(item => item.averageResponseTime), 'ms');
+      createEndpointChart('chart-rate-limit-failures', 'Rate Limit Failures',
+          recentEndpointMetrics.map(item => item.ratelimitFailCount), 'Failures');
+
+      createNetworkChart();
+      createEndpointMetricsChart();
     });
   </script>
 </head>
@@ -302,85 +136,198 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-md-12 col-lg-8 mb-3">
-        <div class="card shadow-sm" style="border-radius: 1rem;">
-          <div class="card-header">
-            <h6 class="my-0 fw-normal">Daily Endpoint Statistics</h6>
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">Endpoint Metrics</h5>
           </div>
           <div class="card-body">
-            <div class="chart-container">
-              <canvas id="endpointMetricsChart"></canvas>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">Daily Visit Count</h6>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="chart-visit-count"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">Average Response Time</h6>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="chart-response-time"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">Rate Limit Failures</h6>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="chart-rate-limit-failures"></canvas>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-12 col-lg-4 mb-3">
-        <div class="card shadow-sm" style="border-radius: 1rem;">
-          <div class="card-header">
-            <h6 class="my-0 fw-normal">System Metrics</h6>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="systemUsageChart"></canvas>
+            <div class="row">
+              <!-- Top Ratelimit Error Endpoints -->
+              <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card shadow-sm" style="border-radius: 1rem;">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">Top Ratelimit Error Endpoints</h6>
+                  </div>
+                  <div class="card-body">
+                    <ul class="list-group" id="dailyTopFail"
+                        th:if="${not #lists.isEmpty(dailyTopFailure)}">
+                      <li th:each="metric : ${dailyTopFailure}"
+                          class="list-group-item d-flex justify-content-between align-items-center">
+          <span th:class="'method-icon method-' + ${metric.method.toLowerCase()}"
+                th:text="${metric.method}"></span>
+                        <span th:text="${metric.endpoint}"></span>
+                        <span class="badge bg-danger rounded-pill"
+                              th:text="${metric.count}"></span>
+                      </li>
+                    </ul>
+                    <p class="text-center text-muted my-3"
+                       th:if="${#lists.isEmpty(dailyTopFailure)}">
+                      No Data Available
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Daily Top Traffic Endpoints -->
+              <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card shadow-sm" style="border-radius: 1rem;">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">Daily Top Traffic Endpoints</h6>
+                  </div>
+                  <div class="card-body">
+                    <ul class="list-group" id="dailyTopTraffic"
+                        th:if="${not #lists.isEmpty(dailyTopTraffic)}">
+                      <li th:each="metric : ${dailyTopTraffic}"
+                          class="list-group-item d-flex justify-content-between align-items-center">
+          <span th:class="'method-icon method-' + ${metric.method.toLowerCase()}"
+                th:text="${metric.method}"></span>
+                        <span th:text="${metric.endpoint}"></span>
+                        <span class="badge bg-primary rounded-pill"
+                              th:text="${metric.count}"></span>
+                      </li>
+                    </ul>
+                    <p class="text-center text-muted my-3"
+                       th:if="${#lists.isEmpty(dailyTopTraffic)}">
+                      No Data Available
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Daily Slowest Endpoints -->
+              <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card shadow-sm" style="border-radius: 1rem;">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">Daily Slowest Endpoints</h6>
+                  </div>
+                  <div class="card-body">
+                    <ul class="list-group" id="dailySlowestEndpoints"
+                        th:if="${not #lists.isEmpty(dailySlowestEndpoints)}">
+                      <li th:each="metric : ${dailySlowestEndpoints}"
+                          class="list-group-item d-flex justify-content-between align-items-center">
+          <span th:class="'method-icon method-' + ${metric.method.toLowerCase()}"
+                th:text="${metric.method}"></span>
+                        <span th:text="${metric.endpoint}"></span>
+                        <span class="badge bg-danger rounded-pill"
+                              th:text="${metric.averageResponseTime} + ' ms'"></span>
+                      </li>
+                    </ul>
+                    <p class="text-center text-muted my-3"
+                       th:if="${#lists.isEmpty(dailySlowestEndpoints)}">
+                      No Data Available
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-md-6 col-lg-4 mb-3">
-        <div class="card shadow-sm" style="border-radius: 1rem;">
-          <div class="card-header">
-            <h6 class="my-0 fw-normal">Top Ratelimit Error Endpoints</h6>
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">System Metrics</h5>
           </div>
           <div class="card-body">
-            <ul class="list-group" id="dailyTopFail">
-              <li th:each="metric : ${dailyTopFailure}"
-                  class="list-group-item d-flex justify-content-between align-items-center">
-                <span th:class="'method-icon method-' + ${metric.method.toLowerCase()}"
-                      th:text="${metric.method}"></span>
-                <span th:text="${metric.endpoint}"></span>
-                <span class="badge bg-danger rounded-pill"
-                      th:text="${metric.count}"></span>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-3">
-        <div class="card shadow-sm" style="border-radius: 1rem;">
-          <div class="card-header">
-            <h6 class="my-0 fw-normal">Daily Top Traffic Endpoints</h6>
-          </div>
-          <div class="card-body">
-            <ul class="list-group" id="dailyTopTraffic">
-              <li th:each="metric : ${dailyTopTraffic}"
-                  class="list-group-item d-flex justify-content-between align-items-center">
-                <span th:class="'method-icon method-' + ${metric.method.toLowerCase()}"
-                      th:text="${metric.method}"></span>
-                <span th:text="${metric.endpoint}"></span>
-                <span class="badge bg-primary rounded-pill" th:text="${metric.count}"></span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-3">
-        <div class="card shadow-sm" style="border-radius: 1rem;">
-          <div class="card-header">
-            <h6 class="my-0 fw-normal">Daily Slowest Endpoints</h6>
-          </div>
-          <div class="card-body">
-            <ul class="list-group" id="dailySlowestEndpoints">
-              <li th:each="metric : ${dailySlowestEndpoints}"
-                  class="list-group-item d-flex justify-content-between align-items-center">
-                <span th:class="'method-icon method-' + ${metric.method.toLowerCase()}"
-                      th:text="${metric.method}"></span>
-                <span th:text="${metric.endpoint}"></span>
-                <span class="badge bg-danger rounded-pill"
-                      th:text="${metric.averageResponseTime} + ' ms'"></span>
-            </ul>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">CPU Usage</h6>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="chart-cpu"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">Memory Usage</h6>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="chart-memory"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">Disk Usage</h6>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="chart-disk"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">JVM Heap Usage</h6>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="chart-jvm-heap"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">JVM Non-Heap Usage</h6>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="chart-jvm-non-heap"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="my-0 fw-normal">Network Usage</h6>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="chart-network"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -54,8 +54,15 @@ public class SystemMetricsScheduler {
     double cpuUsagePercent = systemUsageMonitor.systemCpuUsagePercent();
     double memoryUsagePercent = systemUsageMonitor.getSystemMemoryUsagePercent();
     double diskUsagePercent = systemUsageMonitor.diskUsagePercent();
+    double jvmHeapUsagePercent = systemUsageMonitor.getJvmHeapUsagePercent();
+    double jvmNonHeapUsagePercent = systemUsageMonitor.getJvmNonHeapUsagePercent();
+    long jvmTotalMemoryUsed = systemUsageMonitor.getJvmTotalMemoryUsed();
+    long networkInBytes = systemUsageMonitor.getNetworkInBytes();
+    long networkOutBytes = systemUsageMonitor.getNetworkOutBytes();
 
-    statisticsService.storeSystemMetrics(cpuUsagePercent, memoryUsagePercent, diskUsagePercent);
+    statisticsService.storeSystemMetrics(cpuUsagePercent, memoryUsagePercent, diskUsagePercent,
+        jvmHeapUsagePercent, jvmNonHeapUsagePercent, jvmTotalMemoryUsed,
+        networkInBytes, networkOutBytes);
     systemWatchNotificationManager.checkMetrics(cpuUsagePercent, memoryUsagePercent, diskUsagePercent);
   }
 }

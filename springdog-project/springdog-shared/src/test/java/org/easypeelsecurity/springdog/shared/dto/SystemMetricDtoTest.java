@@ -16,7 +16,7 @@
 
 package org.easypeelsecurity.springdog.shared.dto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 
@@ -26,22 +26,13 @@ import org.junit.jupiter.api.Test;
 class SystemMetricDtoTest {
 
   @Test
-  @DisplayName("Should create SystemMetricDto object correctly.")
-  void createSystemMetricDtoSuccessfully() {
-    // given
-    double cpuUsage = 75.5;
-    double memoryUsage = 60.0;
-    double diskUsage = 85.0;
-    LocalDateTime timestamp = LocalDateTime.now();
-
+  @DisplayName("Should create a SystemMetricDto with a timestamp")
+  void shouldCreateSystemMetricDtoWithTimestamp() {
     // when
-    SystemMetricDto systemMetricDto = new SystemMetricDto(cpuUsage, memoryUsage, diskUsage, timestamp);
+    SystemMetricDto systemMetricDto = SystemMetricDto.builder().build();
 
     // then
-    assertEquals(cpuUsage, systemMetricDto.getCpuUsagePercent());
-    assertEquals(memoryUsage, systemMetricDto.getMemoryUsagePercent());
-    assertEquals(diskUsage, systemMetricDto.getDiskUsagePercent());
-    assertEquals(timestamp, systemMetricDto.getTimestamp());
+    assertThat(systemMetricDto.getTimestamp().isBefore(LocalDateTime.now())).isTrue();
   }
 }
 

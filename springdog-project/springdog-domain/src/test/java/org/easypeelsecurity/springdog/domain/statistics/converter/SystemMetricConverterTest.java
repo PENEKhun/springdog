@@ -16,6 +16,7 @@
 
 package org.easypeelsecurity.springdog.domain.statistics.converter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -61,7 +62,17 @@ class SystemMetricConverterTest {
   @DisplayName("Should convert SystemMetricDto to SystemMetric correctly.")
   void convertDtoToSystemMetricSuccessfully() {
     // given
-    SystemMetricDto systemMetricDto = new SystemMetricDto(75.5, 60.0, 85.0, LocalDateTime.now());
+    SystemMetricDto systemMetricDto = SystemMetricDto.builder()
+        .cpuUsagePercent(1.0)
+        .memoryUsagePercent(2.0)
+        .diskUsagePercent(3.0)
+        .jvmHeapUsagePercent(4.0)
+        .jvmNonHeapUsagePercent(5.0)
+        .jvmTotalMemoryUsed(6L)
+        .networkInBytes(7L)
+        .networkOutBytes(8L)
+        .timestamp(LocalDateTime.of(2024, 1, 1, 0, 0))
+        .build();
     SystemMetric systemMetricMock = new SystemMetric();
     when(context.newObject(SystemMetric.class)).thenReturn(systemMetricMock);
 
@@ -69,10 +80,15 @@ class SystemMetricConverterTest {
     SystemMetric systemMetric = SystemMetricConverter.convert(context, systemMetricDto);
 
     // then
-    assertEquals(75.5, systemMetric.getCpuUsagePercent());
-    assertEquals(60.0, systemMetric.getMemoryUsagePercent());
-    assertEquals(85.0, systemMetric.getDiskUsagePercent());
-    assertEquals(systemMetricDto.getTimestamp(), systemMetric.getTimestamp());
+    assertThat(systemMetric.getCpuUsagePercent()).isEqualTo(1.0);
+    assertThat(systemMetric.getMemoryUsagePercent()).isEqualTo(2.0);
+    assertThat(systemMetric.getDiskUsagePercent()).isEqualTo(3.0);
+    assertThat(systemMetric.getJvmHeapUsagePercent()).isEqualTo(4.0);
+    assertThat(systemMetric.getJvmNonHeapUsagePercent()).isEqualTo(5.0);
+    assertThat(systemMetric.getJvmTotalMemoryUsed()).isEqualTo(6L);
+    assertThat(systemMetric.getNetworkInBytes()).isEqualTo(7L);
+    assertThat(systemMetric.getNetworkOutBytes()).isEqualTo(8L);
+    assertThat(systemMetric.getTimestamp()).isEqualTo(LocalDateTime.of(2024, 1, 1, 0, 0));
   }
 }
 

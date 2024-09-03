@@ -24,12 +24,22 @@ public abstract class _SystemMetric extends BaseDataObject {
 
     public static final NumericProperty<Double> CPU_USAGE_PERCENT = PropertyFactory.createNumeric("cpuUsagePercent", Double.class);
     public static final NumericProperty<Double> DISK_USAGE_PERCENT = PropertyFactory.createNumeric("diskUsagePercent", Double.class);
+    public static final NumericProperty<Double> JVM_HEAP_USAGE_PERCENT = PropertyFactory.createNumeric("jvmHeapUsagePercent", Double.class);
+    public static final NumericProperty<Double> JVM_NON_HEAP_USAGE_PERCENT = PropertyFactory.createNumeric("jvmNonHeapUsagePercent", Double.class);
+    public static final NumericProperty<Long> JVM_TOTAL_MEMORY_USED = PropertyFactory.createNumeric("jvmTotalMemoryUsed", Long.class);
     public static final NumericProperty<Double> MEMORY_USAGE_PERCENT = PropertyFactory.createNumeric("memoryUsagePercent", Double.class);
+    public static final NumericProperty<Long> NETWORK_IN_BYTES = PropertyFactory.createNumeric("networkInBytes", Long.class);
+    public static final NumericProperty<Long> NETWORK_OUT_BYTES = PropertyFactory.createNumeric("networkOutBytes", Long.class);
     public static final DateProperty<LocalDateTime> TIMESTAMP = PropertyFactory.createDate("timestamp", LocalDateTime.class);
 
     protected double cpuUsagePercent;
     protected double diskUsagePercent;
+    protected double jvmHeapUsagePercent;
+    protected double jvmNonHeapUsagePercent;
+    protected long jvmTotalMemoryUsed;
     protected double memoryUsagePercent;
+    protected long networkInBytes;
+    protected long networkOutBytes;
     protected LocalDateTime timestamp;
 
 
@@ -53,6 +63,36 @@ public abstract class _SystemMetric extends BaseDataObject {
         return this.diskUsagePercent;
     }
 
+    public void setJvmHeapUsagePercent(double jvmHeapUsagePercent) {
+        beforePropertyWrite("jvmHeapUsagePercent", this.jvmHeapUsagePercent, jvmHeapUsagePercent);
+        this.jvmHeapUsagePercent = jvmHeapUsagePercent;
+    }
+
+    public double getJvmHeapUsagePercent() {
+        beforePropertyRead("jvmHeapUsagePercent");
+        return this.jvmHeapUsagePercent;
+    }
+
+    public void setJvmNonHeapUsagePercent(double jvmNonHeapUsagePercent) {
+        beforePropertyWrite("jvmNonHeapUsagePercent", this.jvmNonHeapUsagePercent, jvmNonHeapUsagePercent);
+        this.jvmNonHeapUsagePercent = jvmNonHeapUsagePercent;
+    }
+
+    public double getJvmNonHeapUsagePercent() {
+        beforePropertyRead("jvmNonHeapUsagePercent");
+        return this.jvmNonHeapUsagePercent;
+    }
+
+    public void setJvmTotalMemoryUsed(long jvmTotalMemoryUsed) {
+        beforePropertyWrite("jvmTotalMemoryUsed", this.jvmTotalMemoryUsed, jvmTotalMemoryUsed);
+        this.jvmTotalMemoryUsed = jvmTotalMemoryUsed;
+    }
+
+    public long getJvmTotalMemoryUsed() {
+        beforePropertyRead("jvmTotalMemoryUsed");
+        return this.jvmTotalMemoryUsed;
+    }
+
     public void setMemoryUsagePercent(double memoryUsagePercent) {
         beforePropertyWrite("memoryUsagePercent", this.memoryUsagePercent, memoryUsagePercent);
         this.memoryUsagePercent = memoryUsagePercent;
@@ -61,6 +101,26 @@ public abstract class _SystemMetric extends BaseDataObject {
     public double getMemoryUsagePercent() {
         beforePropertyRead("memoryUsagePercent");
         return this.memoryUsagePercent;
+    }
+
+    public void setNetworkInBytes(long networkInBytes) {
+        beforePropertyWrite("networkInBytes", this.networkInBytes, networkInBytes);
+        this.networkInBytes = networkInBytes;
+    }
+
+    public long getNetworkInBytes() {
+        beforePropertyRead("networkInBytes");
+        return this.networkInBytes;
+    }
+
+    public void setNetworkOutBytes(long networkOutBytes) {
+        beforePropertyWrite("networkOutBytes", this.networkOutBytes, networkOutBytes);
+        this.networkOutBytes = networkOutBytes;
+    }
+
+    public long getNetworkOutBytes() {
+        beforePropertyRead("networkOutBytes");
+        return this.networkOutBytes;
     }
 
     public void setTimestamp(LocalDateTime timestamp) {
@@ -86,8 +146,18 @@ public abstract class _SystemMetric extends BaseDataObject {
                 return this.cpuUsagePercent;
             case "diskUsagePercent":
                 return this.diskUsagePercent;
+            case "jvmHeapUsagePercent":
+                return this.jvmHeapUsagePercent;
+            case "jvmNonHeapUsagePercent":
+                return this.jvmNonHeapUsagePercent;
+            case "jvmTotalMemoryUsed":
+                return this.jvmTotalMemoryUsed;
             case "memoryUsagePercent":
                 return this.memoryUsagePercent;
+            case "networkInBytes":
+                return this.networkInBytes;
+            case "networkOutBytes":
+                return this.networkOutBytes;
             case "timestamp":
                 return this.timestamp;
             default:
@@ -108,8 +178,23 @@ public abstract class _SystemMetric extends BaseDataObject {
             case "diskUsagePercent":
                 this.diskUsagePercent = val == null ? 0 : (double)val;
                 break;
+            case "jvmHeapUsagePercent":
+                this.jvmHeapUsagePercent = val == null ? 0 : (double)val;
+                break;
+            case "jvmNonHeapUsagePercent":
+                this.jvmNonHeapUsagePercent = val == null ? 0 : (double)val;
+                break;
+            case "jvmTotalMemoryUsed":
+                this.jvmTotalMemoryUsed = val == null ? 0 : (long)val;
+                break;
             case "memoryUsagePercent":
                 this.memoryUsagePercent = val == null ? 0 : (double)val;
+                break;
+            case "networkInBytes":
+                this.networkInBytes = val == null ? 0 : (long)val;
+                break;
+            case "networkOutBytes":
+                this.networkOutBytes = val == null ? 0 : (long)val;
                 break;
             case "timestamp":
                 this.timestamp = (LocalDateTime)val;
@@ -132,7 +217,12 @@ public abstract class _SystemMetric extends BaseDataObject {
         super.writeState(out);
         out.writeDouble(this.cpuUsagePercent);
         out.writeDouble(this.diskUsagePercent);
+        out.writeDouble(this.jvmHeapUsagePercent);
+        out.writeDouble(this.jvmNonHeapUsagePercent);
+        out.writeLong(this.jvmTotalMemoryUsed);
         out.writeDouble(this.memoryUsagePercent);
+        out.writeLong(this.networkInBytes);
+        out.writeLong(this.networkOutBytes);
         out.writeObject(this.timestamp);
     }
 
@@ -141,7 +231,12 @@ public abstract class _SystemMetric extends BaseDataObject {
         super.readState(in);
         this.cpuUsagePercent = in.readDouble();
         this.diskUsagePercent = in.readDouble();
+        this.jvmHeapUsagePercent = in.readDouble();
+        this.jvmNonHeapUsagePercent = in.readDouble();
+        this.jvmTotalMemoryUsed = in.readLong();
         this.memoryUsagePercent = in.readDouble();
+        this.networkInBytes = in.readLong();
+        this.networkOutBytes = in.readLong();
         this.timestamp = (LocalDateTime)in.readObject();
     }
 

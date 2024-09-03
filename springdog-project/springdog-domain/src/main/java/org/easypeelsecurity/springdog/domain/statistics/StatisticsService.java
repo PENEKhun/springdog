@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import org.easypeelsecurity.springdog.domain.ratelimit.EndpointRepository;
 import org.easypeelsecurity.springdog.domain.ratelimit.model.Endpoint;
+import org.easypeelsecurity.springdog.domain.statistics.converter.SystemMetricConverter;
 import org.easypeelsecurity.springdog.domain.statistics.model.EndpointMetric;
 import org.easypeelsecurity.springdog.domain.statistics.model.SystemMetric;
 import org.easypeelsecurity.springdog.shared.dto.EndpointMetricDto;
@@ -72,11 +73,7 @@ public class StatisticsService {
     long totalActiveEndpointCount = endpointRepository.getEndpointCountByStatus(context, ACTIVE.name());
     List<SystemMetricDto> recentSystemMetrics = systemMetricRepository.getRecentSystemMetrics(context, 30)
         .stream()
-        .map(metric -> new SystemMetricDto(
-            metric.getCpuUsagePercent(),
-            metric.getMemoryUsagePercent(),
-            metric.getDiskUsagePercent(),
-            metric.getTimestamp()))
+        .map(SystemMetricConverter::convert)
         .toList();
 
     return new DashboardResponse(
@@ -130,11 +127,18 @@ public class StatisticsService {
   /**
    * Store system metrics.
    *
-   * @param cpuUsagePercent    cpu usage percentage
-   * @param memoryUsagePercent memory usage percentage
-   * @param diskUsagePercent   disk usage percentage
+   * @param cpuUsagePercent        cpu usage percentage
+   * @param memoryUsagePercent     memory usage percentage
+   * @param diskUsagePercent       disk usage percentage
+   * @param jvmHeapUsagePercent    JVM heap usage percentage
+   * @param jvmNonHeapUsagePercent JVM non-heap usage percentage
+   * @param jvmTotalMemoryUsed     JVM total memory used
+   * @param networkInBytes         network in bytes
+   * @param networkOutBytes        network out bytes
    */
-  public void storeSystemMetrics(double cpuUsagePercent, double memoryUsagePercent, double diskUsagePercent) {
+  public void storeSystemMetrics(double cpuUsagePercent, double memoryUsagePercent, double diskUsagePercent,
+      double jvmHeapUsagePercent, double jvmNonHeapUsagePercent, long jvmTotalMemoryUsed,
+      long networkInBytes, long networkOutBytes) {
 
     if (cpuUsagePercent < 0 || cpuUsagePercent > 100) {
       throw new IllegalArgumentException("CPU usage percentage must be between 0 and 100");
@@ -152,6 +156,11 @@ public class StatisticsService {
     systemMetric.setCpuUsagePercent(cpuUsagePercent);
     systemMetric.setMemoryUsagePercent(memoryUsagePercent);
     systemMetric.setDiskUsagePercent(diskUsagePercent);
+    systemMetric.setJvmHeapUsagePercent(jvmHeapUsagePercent);
+    systemMetric.setJvmNonHeapUsagePercent(jvmNonHeapUsagePercent);
+    systemMetric.setJvmTotalMemoryUsed(jvmTotalMemoryUsed);
+    systemMetric.setNetworkInBytes(networkInBytes);
+    systemMetric.setNetworkOutBytes(networkOutBytes);
 
     context.commitChanges();
   }
