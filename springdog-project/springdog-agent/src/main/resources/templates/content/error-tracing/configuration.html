@@ -1,0 +1,142 @@
+<!--
+  ~ Copyright 2024 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html layout:decorate="~{/templates/layout/default_layout.html}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+
+<head>
+  <title>configuration</title>
+</head>
+
+<div class="content" layout:fragment="content">
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const searchInput = document.getElementById('searchInput');
+      const accordionItems = document.querySelectorAll('.accordion-item');
+
+      function highlightText(text, searchValue) {
+        if (!searchValue) {
+          return text;
+        }
+        const regex = new RegExp(`(${searchValue})`, 'gi');
+        return text.replace(regex, '<mark>$1</mark>');
+      }
+
+      searchInput.addEventListener('input', function (e) {
+        const searchValue = e.target.value.toLowerCase();
+        accordionItems.forEach(function (accordionItem) {
+          const exceptionItems = accordionItem.querySelectorAll('.exception-item');
+          let hasVisibleItem = false;
+
+          exceptionItems.forEach(function (item) {
+            const label = item.querySelector('label');
+            const originalText = label.getAttribute('data-original-text') || label.textContent;
+            const exceptionName = originalText.toLowerCase();
+
+            if (exceptionName.includes(searchValue)) {
+              item.style.display = 'block';
+              hasVisibleItem = true;
+              if (!label.getAttribute('data-original-text')) {
+                label.setAttribute('data-original-text', originalText);
+              }
+              label.innerHTML = highlightText(originalText, searchValue);
+            } else {
+              item.style.display = 'none';
+              label.textContent = originalText;
+            }
+          });
+
+          accordionItem.style.display = hasVisibleItem ? 'block' : 'none';
+        });
+      });
+
+      // Add event listeners to all checkboxes
+      const checkboxes = document.querySelectorAll('.form-check-input');
+      checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function (e) {
+          const exceptionId = this.value;
+          const isChecked = this.checked;
+
+          // Call the API
+          springdogFetch(`/error-tracing/configuration/${exceptionId}?enabled=${isChecked}`, {
+            method: 'GET'
+          })
+          .then(data => {
+            console.log(`Exception ${exceptionId} monitoring status changed to ${isChecked}`);
+            // 성공 시 추가 작업이 필요하다면 여기에 작성
+          })
+          .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+            // Revert the checkbox state if the API call fails
+            this.checked = !isChecked;
+          });
+        });
+      });
+    });
+  </script>
+
+  <h1 class="mt-4">Error Trace</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">
+      You can specify a list of Exception Classes to watch for in your application. <br/>
+      When an exception is thrown, the agent will capture the stack trace and send it to the server.
+    </li>
+  </ol>
+
+  <div class="mb-3">
+    <label for="searchInput">Search</label>
+    <input type="text" class="form-control" id="searchInput" placeholder="Search for exceptions...">
+  </div>
+
+  <div class="accordion" id="exceptionAccordion">
+    <!--/*@thymesVar id="exceptionClasses" type="org.easypeelsecurity.springdog.shared.dto.ExceptionClassesDto"*/-->
+    <div class="accordion-item" th:each="exceptionList : ${exceptionClasses.exceptionList}">
+      <h2 class="accordion-header" th:id="'heading-' + ${exceptionList.packageTypeId}">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                th:data-bs-target="'#collapse-' + ${exceptionList.packageTypeId}"
+                aria-expanded="false"
+                th:aria-controls="'collapse-' + ${exceptionList.packageTypeId}">
+          <span th:text="${exceptionList.packageType}" class="fw-bold"></span>
+          <span class="ms-2 text-muted" th:text="${exceptionList.description}"></span>
+        </button>
+      </h2>
+      <div th:id="'collapse-' + ${exceptionList.packageTypeId}" class="accordion-collapse collapse"
+           th:aria-labelledby="'heading-' + ${exceptionList.packageTypeId}"
+           data-bs-parent="#exceptionAccordion">
+        <div class="accordion-body">
+          <ul class="list-group">
+            <li class="list-group-item exception-item"
+                th:each="exception : ${exceptionList.subExceptions}">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" th:value="${exception.exceptionId}"
+                       th:id="'exception-' + ${exception.exceptionId}"
+                       th:checked="${exception.isEnableToMonitor()}">
+                <label class="form-check-label" th:for="'exception-' + ${exception.exceptionId}"
+                       th:text="${exception.exceptionName}">
+                </label>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</html>

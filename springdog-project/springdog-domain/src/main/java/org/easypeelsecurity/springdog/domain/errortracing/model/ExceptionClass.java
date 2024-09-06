@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.agent;
+package org.easypeelsecurity.springdog.domain.errortracing.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.easypeelsecurity.springdog.domain.errortracing.model.auto._ExceptionClass;
 
-/**
- * Annotation for Springdog agent controller.
- * related to {@link SpringdogDynamicUrlMappingConfig}
- */
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SpringdogAgentController {
+@SuppressWarnings("all")
+public class ExceptionClass extends _ExceptionClass {
+
+  private static final long serialVersionUID = 1L;
 }

@@ -3,11 +3,13 @@
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/domain https://cayenne.apache.org/schema/10/domain.xsd"
 	 project-version="10">
+	<map name="ErrorTracing"/>
 	<map name="Ratelimit"/>
 	<map name="Statistics"/>
 	<node name="springdog derby"
 		 factory="org.apache.cayenne.configuration.server.XMLPoolingDataSourceFactory"
 		 schema-update-strategy="org.apache.cayenne.access.dbsync.CreateIfNoSchemaStrategy">
+		<map-ref name="ErrorTracing"/>
 		<map-ref name="Ratelimit"/>
 		<map-ref name="Statistics"/>
 		<data-source>

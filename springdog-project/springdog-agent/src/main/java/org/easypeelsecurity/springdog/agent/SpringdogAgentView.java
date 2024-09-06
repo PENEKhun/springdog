@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionListingService;
 import org.easypeelsecurity.springdog.domain.ratelimit.EndpointService;
 import org.easypeelsecurity.springdog.domain.statistics.StatisticsService;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
@@ -52,6 +53,8 @@ public class SpringdogAgentView {
   private StatisticsService statisticsService;
   @Autowired
   private EndpointService endpointService;
+  @Autowired
+  private ExceptionListingService exceptionListingService;
   @Autowired
   private SpringdogProperties properties;
 
@@ -129,6 +132,12 @@ public class SpringdogAgentView {
     model.addAttribute("result", true);
     model.addAttribute("message", "Successfully updated");
     return viewRateLimitSpecific(endpointId, model);
+  }
+
+  @GetMapping("/error-tracing/configuration")
+  public String errorTracingConfiguration(Model model) {
+    model.addAttribute("exceptionClasses", exceptionListingService.getExceptionListing());
+    return "/templates/content/error-tracing/configuration.html";
   }
 
   @GetMapping("/service/change-pw")

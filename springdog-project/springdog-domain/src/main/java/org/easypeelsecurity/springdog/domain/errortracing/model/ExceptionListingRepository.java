@@ -14,18 +14,27 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.agent;
+package org.easypeelsecurity.springdog.domain.errortracing.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
+
+import org.apache.cayenne.ObjectContext;
 
 /**
- * Annotation for Springdog agent controller.
- * related to {@link SpringdogDynamicUrlMappingConfig}
+ * Repository for {@link ExceptionType}, {@link ExceptionClass} entities.
  */
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SpringdogAgentController {
+public interface ExceptionListingRepository {
+  /**
+   * Find all {@link ExceptionType} entities.
+   *
+   * @return The list of {@link ExceptionType} entities
+   */
+  List<ExceptionType> findAllExceptions(ObjectContext context);
+
+  /**
+   * Select Exception class by id.
+   *
+   * @return Exception class
+   */
+  ExceptionClass findByIdOrNull(ObjectContext context, long exceptionClassId);
 }

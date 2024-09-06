@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap https://cayenne.apache.org/schema/10/modelMap.xsd"
+	 project-version="10">
+	<property name="defaultPackage" value="org.easypeelsecurity.springdog.domain.errortracing.model"/>
+	<property name="defaultSchema" value="APP"/>
+	<db-entity name="EXCEPTION_CAUSE" schema="APP">
+		<db-attribute name="CLASS_NAME" type="VARCHAR" isMandatory="true" length="500"/>
+		<db-attribute name="FILE_NAME" type="VARCHAR" isMandatory="true" length="500"/>
+		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="LINE" type="INTEGER" isMandatory="true"/>
+		<db-attribute name="MESSAGE" type="VARCHAR" isMandatory="true" length="3000"/>
+		<db-attribute name="METHOD_NAME" type="VARCHAR" isMandatory="true" length="300"/>
+		<db-attribute name="NEXT_EXCEPTION_ID" type="BIGINT"/>
+		<db-attribute name="TIMESTAMP" type="TIMESTAMP" isMandatory="true"/>
+	</db-entity>
+	<db-entity name="EXCEPTION_CLASS" schema="APP">
+		<db-attribute name="EXCEPTION_CLASS_NAME" type="VARCHAR" isMandatory="true" length="200"/>
+		<db-attribute name="EXCEPTION_TYPE_ID" type="BIGINT"/>
+		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="MONITORING_ENABLED" type="BOOLEAN" isMandatory="true"/>
+	</db-entity>
+	<db-entity name="EXCEPTION_TYPE" schema="APP">
+		<db-attribute name="DESCRIPTION" type="VARCHAR" isMandatory="true" length="500"/>
+		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="PACKAGE_TYPE" type="VARCHAR" isMandatory="true" length="500"/>
+	</db-entity>
+	<obj-entity name="ExceptionCause" className="org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionCause" dbEntityName="EXCEPTION_CAUSE">
+		<obj-attribute name="className" type="java.lang.String" db-attribute-path="CLASS_NAME"/>
+		<obj-attribute name="fileName" type="java.lang.String" db-attribute-path="FILE_NAME"/>
+		<obj-attribute name="line" type="int" db-attribute-path="LINE"/>
+		<obj-attribute name="message" type="java.lang.String" db-attribute-path="MESSAGE"/>
+		<obj-attribute name="methodName" type="java.lang.String" db-attribute-path="METHOD_NAME"/>
+		<obj-attribute name="timestamp" type="java.time.LocalDateTime" db-attribute-path="TIMESTAMP"/>
+		<pre-persist method-name="onPrePersist"/>
+	</obj-entity>
+	<obj-entity name="ExceptionClass" className="org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionClass" dbEntityName="EXCEPTION_CLASS">
+		<obj-attribute name="exceptionClassName" type="java.lang.String" db-attribute-path="EXCEPTION_CLASS_NAME"/>
+		<obj-attribute name="id" type="long" db-attribute-path="ID"/>
+		<obj-attribute name="monitoringEnabled" type="boolean" db-attribute-path="MONITORING_ENABLED"/>
+	</obj-entity>
+	<obj-entity name="ExceptionType" className="org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionType" dbEntityName="EXCEPTION_TYPE">
+		<obj-attribute name="description" type="java.lang.String" db-attribute-path="DESCRIPTION"/>
+		<obj-attribute name="id" type="long" db-attribute-path="ID"/>
+		<obj-attribute name="packageType" type="java.lang.String" db-attribute-path="PACKAGE_TYPE"/>
+	</obj-entity>
+	<db-relationship name="NEXT_EXCEPTION" source="EXCEPTION_CAUSE" target="EXCEPTION_CAUSE">
+		<db-attribute-pair source="ID" target="NEXT_EXCEPTION_ID"/>
+	</db-relationship>
+	<db-relationship name="EXCEPTION_TYPE" source="EXCEPTION_CLASS" target="EXCEPTION_TYPE">
+		<db-attribute-pair source="EXCEPTION_TYPE_ID" target="ID"/>
+	</db-relationship>
+	<db-relationship name="EXCEPTION_CLASSES" source="EXCEPTION_TYPE" target="EXCEPTION_CLASS" toMany="true">
+		<db-attribute-pair source="ID" target="EXCEPTION_TYPE_ID"/>
+	</db-relationship>
+	<obj-relationship name="nextException" source="ExceptionCause" target="ExceptionCause" deleteRule="Nullify" db-relationship-path="NEXT_EXCEPTION"/>
+	<obj-relationship name="rootExceptionPackageType" source="ExceptionClass" target="ExceptionType" deleteRule="Nullify" db-relationship-path="EXCEPTION_TYPE"/>
+	<obj-relationship name="exceptionClasses" source="ExceptionType" target="ExceptionClass" deleteRule="Deny" db-relationship-path="EXCEPTION_CLASSES"/>
+	<dbImport xmlns="http://cayenne.apache.org/schema/10/dbimport">
+		<tableTypes>
+			<tableType>TABLE</tableType>
+			<tableType>VIEW</tableType>
+		</tableTypes>
+		<forceDataMapCatalog>false</forceDataMapCatalog>
+		<forceDataMapSchema>false</forceDataMapSchema>
+		<namingStrategy>org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator</namingStrategy>
+		<skipPrimaryKeyLoading>false</skipPrimaryKeyLoading>
+		<skipRelationshipsLoading>false</skipRelationshipsLoading>
+		<useJava7Types>false</useJava7Types>
+		<usePrimitives>true</usePrimitives>
+	</dbImport>
+	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
+		<destDir>../../../../springdog-domain/src/main/java</destDir>
+		<mode>entity</mode>
+		<template>templates/v4_1/subclass.vm</template>
+		<superTemplate>templates/v4_1/superclass.vm</superTemplate>
+		<embeddableTemplate>templates/v4_1/embeddable-subclass.vm</embeddableTemplate>
+		<embeddableSuperTemplate>templates/v4_1/embeddable-superclass.vm</embeddableSuperTemplate>
+		<queryTemplate>templates/v4_1/datamap-subclass.vm</queryTemplate>
+		<querySuperTemplate>templates/v4_1/datamap-superclass.vm</querySuperTemplate>
+		<outputPattern>*.java</outputPattern>
+		<makePairs>true</makePairs>
+		<usePkgPath>true</usePkgPath>
+		<overwrite>false</overwrite>
+		<createPropertyNames>false</createPropertyNames>
+		<createPKProperties>false</createPKProperties>
+		<client>false</client>
+	</cgen>
+</data-map>
