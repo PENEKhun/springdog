@@ -16,6 +16,8 @@
 
 package org.easypeelsecurity.springdog.manager.util;
 
+import org.easypeelsecurity.springdog.agent.SpringdogAgentController;
+
 /**
  * Utility class for request handler.
  */
@@ -28,6 +30,6 @@ public abstract class RequestHandlerUtil {
   public static boolean shouldSkipRequest(Class<?> controllerClass) {
     return controllerClass.equals(
         org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.class) ||
-        controllerClass.equals(org.easypeelsecurity.springdog.agent.SpringdogAgentView.class);
+        controllerClass.isAnnotationPresent(SpringdogAgentController.class);
   }
 }

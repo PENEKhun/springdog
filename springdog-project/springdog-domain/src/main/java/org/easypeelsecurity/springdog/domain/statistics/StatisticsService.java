@@ -63,6 +63,19 @@ public class StatisticsService {
   }
 
   /**
+   * Get the recent system metrics.
+   *
+   * @param limit The maximum number of system metrics to include in the results
+   * @return The list of {@link SystemMetricDto}
+   */
+  public List<SystemMetricDto> getRecentSystemMetrics(int limit) {
+    return systemMetricRepository.getRecentSystemMetrics(context, limit)
+        .stream()
+        .map(SystemMetricConverter::convert)
+        .toList();
+  }
+
+  /**
    * Get the dashboard response.
    *
    * @param specificDate Date of view
@@ -71,10 +84,7 @@ public class StatisticsService {
   public DashboardResponse getDashboardResponse(LocalDate specificDate) {
     long totalEndpointCount = endpointRepository.getEndpointCount(context);
     long totalActiveEndpointCount = endpointRepository.getEndpointCountByStatus(context, ACTIVE.name());
-    List<SystemMetricDto> recentSystemMetrics = systemMetricRepository.getRecentSystemMetrics(context, 30)
-        .stream()
-        .map(SystemMetricConverter::convert)
-        .toList();
+    List<SystemMetricDto> recentSystemMetrics = getRecentSystemMetrics(10);
 
     return new DashboardResponse(
         totalEndpointCount,
@@ -183,5 +193,13 @@ public class StatisticsService {
             metric.getFailureWithRatelimit(),
             metric.getMetricDate()))
         .toList();
+  }
+
+  public SystemMetricDto loadMetric() {
+    return null;
+  }
+
+  public void addMemo(Long metricId, String description) {
+
   }
 }

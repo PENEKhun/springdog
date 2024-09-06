@@ -27,5 +27,5 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@interface SpringdogAgentController {
+public @interface SpringdogAgentController {
 }

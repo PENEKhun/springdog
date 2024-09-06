@@ -86,6 +86,12 @@ public class SpringdogAgentView {
     return "/templates/content/main.html";
   }
 
+  @GetMapping("/system-watch")
+  public String systemWatch(Model model) {
+    model.addAttribute("systemMetrics", statisticsService.getRecentSystemMetrics(50));
+    return "/templates/content/system-watch/metrics.html";
+  }
+
   @GetMapping("/rate-limit")
   public String rateLimitManage(Model model) {
     List<EndpointDto> endpoints = endpointService.findAllEndpoints();
