@@ -14,18 +14,35 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.agent;
+package org.easypeelsecurity.springdog.shared.dto;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
+
+import lombok.Builder;
 
 /**
- * Annotation for Springdog agent controller.
- * related to {@link SpringdogDynamicUrlMappingConfig}
+ * Exception class DTO.
  */
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SpringdogAgentController {
+public record ExceptionClassesDto(List<ExceptionListDto> exceptionList) {
+
+  /**
+   * Exception list.
+   */
+  @Builder
+  public record ExceptionListDto(
+      Long packageTypeId,
+      String packageType,
+      String description,
+      List<ExceptionItemDto> subExceptions) {
+
+    /**
+     * Exception item.
+     */
+    @Builder
+    public record ExceptionItemDto(
+        Long exceptionId,
+        String exceptionName,
+        boolean isEnableToMonitor) {
+    }
+  }
 }

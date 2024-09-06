@@ -14,18 +14,8 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.agent;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Annotation for Springdog agent controller.
- * related to {@link SpringdogDynamicUrlMappingConfig}
+ * Model classes for error tracing.
  */
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SpringdogAgentController {
-}
+
+package org.easypeelsecurity.springdog.domain.errortracing.model;

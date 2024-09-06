@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+    compileOnly "org.springframework:spring-context:6.1.12"
     implementation "com.github.ben-manes.caffeine:caffeine:${caffeineVersion}"
     implementation project(":springdog-project:springdog-notification")
     implementation project(":springdog-project:springdog-domain")
@@ -11,6 +12,7 @@ dependencies {
     implementation project(":springdog-project:springdog-agent")
     implementation "commons-io:commons-io:2.16.1"
     implementation "com.github.oshi:oshi-core:6.6.3"
+    implementation "io.github.classgraph:classgraph:${classgraphVersion}"
     testCompileOnly "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
 }
 

@@ -18,60 +18,32 @@ package org.easypeelsecurity.springdog.agent;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import org.easypeelsecurity.springdog.agent.security.SpringdogSecurityConfig;
-import org.easypeelsecurity.springdog.domain.ratelimit.EndpointService;
-import org.easypeelsecurity.springdog.domain.statistics.StatisticsService;
 import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
+import org.easypeelsecurity.springdog.shared.dto.ExceptionClassesDto;
 import org.easypeelsecurity.springdog.shared.enums.HttpMethod;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import fixture.DashBoardResponseFixture;
+import support.AgentTestSupport;
 
-@SpringBootTest(properties = "springdog.agent.base-path=springdog")
-@Import({TestConfig.class, SpringdogSecurityConfig.class})
-class SpringdogAgentViewTest {
-  MockMvc mockMvc;
-
-  @Autowired
-  WebApplicationContext context;
-
-  @MockBean
-  StatisticsService statisticsService;
-
-  @MockBean
-  EndpointService endpointService;
-
-  @BeforeEach
-  void setUp() {
-    this.mockMvc = MockMvcBuilders
-        .webAppContextSetup(context)
-        .apply(springSecurity())
-        .build();
-  }
+class SpringdogAgentViewTest extends AgentTestSupport {
 
   @ParameterizedTest
   @CsvSource({
@@ -166,5 +138,13 @@ class SpringdogAgentViewTest {
     mockMvc.perform(get("/springdog/logout"))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/springdog/login?logout"));
+  }
+
+  @Test
+  @WithMockUser(username = "admin", roles = {SpringdogSecurityConfig.SPRINGDOG_AGENT_ADMIN_ROLE})
+  void errorTraceConfiguration() throws Exception {
+    when(exceptionListingService.getExceptionListing()).thenReturn(new ExceptionClassesDto(new ArrayList<>()));
+    mockMvc.perform(get("/springdog/error-tracing/configuration"))
+        .andExpect(status().isOk());
   }
 }

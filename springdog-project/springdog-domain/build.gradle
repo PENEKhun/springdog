@@ -6,6 +6,8 @@ plugins {
 dependencies {
     implementation "com.github.ben-manes.caffeine:caffeine:${caffeineVersion}"
     implementation project(':springdog-project:springdog-shared')
+    testImplementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
     testCompileOnly project(':springdog-project:springdog-shared')
     implementation("org.apache.cayenne:cayenne-server:${cayenneVersion}") {
         exclude group: 'org.slf4j', module: 'slf4j'

@@ -12,6 +12,12 @@
   <script th:src="@{/js/jquery.min.js}"></script>
   <script th:src="@{/js/popper.min.js}"></script>
   <script th:src="@{/js/bootstrap.min.js}"></script>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    window.springdogBasePath = /*[[${@springdogProperties.computeAbsolutePath('')}]]*/ '';
+    /*]]>*/
+  </script>
+  <script th:src="@{/js/springdog-api.js}"></script>
 
   <link rel="stylesheet" th:href="@{/css/styles.css}"/>
   <link rel="stylesheet" th:href="@{/css/dataTables-2.0.3.min.css}"/>
