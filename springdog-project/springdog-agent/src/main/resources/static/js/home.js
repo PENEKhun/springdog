@@ -17,7 +17,7 @@
 const createTooltipCallback = (label) => (context) => `${context.parsed.y.toFixed(
     2)} ${label}`;
 
-const createScales = (xTitle, yTitle) => ({
+const createScales = (xTitle, yTitle, extraConfig) => ({
   x: {
     type: 'time',
     time: {unit: 'day'},
@@ -25,7 +25,8 @@ const createScales = (xTitle, yTitle) => ({
   },
   y: {
     beginAtZero: true,
-    title: {display: true, text: yTitle}
+    title: {display: true, text: yTitle},
+    ...extraConfig
   }
 });
 
@@ -78,7 +79,7 @@ function createEndpointChart(elementId, label, data, yAxisLabel) {
   new Chart(ctx, config);
 }
 
-function createChart(elementId, label, data, yAxisLabel) {
+function createChart(elementId, label, data, yAxisLabel, extraConfig) {
   const ctx = document.getElementById(elementId).getContext('2d');
 
   const filteredData = filterData(data);
@@ -92,7 +93,7 @@ function createChart(elementId, label, data, yAxisLabel) {
         tension: 0.1
       }],
       {
-        scales: createScales('Time', yAxisLabel),
+        scales: createScales('Time', yAxisLabel, extraConfig),
         plugins: {
           legend: {display: false},
           tooltip: {callbacks: {label: createTooltipCallback(yAxisLabel)}}

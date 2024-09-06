@@ -67,15 +67,15 @@
       });
 
       createChart('chart-cpu', 'CPU Usage', systemMetrics.map(metric => metric.cpuUsagePercent),
-          '%');
+          '%', {max: 100, min: 1});
       createChart('chart-memory', 'Memory Usage',
-          systemMetrics.map(metric => metric.memoryUsagePercent), '%');
+          systemMetrics.map(metric => metric.memoryUsagePercent), '%', {max: 100, min: 1});
       createChart('chart-disk', 'Disk Usage', systemMetrics.map(metric => metric.diskUsagePercent),
-          '%');
+          '%', {max: 100, min: 1});
       createChart('chart-jvm-heap', 'JVM Heap Usage',
-          systemMetrics.map(metric => metric.jvmHeapUsagePercent), '%');
+          systemMetrics.map(metric => metric.jvmHeapUsagePercent), '%', {max: 100, min: 1});
       createChart('chart-jvm-non-heap', 'JVM Non-Heap Usage',
-          systemMetrics.map(metric => metric.jvmNonHeapUsagePercent), '%');
+          systemMetrics.map(metric => metric.jvmNonHeapUsagePercent), '%', {max: 100, min: 1});
 
       createEndpointChart('chart-visit-count', 'Visit Count',
           recentEndpointMetrics.map(item => item.totalPageView), 'Visits');
