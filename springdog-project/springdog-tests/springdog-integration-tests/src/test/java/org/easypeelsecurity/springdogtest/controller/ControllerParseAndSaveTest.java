@@ -77,7 +77,11 @@ class ControllerParseAndSaveTest {
                 false, Set.of(), Set.of(
                     new EndpointHeaderDto("token1", false),
                     new EndpointHeaderDto("token2", false)
-                ))
+                )),
+            tuple("/api/exception1", GET, "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.exception1()",
+                false, Set.of(), Set.of()),
+            tuple("/api/exception2", GET, "java.lang.String org.easypeelsecurity.springdogtest.ExampleController.exception2()",
+                false, Set.of(), Set.of())
         );
   }
 }

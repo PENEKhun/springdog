@@ -36,5 +36,31 @@ public interface ExceptionListingRepository {
    *
    * @return Exception class
    */
-  ExceptionClass findByIdOrNull(ObjectContext context, long exceptionClassId);
+  ExceptionClass findExceptionClassByIdOrNull(ObjectContext context, long exceptionClassId);
+
+  /**
+   * Select Exception class by exception class name.
+   *
+   * @param context       The context
+   * @param exceptionFQCM The exception class name
+   * @return Exception class
+   */
+  ExceptionClass findByExceptionClassByFQCM(ObjectContext context, String exceptionFQCM);
+
+  /**
+   * Get All Exception causes.
+   *
+   * @param context The context
+   * @return Exception class
+   */
+  List<ExceptionCause> findAllParentExceptionCauses(ObjectContext context);
+
+  /**
+   * Find Exception cause by id.
+   *
+   * @param context          The context
+   * @param exceptionCauseId The exception cause id
+   * @return Exception cause
+   */
+  ExceptionCause findExceptionCauseByIdOrNull(ObjectContext context, long exceptionCauseId);
 }

@@ -38,6 +38,7 @@ import org.easypeelsecurity.springdog.domain.ratelimit.EndpointService;
 import org.easypeelsecurity.springdog.domain.statistics.StatisticsService;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
+import org.easypeelsecurity.springdog.shared.dto.ErrorTracingDto;
 import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
@@ -132,6 +133,13 @@ public class SpringdogAgentView {
     model.addAttribute("result", true);
     model.addAttribute("message", "Successfully updated");
     return viewRateLimitSpecific(endpointId, model);
+  }
+
+  @GetMapping("/error-tracing")
+  public String errorTracingHome(Model model) {
+    List<ErrorTracingDto> causes = exceptionListingService.getAllParentCauses();
+    model.addAttribute("causes", causes);
+    return "/templates/content/error-tracing/list.html";
   }
 
   @GetMapping("/error-tracing/configuration")

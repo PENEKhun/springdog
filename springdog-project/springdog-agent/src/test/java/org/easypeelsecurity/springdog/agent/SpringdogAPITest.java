@@ -16,10 +16,16 @@
 
 package org.easypeelsecurity.springdog.agent;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import org.easypeelsecurity.springdog.agent.security.SpringdogSecurityConfig;
@@ -30,11 +36,30 @@ import support.AgentTestSupport;
 
 class SpringdogAPITest extends AgentTestSupport {
 
+  @Autowired
+  SpringdogAPI springdogAPI;
+
   @Test
   @WithMockUser(username = "admin", roles = {SpringdogSecurityConfig.SPRINGDOG_AGENT_ADMIN_ROLE})
   void errorTraceConfigurationEnable() throws Exception {
     doNothing().when(exceptionListingService).changeMonitoringStatus(1L, true);
     mockMvc.perform(get("/springdog/error-tracing/configuration/1?enabled=true"))
-        .andExpect(status().isOk());
+        .andExpect(status().isNoContent());
+  }
+
+  @Test
+  void handleException() {
+    // given
+    Exception iae = new IllegalArgumentException("id field is required");
+
+    // when
+    ResponseEntity<CommonResponse<Void>> response = springdogAPI.handleInvalidInput(iae);
+
+    // then
+    assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+    assertThat(response.getBody().getMessage()).isEqualTo(
+        "Invalid input value. id field is required");
+    assertThat(response.getBody().getTimestamp()).isBeforeOrEqualTo(LocalDateTime.now());
+    assertThat(response.getBody().getResult()).isEqualTo("FAILURE");
   }
 }
