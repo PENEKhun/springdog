@@ -18,6 +18,7 @@ package org.easypeelsecurity.springdog.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import org.easypeelsecurity.springdog.agent.security.SpringdogSecurityConfig;
+import org.easypeelsecurity.springdog.shared.dto.ErrorTracingDto;
 
 import org.junit.jupiter.api.Test;
 
@@ -45,6 +47,31 @@ class SpringdogAPITest extends AgentTestSupport {
     doNothing().when(exceptionListingService).changeMonitoringStatus(1L, true);
     mockMvc.perform(get("/springdog/error-tracing/configuration/1?enabled=true"))
         .andExpect(status().isNoContent());
+  }
+
+  @Test
+  @WithMockUser(username = "admin", roles = {SpringdogSecurityConfig.SPRINGDOG_AGENT_ADMIN_ROLE})
+  void errorTraceListing() throws Exception {
+    when(exceptionListingService.getErrorTrace(1L))
+        .thenReturn(ErrorTracingDto.builder()
+            .id(1L)
+            .className("java.lang.IllegalArgumentException")
+            .fileName("TestClass.java")
+            .methodName("testMethod")
+            .lineNumber(10)
+            .timestamp(LocalDateTime.now())
+            .build()
+        );
+
+    mockMvc.perform(get("/springdog/error-tracing/1"))
+        .andExpect(status().isOk())
+        .andExpect(mvcResult -> {
+          String responseBody = mvcResult.getResponse().getContentAsString();
+          assertThat(responseBody).contains("java.lang.IllegalArgumentException");
+          assertThat(responseBody).contains("TestClass.java");
+          assertThat(responseBody).contains("testMethod");
+          assertThat(responseBody).contains("10");
+        });
   }
 
   @Test
