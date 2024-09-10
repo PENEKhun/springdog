@@ -18,35 +18,18 @@ package org.easypeelsecurity.agenttests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-
-import org.htmlunit.WebClient;
-import org.htmlunit.html.HtmlPage;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ExampleControllerTest {
+import support.SeleniumTestSupport;
 
-  @LocalServerPort
-  private int port;
-
-  private WebClient webClient;
-
-  @BeforeEach
-  public void setUp() {
-    webClient = new WebClient();
-    webClient.getOptions().setThrowExceptionOnScriptError(false);
-    webClient.getOptions().setCssEnabled(false);
-    webClient.getOptions().setJavaScriptEnabled(false);
-  }
+class ExampleControllerTest extends SeleniumTestSupport {
 
   @Test
   @DisplayName("Should return hello world")
-  void shouldReturnHelloWorld() throws Exception {
-    HtmlPage page = webClient.getPage("http://localhost:" + port + "/api/hello");
-    assertThat(page.getBody().asNormalizedText()).isEqualTo("Hello, World!");
+  void shouldReturnHelloWorld() {
+    accessNotSpringdogPage("/api/hello");
+
+    assertThat(pageSource()).contains("Hello, World!");
   }
 }
