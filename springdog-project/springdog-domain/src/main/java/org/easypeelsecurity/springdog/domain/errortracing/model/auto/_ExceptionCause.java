@@ -27,17 +27,21 @@ public abstract class _ExceptionCause extends BaseDataObject {
 
     public static final StringProperty<String> CLASS_NAME = PropertyFactory.createString("className", String.class);
     public static final StringProperty<String> FILE_NAME = PropertyFactory.createString("fileName", String.class);
+    public static final NumericProperty<Long> ID = PropertyFactory.createNumeric("id", Long.class);
     public static final NumericProperty<Integer> LINE = PropertyFactory.createNumeric("line", Integer.class);
     public static final StringProperty<String> MESSAGE = PropertyFactory.createString("message", String.class);
     public static final StringProperty<String> METHOD_NAME = PropertyFactory.createString("methodName", String.class);
+    public static final NumericProperty<Long> PARENT_EXCEPTION_ID = PropertyFactory.createNumeric("parentExceptionId", Long.class);
     public static final DateProperty<LocalDateTime> TIMESTAMP = PropertyFactory.createDate("timestamp", LocalDateTime.class);
     public static final EntityProperty<ExceptionCause> NEXT_EXCEPTION = PropertyFactory.createEntity("nextException", ExceptionCause.class);
 
     protected String className;
     protected String fileName;
+    protected long id;
     protected int line;
     protected String message;
     protected String methodName;
+    protected Long parentExceptionId;
     protected LocalDateTime timestamp;
 
     protected Object nextException;
@@ -60,6 +64,16 @@ public abstract class _ExceptionCause extends BaseDataObject {
     public String getFileName() {
         beforePropertyRead("fileName");
         return this.fileName;
+    }
+
+    public void setId(long id) {
+        beforePropertyWrite("id", this.id, id);
+        this.id = id;
+    }
+
+    public long getId() {
+        beforePropertyRead("id");
+        return this.id;
     }
 
     public void setLine(int line) {
@@ -90,6 +104,16 @@ public abstract class _ExceptionCause extends BaseDataObject {
     public String getMethodName() {
         beforePropertyRead("methodName");
         return this.methodName;
+    }
+
+    public void setParentExceptionId(Long parentExceptionId) {
+        beforePropertyWrite("parentExceptionId", this.parentExceptionId, parentExceptionId);
+        this.parentExceptionId = parentExceptionId;
+    }
+
+    public Long getParentExceptionId() {
+        beforePropertyRead("parentExceptionId");
+        return this.parentExceptionId;
     }
 
     public void setTimestamp(LocalDateTime timestamp) {
@@ -123,12 +147,16 @@ public abstract class _ExceptionCause extends BaseDataObject {
                 return this.className;
             case "fileName":
                 return this.fileName;
+            case "id":
+                return this.id;
             case "line":
                 return this.line;
             case "message":
                 return this.message;
             case "methodName":
                 return this.methodName;
+            case "parentExceptionId":
+                return this.parentExceptionId;
             case "timestamp":
                 return this.timestamp;
             case "nextException":
@@ -151,6 +179,9 @@ public abstract class _ExceptionCause extends BaseDataObject {
             case "fileName":
                 this.fileName = (String)val;
                 break;
+            case "id":
+                this.id = val == null ? 0 : (long)val;
+                break;
             case "line":
                 this.line = val == null ? 0 : (int)val;
                 break;
@@ -159,6 +190,9 @@ public abstract class _ExceptionCause extends BaseDataObject {
                 break;
             case "methodName":
                 this.methodName = (String)val;
+                break;
+            case "parentExceptionId":
+                this.parentExceptionId = (Long)val;
                 break;
             case "timestamp":
                 this.timestamp = (LocalDateTime)val;
@@ -184,9 +218,11 @@ public abstract class _ExceptionCause extends BaseDataObject {
         super.writeState(out);
         out.writeObject(this.className);
         out.writeObject(this.fileName);
+        out.writeLong(this.id);
         out.writeInt(this.line);
         out.writeObject(this.message);
         out.writeObject(this.methodName);
+        out.writeObject(this.parentExceptionId);
         out.writeObject(this.timestamp);
         out.writeObject(this.nextException);
     }
@@ -196,9 +232,11 @@ public abstract class _ExceptionCause extends BaseDataObject {
         super.readState(in);
         this.className = (String)in.readObject();
         this.fileName = (String)in.readObject();
+        this.id = in.readLong();
         this.line = in.readInt();
         this.message = (String)in.readObject();
         this.methodName = (String)in.readObject();
+        this.parentExceptionId = (Long)in.readObject();
         this.timestamp = (LocalDateTime)in.readObject();
         this.nextException = in.readObject();
     }

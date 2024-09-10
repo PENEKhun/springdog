@@ -1,0 +1,209 @@
+<!--
+  ~ Copyright 2024 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html layout:decorate="~{/templates/layout/default_layout.html}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+  <title>Error Trace</title>
+  <style>
+    .list-group {
+      word-break: break-all;
+    }
+  </style>
+</head>
+
+<div class="content" layout:fragment="content">
+  <h1 class="mt-4">Error Trace</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">
+      Exception Traces
+    </li>
+  </ol>
+  <div class="card-body">
+    <div class="accordion" id="rootAccordion">
+      <!--/*@thymesVar id="causes" type="java.util.List<org.easypeelsecurity.springdog.shared.dto.ErrorTracingDto>"*/-->
+      <th:block th:if="${not #lists.isEmpty(causes)}">
+        <th:block th:each="errorTrace, errorTraceStat : ${causes}">
+          <div class="accordion-item">
+            <h2 class="accordion-header" th:id="'heading-' + ${errorTraceStat.index}">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                      th:data-bs-target="'#collapse-' + ${errorTraceStat.index}"
+                      aria-expanded="false"
+                      th:aria-controls="'collapse-' + ${errorTraceStat.index}"
+                      th:data-error-trace-id="${errorTrace.id}"
+                      th:data-next-error-trace-id="${errorTrace.next != null} ? ${errorTrace.next.id} : null">
+                <span class="badge bg-secondary me-2"
+                      th:text="${#temporals.format(errorTrace.timestamp, 'yyyy-MM-dd HH:mm:ss')}">2024-05-12 15:00:35</span>
+                <span class="text-primary"
+                      th:text="${errorTrace.className + '.' + errorTrace.methodName}">XXX Class.Methodname</span>
+              </button>
+            </h2>
+            <div th:id="'collapse-' + ${errorTraceStat.index}" class="accordion-collapse collapse"
+                 th:data-bs-parent="${errorTraceStat.first} ? '#rootAccordion' : '#nestedAccordion-' + ${errorTraceStat.index - 1}">
+              <div class="accordion-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5 class="text-danger">Exception Details</h5>
+                    <ul class="list-group">
+                      <li class="list-group-item"><strong>Class:</strong> <span
+                          th:text="${errorTrace.className}"></span></li>
+                      <li class="list-group-item"><strong>Method:</strong> <span
+                          th:text="${errorTrace.methodName}"></span></li>
+                      <li class="list-group-item"><strong>File:</strong> <span
+                          th:text="${errorTrace.fileName}"></span></li>
+                      <li class="list-group-item"><strong>Line:</strong> <span
+                          th:text="${errorTrace.lineNumber}"></span></li>
+                    </ul>
+                  </div>
+                  <div class="col-md-6">
+                    <h5 class="text-danger">Error Message</h5>
+                    <div class="alert alert-danger" th:text="${errorTrace.message}">Error message
+                      here
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-3">
+                  <h5 class="text-danger">Stack Trace</h5>
+                  <pre class="bg-light p-3"><code
+                      th:text="${'Stack Trace ...\n' + errorTrace.className + '.' + errorTrace.methodName + '\nat ' + errorTrace.fileName + ':' + errorTrace.lineNumber}"></code></pre>
+                </div>
+
+                <th:block th:if="${errorTrace.next != null}">
+                  <div class="mt-3">
+                    <div id="nextErrorTraceContainer" class="mt-3"></div>
+                  </div>
+                </th:block>
+              </div>
+            </div>
+          </div>
+        </th:block>
+      </th:block>
+      <th:block th:if="${#lists.isEmpty(causes)}">
+        <p>No error details available.</p>
+      </th:block>
+    </div>
+  </div>
+
+  <script>
+    function handleAccordionClick(button, errorTraceId, event) {
+      if (event) {
+        event.stopPropagation();
+      }
+
+      const collapseElement = button.getAttribute('data-bs-target');
+      const container = document.querySelector(collapseElement + ' #nextErrorTraceContainer');
+
+      if (container && !container.hasChildNodes()) {
+        loadNextErrorTrace(errorTraceId, container);
+      }
+    }
+
+    function loadNextErrorTrace(errorTraceId, container) {
+      const spinner = document.createElement('div');
+      spinner.className = 'spinner-border text-primary';
+      spinner.role = 'status';
+      spinner.innerHTML = '<span class="visually-hidden">Loading...</span>';
+      container.appendChild(spinner);
+
+      if (errorTraceId === null) {
+        container.innerHTML = '<div class="alert alert-info">No more error traces available.</div>';
+        return;
+      }
+
+      springdogFetch(`/error-tracing/${errorTraceId}`, {method: 'GET'})
+      .then(data => {
+        container.innerHTML = generateErrorTraceHtml(data);
+        const nestedAccordion = container.querySelector('.accordion-item');
+        if (nestedAccordion) {
+          const nestedButton = nestedAccordion.querySelector('.accordion-button');
+          nestedButton.addEventListener('click',
+              (event) => handleAccordionClick(nestedButton, data.id, event));
+        }
+      })
+      .catch(error => {
+        console.error('Error loading next error trace:', error);
+        container.innerHTML = '<div class="alert alert-danger">Failed to load next error trace. Please try again.</div>';
+      });
+    }
+
+    function generateErrorTraceHtml(errorTrace) {
+      const timestamp = new Date(errorTrace.timestamp).toLocaleString();
+      let html = `
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="heading-${errorTrace.id}">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapse-${errorTrace.id}"
+                aria-expanded="false"
+                aria-controls="collapse-${errorTrace.id}"
+                data-error-trace-id="${errorTrace.id}">
+          <span class="badge bg-secondary me-2">${timestamp}</span>
+          <span class="text-primary">${errorTrace.className}.${errorTrace.methodName}</span>
+        </button>
+      </h2>
+      <div id="collapse-${errorTrace.id}" class="accordion-collapse collapse"
+           data-bs-parent="#nestedAccordion-${errorTrace.id}">
+        <div class="accordion-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h5 class="text-danger">Exception Details</h5>
+              <ul class="list-group">
+                <li class="list-group-item"><strong>Class:</strong> <span>${errorTrace.className}</span></li>
+                <li class="list-group-item"><strong>Method:</strong> <span>${errorTrace.methodName}</span></li>
+                <li class="list-group-item"><strong>File:</strong> <span>${errorTrace.fileName}</span></li>
+                <li class="list-group-item"><strong>Line:</strong> <span>${errorTrace.lineNumber}</span></li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h5 class="text-danger">Error Message</h5>
+              <div class="alert alert-danger">${errorTrace.message}</div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <h5 class="text-danger">Stack Trace</h5>
+            <pre class="bg-light p-3"><code>Stack Trace ...${errorTrace.className}.${errorTrace.methodName} at ${errorTrace.fileName}:${errorTrace.lineNumber}</code></pre>
+          </div>`;
+
+      if (errorTrace.next) {
+        html += `
+          <div class="mt-3">
+            <div id="nextErrorTraceContainer" class="mt-3"></div>
+          </div>`;
+      }
+
+      html += `
+        </div>
+      </div>
+    </div>`;
+
+      return html;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('#rootAccordion .accordion-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+          const nextTraceId = button.getAttribute('data-next-error-trace-id');
+          handleAccordionClick(button, nextTraceId, event);
+        });
+      });
+    });
+  </script>
+
+</div>
+</html>

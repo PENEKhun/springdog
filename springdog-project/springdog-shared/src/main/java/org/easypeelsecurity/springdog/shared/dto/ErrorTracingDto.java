@@ -27,22 +27,24 @@ import lombok.Setter;
  */
 @Getter
 public class ErrorTracingDto {
-  private Integer id;
-  private String message;
-  private String fileName;
-  private String className;
-  private String methodName;
-  private int lineNumber;
+  private final Long id;
+  private final String message;
+  private final String fileName;
+  private final String className;
+  private final String methodName;
+  private final int lineNumber;
+  @Setter
+  private Long parentTraceId;
   @Setter
   private ErrorTracingDto next;
-  private LocalDateTime timestamp;
+  private final LocalDateTime timestamp;
 
   /**
    * Constructor.
    */
   @Builder
-  public ErrorTracingDto(Integer id, String message, String fileName, String className, String methodName,
-      int lineNumber, ErrorTracingDto next, LocalDateTime timestamp) {
+  public ErrorTracingDto(Long id, String message, String fileName, String className, String methodName,
+      int lineNumber, Long parentTraceId, ErrorTracingDto next, LocalDateTime timestamp) {
     this.id = id;
     if (message == null) {
       message = "Unknown message";
@@ -61,6 +63,7 @@ public class ErrorTracingDto {
     }
     this.methodName = methodName;
     this.lineNumber = lineNumber;
+    this.parentTraceId = parentTraceId;
     this.next = next;
     this.timestamp = timestamp;
   }

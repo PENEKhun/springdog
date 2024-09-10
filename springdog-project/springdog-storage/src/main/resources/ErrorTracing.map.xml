@@ -13,6 +13,7 @@
 		<db-attribute name="MESSAGE" type="VARCHAR" isMandatory="true" length="3000"/>
 		<db-attribute name="METHOD_NAME" type="VARCHAR" isMandatory="true" length="300"/>
 		<db-attribute name="NEXT_EXCEPTION_ID" type="BIGINT"/>
+		<db-attribute name="PARENT_EXCEPTION_ID" type="BIGINT"/>
 		<db-attribute name="TIMESTAMP" type="TIMESTAMP" isMandatory="true"/>
 	</db-entity>
 	<db-entity name="EXCEPTION_CLASS" schema="APP">
@@ -29,9 +30,11 @@
 	<obj-entity name="ExceptionCause" className="org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionCause" dbEntityName="EXCEPTION_CAUSE">
 		<obj-attribute name="className" type="java.lang.String" db-attribute-path="CLASS_NAME"/>
 		<obj-attribute name="fileName" type="java.lang.String" db-attribute-path="FILE_NAME"/>
+		<obj-attribute name="id" type="long" db-attribute-path="ID"/>
 		<obj-attribute name="line" type="int" db-attribute-path="LINE"/>
 		<obj-attribute name="message" type="java.lang.String" db-attribute-path="MESSAGE"/>
 		<obj-attribute name="methodName" type="java.lang.String" db-attribute-path="METHOD_NAME"/>
+		<obj-attribute name="parentExceptionId" type="java.lang.Long" db-attribute-path="PARENT_EXCEPTION_ID"/>
 		<obj-attribute name="timestamp" type="java.time.LocalDateTime" db-attribute-path="TIMESTAMP"/>
 		<pre-persist method-name="onPrePersist"/>
 	</obj-entity>
@@ -71,6 +74,7 @@
 		<usePrimitives>true</usePrimitives>
 	</dbImport>
 	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
+		<excludeEntities>ExceptionType,ExceptionClass</excludeEntities>
 		<destDir>../../../../springdog-domain/src/main/java</destDir>
 		<mode>entity</mode>
 		<template>templates/v4_1/subclass.vm</template>

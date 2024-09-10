@@ -62,6 +62,16 @@ public class ExampleController {
     return "example6";
   }
 
+  @GetMapping("/exception1")
+  public String exception1() {
+    throw new IllegalArgumentException("exception1");
+  }
+
+  @GetMapping("/exception2")
+  public String exception2() {
+    throw new TestException("exception2");
+  }
+
   static class PostRequest {
 
     private String title;

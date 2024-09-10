@@ -16,12 +16,15 @@
 
 package org.easypeelsecurity.springdog.agent;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionListingService;
+import org.easypeelsecurity.springdog.shared.dto.ErrorTracingDto;
 
 /**
  * RestController for springdog.
@@ -29,7 +32,7 @@ import org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionListing
 @RestController
 @SpringdogAgentController
 @SuppressWarnings("checkstyle:MissingJavadocMethod")
-public class SpringdogAPI {
+public class SpringdogAPI extends SpringdogAPIExceptionHandler {
 
   private final ExceptionListingService exceptionListingService;
 
@@ -37,10 +40,17 @@ public class SpringdogAPI {
     this.exceptionListingService = exceptionListingService;
   }
 
+  @org.springframework.web.bind.annotation.ResponseStatus(NO_CONTENT)
   @GetMapping("/error-tracing/configuration/{exceptionClassId}")
   public void errorExceptionMonitoringStatus(
       @PathVariable(name = "exceptionClassId") long exceptionClassId,
       @RequestParam("enabled") boolean enabled) {
     exceptionListingService.changeMonitoringStatus(exceptionClassId, enabled);
+  }
+
+  @GetMapping("/error-tracing/{errorTracingId}")
+  public CommonResponse<ErrorTracingDto> getErrorTracing(
+      @PathVariable(name = "errorTracingId") long errorTracingId) {
+    return new CommonResponse<>(exceptionListingService.getErrorTrace(errorTracingId));
   }
 }

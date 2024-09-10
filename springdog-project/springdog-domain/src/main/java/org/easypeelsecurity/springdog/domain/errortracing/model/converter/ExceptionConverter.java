@@ -16,12 +16,15 @@
 
 package org.easypeelsecurity.springdog.domain.errortracing.model.converter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionCause;
 import org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionClass;
 import org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionType;
+import org.easypeelsecurity.springdog.shared.dto.ErrorTracingDto;
 import org.easypeelsecurity.springdog.shared.dto.ExceptionClassesDto;
 import org.easypeelsecurity.springdog.shared.dto.ExceptionClassesDto.ExceptionListDto;
 import org.easypeelsecurity.springdog.shared.dto.ExceptionClassesDto.ExceptionListDto.ExceptionItemDto;
@@ -59,6 +62,54 @@ public abstract class ExceptionConverter {
     }
 
     return entities;
+  }
+
+  /**
+   * Converts an ExceptionCause entity to an ErrorTracingDto.
+   *
+   * @param exceptionCause The ExceptionCause entity to convert
+   * @return The converted ErrorTracingDto
+   */
+  public static ErrorTracingDto entityToErrorTracingDto(ExceptionCause exceptionCause) {
+    if (exceptionCause == null) {
+      return null;
+    }
+
+    ErrorTracingDto result = ErrorTracingDto.builder()
+        .id(exceptionCause.getId())
+        .message(exceptionCause.getMessage())
+        .fileName(exceptionCause.getFileName())
+        .className(exceptionCause.getClassName())
+        .methodName(exceptionCause.getMethodName())
+        .lineNumber(exceptionCause.getLine())
+        .timestamp(exceptionCause.getTimestamp())
+        .build();
+
+    if (exceptionCause.getNextException() != null) {
+      var next = entityToErrorTracingDto(exceptionCause.getNextException());
+      next.setParentTraceId(result.getId());
+      result.setNext(next);
+    }
+
+    return result;
+  }
+
+  /**
+   * Converts a list of ExceptionCause entities to ErrorTracingDto.
+   *
+   * @param exceptionCauses The list of ExceptionCause entities to convert
+   * @return The converted ErrorTracingDto
+   */
+  public static List<ErrorTracingDto> entityToErrorTracingDto(List<ExceptionCause> exceptionCauses) {
+    if (exceptionCauses == null || exceptionCauses.isEmpty()) {
+      return new ArrayList<>();
+    }
+
+    List<ErrorTracingDto> result = new ArrayList<>();
+    for (ExceptionCause exceptionCause : exceptionCauses) {
+      result.add(entityToErrorTracingDto(exceptionCause));
+    }
+    return result;
   }
 
   /**
@@ -105,5 +156,43 @@ public abstract class ExceptionConverter {
     existType.addToExceptionClasses(exceptionClass);
     exceptionClass.setMonitoringEnabled(newExceptionClass.isEnableToMonitor());
     return exceptionClass;
+  }
+
+  /**
+   * Converts an ErrorTracingDto to an ExceptionCause entity.
+   *
+   * @param context    The ObjectContext to create the entity in
+   * @param errorChain The ErrorTracingDto to convert
+   * @return The converted ExceptionCause entity
+   */
+  public static ExceptionCause convertDtoToEntity(ObjectContext context, ErrorTracingDto errorChain) {
+    if (errorChain == null) {
+      return null;
+    }
+    ExceptionCause rootCause = context.newObject(ExceptionCause.class);
+    return convertRecursive(context, errorChain, rootCause);
+  }
+
+  private static ExceptionCause convertRecursive(ObjectContext context, ErrorTracingDto errorChain,
+      ExceptionCause currentCause) {
+    if (errorChain == null) {
+      return null;
+    }
+
+    currentCause.setMessage(errorChain.getMessage());
+    currentCause.setFileName(errorChain.getFileName());
+    currentCause.setClassName(errorChain.getClassName());
+    currentCause.setMethodName(errorChain.getMethodName());
+    currentCause.setLine(errorChain.getLineNumber());
+    currentCause.setTimestamp(LocalDateTime.now());
+
+    if (errorChain.getNext() != null) {
+      ExceptionCause nextCause = context.newObject(ExceptionCause.class);
+      nextCause.setParentExceptionId(currentCause.getId());
+      currentCause.setNextException(nextCause);
+      convertRecursive(context, errorChain.getNext(), nextCause);
+    }
+
+    return currentCause;
   }
 }

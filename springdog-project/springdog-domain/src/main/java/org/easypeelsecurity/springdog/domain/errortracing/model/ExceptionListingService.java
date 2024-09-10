@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import org.easypeelsecurity.springdog.domain.errortracing.model.converter.ExceptionConverter;
+import org.easypeelsecurity.springdog.shared.dto.ErrorTracingDto;
 import org.easypeelsecurity.springdog.shared.dto.ExceptionClassesDto;
 import org.easypeelsecurity.springdog.shared.dto.ExceptionClassesDto.ExceptionListDto;
 import org.easypeelsecurity.springdog.shared.dto.ExceptionClassesDto.ExceptionListDto.ExceptionItemDto;
@@ -88,7 +89,7 @@ public class ExceptionListingService {
    * @param isEnableToMonitor The monitoring status to set
    */
   public void changeMonitoringStatus(long exceptionClassId, boolean isEnableToMonitor) {
-    ExceptionClass exceptionClass = exceptionRepository.findByIdOrNull(context, exceptionClassId);
+    ExceptionClass exceptionClass = exceptionRepository.findExceptionClassByIdOrNull(context, exceptionClassId);
     if (exceptionClass == null) {
       throw new IllegalArgumentException("Exception class not found.");
     }
@@ -134,5 +135,48 @@ public class ExceptionListingService {
    */
   public ExceptionClassesDto getExceptionListing() {
     return ExceptionConverter.convertEntitiesToDto(exceptionRepository.findAllExceptions(context));
+  }
+
+  /**
+   * Check if the exception is enabled.
+   *
+   * @param exceptionFQCM The exception class name
+   * @return True if the exception is enabled
+   */
+  public boolean isExceptionEnabled(String exceptionFQCM) {
+    ExceptionClass exceptionClass = exceptionRepository.findByExceptionClassByFQCM(context, exceptionFQCM);
+    return exceptionClass != null && exceptionClass.isMonitoringEnabled();
+  }
+
+  /**
+   * Save exception.
+   *
+   * @param errorChain The error chain
+   */
+  public void saveException(ErrorTracingDto errorChain) {
+    var exceptionCause = ExceptionConverter.convertDtoToEntity(context, errorChain);
+    context.commitChanges();
+  }
+
+  /**
+   * Get all causes.
+   */
+  public List<ErrorTracingDto> getAllParentCauses() {
+    return ExceptionConverter.entityToErrorTracingDto(
+        exceptionRepository.findAllParentExceptionCauses(context));
+  }
+
+  /**
+   * Get the next error trace.
+   *
+   * @param errorTraceId The parent error trace ID
+   * @return The next error trace
+   */
+  public ErrorTracingDto getErrorTrace(long errorTraceId) {
+    var result = exceptionRepository.findExceptionCauseByIdOrNull(context, errorTraceId);
+    if (result == null) {
+      throw new IllegalArgumentException("Error trace not found.");
+    }
+    return ExceptionConverter.entityToErrorTracingDto(result);
   }
 }

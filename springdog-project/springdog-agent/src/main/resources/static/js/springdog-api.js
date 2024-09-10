@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-window.springdogFetch = function (url, options, data, successCallback,
-    errorCallback) {
+window.springdogFetch = function (url, options, data) {
   if (springdogBasePath === undefined) {
     console.error(
         `springdogBasePath is not defined. Please define it in your HTML file.
@@ -45,12 +44,40 @@ window.springdogFetch = function (url, options, data, successCallback,
   }
 
   return fetch(springdogBasePath + url, fetchOptions)
-  .then(response => {
-    if (!response.ok) {
-      return response.json().then(errorData => {
-        throw new Error(errorData.message || 'Network response was not ok');
-      });
+  .then(async response => {
+    if (response.status === 204) {
+      return;
     }
-    return response.json().catch(() => ({}));
+
+    let json;
+    try {
+      json = await response.json();
+    } catch (error) {
+      throw new Error('Invalid JSON response');
+    }
+
+    if (response.status === 201) {
+      return json.message;
+    } else if (response.status === 200) {
+      if (json.result === undefined) {
+        throw new Error('Unexpected response');
+      }
+
+      if (json.result === 'SUCCESS') {
+        return json.detail;
+      } else {
+        throw new Error(json.message);
+      }
+    } else {
+      if (json.message === undefined) {
+        throw new Error('Unexpected response');
+      } else {
+        throw new Error(json.message);
+      }
+    }
+  })
+  .catch(error => {
+    console.error('Error fetching data:', error);
+    throw error;
   });
 }

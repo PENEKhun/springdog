@@ -20,11 +20,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionCause;
 import org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionClass;
 import org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionListingRepository;
 import org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionType;
 
 import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.query.EJBQLQuery;
 import org.apache.cayenne.query.ObjectSelect;
 
 /**
@@ -43,9 +45,35 @@ public class ExceptionListRepositoryImpl implements ExceptionListingRepository {
   }
 
   @Override
-  public ExceptionClass findByIdOrNull(ObjectContext context, long exceptionClassId) {
+  public ExceptionClass findExceptionClassByIdOrNull(ObjectContext context, long exceptionClassId) {
     return ObjectSelect.query(ExceptionClass.class)
         .where(ExceptionClass.ID.eq(exceptionClassId))
+        .selectOne(context);
+  }
+
+  @Override
+  public ExceptionClass findByExceptionClassByFQCM(ObjectContext context, String exceptionFQCM) {
+    return ObjectSelect.query(ExceptionClass.class)
+        .where(ExceptionClass.EXCEPTION_CLASS_NAME.eq(exceptionFQCM))
+        .selectOne(context);
+  }
+
+  @Override
+  public List<ExceptionCause> findAllParentExceptionCauses(ObjectContext context) {
+    String ejbql = """
+        SELECT e FROM ExceptionCause e
+        WHERE e.id NOT IN (SELECT e2.nextException.id FROM ExceptionCause e2 WHERE e2.nextException IS NOT NULL)
+        ORDER BY e.timestamp DESC
+        """;
+
+    EJBQLQuery query = new EJBQLQuery(ejbql);
+    return context.performQuery(query);
+  }
+
+  @Override
+  public ExceptionCause findExceptionCauseByIdOrNull(ObjectContext context, long exceptionCauseId) {
+    return ObjectSelect.query(ExceptionCause.class)
+        .where(ExceptionCause.ID.eq(exceptionCauseId))
         .selectOne(context);
   }
 }
