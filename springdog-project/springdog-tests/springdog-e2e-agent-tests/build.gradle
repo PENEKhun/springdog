@@ -19,8 +19,10 @@ dependencies {
     testImplementation "org.springframework.security:spring-security-test:${springVersion}"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
-    testImplementation group: 'org.htmlunit', name: 'htmlunit', version: '4.4.0'
-    testImplementation "org.seleniumhq.selenium:htmlunit3-driver:4.23.0"
+
+    implementation "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
+    implementation "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
+    implementation "io.github.bonigarcia:webdrivermanager:${webdrivermanagerVersion}"
 }
 
 test {

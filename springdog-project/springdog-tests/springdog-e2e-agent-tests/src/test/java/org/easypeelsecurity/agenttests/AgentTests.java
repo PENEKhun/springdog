@@ -16,157 +16,136 @@
 
 package org.easypeelsecurity.agenttests;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.xpath;
 
-import java.io.IOException;
+import java.util.List;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-
-import org.htmlunit.WebClient;
-import org.htmlunit.html.HtmlButton;
-import org.htmlunit.html.HtmlForm;
-import org.htmlunit.html.HtmlPage;
-import org.htmlunit.html.HtmlPasswordInput;
-import org.htmlunit.html.HtmlTable;
-import org.htmlunit.html.HtmlTableRow;
-import org.htmlunit.html.HtmlTextInput;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.RetryingTest;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class AgentTests {
-  final String AGENT_USERNAME = "username";
-  final String AGENT_PASSWORD = "password";
+import support.SeleniumTestSupport;
 
-  @LocalServerPort
-  private int port;
-
-  private WebClient webClient;
-
-  @BeforeEach
-  public void setUp() {
-    webClient = new WebClient();
-    webClient.getOptions().setThrowExceptionOnScriptError(false);
-    webClient.getOptions().setCssEnabled(false);
-    webClient.getOptions().setJavaScriptEnabled(false);
-  }
-
-  @AfterEach
-  public void tearDown() {
-    if (webClient != null) {
-      webClient.close();
-    }
-  }
+class AgentTests extends SeleniumTestSupport {
 
   @Test
   @DisplayName("Redirect to the login page when accessing the home PATH")
-  void should_redirect_to_loginPage() throws IOException {
-    HtmlPage page = webClient.getPage("http://localhost:" + port + "/springdog/");
-    assertThat(page.getUrl()).hasToString(getAgentPath("/login"));
+  void should_redirect_to_loginPage() {
+    accessPage("/");
+    assertThat(currentUrl()).isEqualTo(getAgentPath("/login"));
   }
-
 
   @Test
   @DisplayName("Redirect to home page after successful login")
-  void login_success() throws IOException {
-    AgentTestHelper agent = new AgentTestHelper();
-    HtmlPage resultPage = agent.login(AGENT_USERNAME, AGENT_PASSWORD);
-
-    assertThat(resultPage.getUrl()).hasToString(getAgentPath(""));
-    assertThat(resultPage.asXml()).contains("Dashboard", "Total Endpoints");
+  void login_success() throws InterruptedException {
+    withLogin();
+    assertThat(currentUrl()).isEqualTo(getAgentPath(""));
+    assertThat(pageSource()).contains("Dashboard", "Total Endpoints");
   }
 
   @Test
   @DisplayName("Display error message when login fails")
-  void login_fail() throws IOException {
-    AgentTestHelper agent = new AgentTestHelper();
-    HtmlPage resultPage = agent.login("wrong_username", "wrong_password");
+  void login_fail() throws InterruptedException {
+    withWrongLogin();
 
-    assertThat(resultPage.getUrl()).hasToString(getAgentPath("/login?error"));
-    assertThat(resultPage.asXml()).contains("Login Failed.");
+    assertThat(currentUrl()).isEqualTo(getAgentPath("/login?error"));
+    assertThat(pageSource()).contains("Login Failed.");
   }
 
   @Test
-  void homePage() throws IOException {
-    AgentTestHelper agent = new AgentTestHelper();
-    agent.withLogin();
+  void homePage() throws InterruptedException {
+    withLogin();
 
-    HtmlPage page = webClient.getPage(getAgentPath("/"));
-    assertThat(page.asXml()).contains("Dashboard", "Total Endpoints");
+    accessPage("/");
+    assertThat(pageSource()).contains("Dashboard", "Total Endpoints");
   }
 
   @Test
-  void ratelimit_detail() throws IOException {
-    AgentTestHelper agent = new AgentTestHelper();
-    agent.withLogin();
+  @RetryingTest(5)
+  void ratelimit_detail() throws InterruptedException {
+    withLogin();
 
-    HtmlPage page = webClient.getPage(getAgentPath("/rate-limit"));
-    HtmlTable table = page.getFirstByXPath("//table[@id='table']");
-    HtmlTableRow row = table.getRow(1); // Skip the header row
-    HtmlButton analyzeBtn = row.getCell(4).getFirstByXPath(".//button[@title='Analyze']");
-    HtmlPage detailPage = analyzeBtn.click();
+    accessPage("/rate-limit");
+    WebElement analyzeBtn = accessPageUntilXPath("/rate-limit", "(//button[@title='Analyze'])[1]");
+    analyzeBtn.click();
 
-    // then
-    assertThat(detailPage.asNormalizedText()).contains("""
-        Path	Method Signature	HTTP Method	Status	Actions
-        /api/hello	java.lang.String org.easypeelsecurity.agenttests.ExampleController.hello()	GET	 NOT_CONFIGURED""");
+    String pageText = getDriver().findElement(By.tagName("body")).getText();
+    assertThat(pageText).contains(
+        "Endpoint Information\nPath: /api/hello\nEndpoint Method Signature: java.lang.String org.easypeelsecurity.agenttests.ExampleController.hello()\nHTTP Method: GET\nPattern Path: false\nRule Status: NOT_CONFIGURED\nIP Based Rule: false\nPermanent Ban Rule: false\nRequest Limit Count: 0\nTime Limit (seconds): 0\nBan Time (seconds): 0\n");
   }
 
   @Test
-  void ratelimit_read() throws IOException {
-    AgentTestHelper agent = new AgentTestHelper();
-    agent.withLogin();
+  @RetryingTest(5)
+  void ratelimit_read() throws InterruptedException {
+    withLogin();
 
-    HtmlPage page = webClient.getPage(getAgentPath("/rate-limit"));
-    HtmlTable table = page.getFirstByXPath("//table[@id='table']");
-    HtmlTableRow row = table.getRow(1); // Skip the header row
+    WebElement table =
+        accessPageUntil("/rate-limit", ExpectedConditions.presenceOfElementLocated(By.id("table")));
+    WebElement row = table.findElements(By.tagName("tr")).get(1);
 
-    // check row
-    assertThat(row.getCell(0).getTextContent()).isEqualTo("/api/hello");
-    assertThat(row.getCell(1).getTextContent()).isEqualTo(
+    List<WebElement> cells = row.findElements(By.tagName("td"));
+    assertThat(cells.get(0).getText()).isEqualTo("/api/hello");
+    assertThat(cells.get(1).getText()).isEqualTo(
         "java.lang.String org.easypeelsecurity.agenttests.ExampleController.hello()");
-    assertThat(row.getCell(2).getTextContent()).isEqualTo("GET");
-    assertThat(row.getCell(3).getTextContent()).contains("NOT_CONFIGURED");
-    HtmlButton configureButton = row.getCell(4).getFirstByXPath(".//button[@title='Configure']");
-    assertThat(configureButton).isNotNull();
-    HtmlButton analyzeButton = row.getCell(4).getFirstByXPath(".//button[@title='Analyze']");
-    assertThat(analyzeButton).isNotNull();
+    assertThat(cells.get(2).getText()).isEqualTo("GET");
+    assertThat(cells.get(3).getText()).contains("NOT_CONFIGURED");
+    assertThat(cells.get(4).findElement(xpath(".//button[@title='Configure']"))).isNotNull();
+    assertThat(cells.get(4).findElement(xpath(".//button[@title='Analyze']"))).isNotNull();
   }
 
-  class AgentTestHelper {
-    HtmlPage login(String username, String password) throws IOException {
-      HtmlPage loginPage = webClient.getPage(getAgentPath("login"));
+  @Test
+  @RetryingTest(5)
+  void errorTraceConfigurationSearchTest() throws InterruptedException {
+    withLogin();
 
-      // Get the form
-      HtmlForm loginForm = loginPage.getForms().get(0);
-      assertThat(loginForm).isNotNull();
+    WebElement searchInput = accessPageUntil("/error-tracing/configuration",
+        ExpectedConditions.visibilityOfElementLocated(By.id("searchInput")));
+    assertThat(searchInput).isNotNull();
 
-      // Fill in the form
-      HtmlTextInput usernameInput = loginForm.getInputByName("username");
-      HtmlPasswordInput passwordInput = loginForm.getInputByName("password");
-      HtmlButton submitButton = loginForm.getFirstByXPath("//button[@type='submit']");
-      usernameInput.type(username);
-      passwordInput.type(password);
-
-      // Submit
-      return submitButton.click();
-    }
-
-    void withLogin() throws IOException {
-      login(AGENT_USERNAME, AGENT_PASSWORD);
-    }
+    performSearch("java.io.ObjectStrea", "<mark>java.io.ObjectStrea</mark>mException",
+        "java.lang.MatchException");
+    performSearch("MatchException", "java.lang.<mark>MatchException</mark>", "java.io.ObjectStreamException");
+    performSearch("nullpointer", "java.lang.<mark>NullPointer</mark>Exception",
+        "java.io.ObjectStreamException");
   }
 
+  private void performSearch(String searchTerm, String expectedResult, String notExpectedResult) {
+    WebElement searchInput = getDriver().findElement(By.id("searchInput"));
+    searchInput.clear();
+    searchInput.sendKeys(searchTerm);
 
-  private String getAgentPath(String path) {
-    if (path.startsWith("/")) {
-      path = path.substring(1);
-    }
-    return "http://localhost:" + port + "/springdog/" + path;
+    getWait().until(ExpectedConditions.attributeToBe(searchInput, "value", searchTerm));
+    List<String> visibleItems = getDriver().findElements(
+            cssSelector("li.list-group-item.exception-item:not([style*='display: none']) div label"))
+        .stream()
+        .map(element -> element.getAttribute("innerHTML"))
+        .toList();
+
+    assertThat(visibleItems).isNotEmpty();
+    assertThat(visibleItems).contains(expectedResult);
+    assertThat(visibleItems).doesNotContain(notExpectedResult);
+  }
+
+  @Test
+  @RetryingTest(5)
+  void errorTraceConfigurationEnableTest() throws InterruptedException {
+    withLogin();
+
+    WebElement accordionButton =
+        accessPageUntilCssSelector("/error-tracing/configuration", "h2[id^='heading'] button[type='button']");
+    accordionButton.click();
+
+    getWait().until(
+        ExpectedConditions.visibilityOfElementLocated(cssSelector("li.list-group-item.exception-item")));
+    WebElement exceptionClasses =
+        getDriver().findElements(cssSelector("li.list-group-item.exception-item")).getFirst();
+    WebElement checkbox = exceptionClasses.findElement(xpath(".//input[@type='checkbox']"));
+    checkbox.click();
+    assertThat(checkbox.isSelected()).isFalse();
   }
 }
-
