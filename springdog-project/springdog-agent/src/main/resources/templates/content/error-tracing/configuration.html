@@ -15,10 +15,10 @@
   -->
 
 <!DOCTYPE html>
-<html layout:decorate="~{/templates/layout/default_layout.html}"
+<html lang="en"
+      layout:decorate="~{/templates/layout/default_layout.html}"
       xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <title>configuration</title>
@@ -97,7 +97,8 @@
 
   <div class="mb-3">
     <label for="searchInput">Search</label>
-    <input type="search" class="form-control" id="searchInput" placeholder="Search for exceptions...">
+    <input type="search" class="form-control" id="searchInput"
+           placeholder="Search for exceptions...">
   </div>
 
   <div class="accordion" id="exceptionAccordion">
