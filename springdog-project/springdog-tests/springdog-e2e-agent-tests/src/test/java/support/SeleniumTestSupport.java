@@ -57,6 +57,7 @@ public abstract class SeleniumTestSupport {
   public void setUp() {
     ChromeOptions options = new ChromeOptions();
     options.addArguments("--headless");
+    options.addArguments("--window-size=1920,1080"); // HACK for testing on GitHub actions
     options.addArguments("--disable-gpu");
     options.addArguments("--no-sandbox");
     options.setExperimentalOption("excludeSwitches", new String[] {"enable-automation"});
