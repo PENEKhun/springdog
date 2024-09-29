@@ -16,12 +16,20 @@
 
 package org.easypeelsecurity.springdog.notification.email;
 
+import static org.easypeelsecurity.springdog.shared.settings.SlowResponsePlaceholder.ENDPOINT_PATH;
+import static org.easypeelsecurity.springdog.shared.settings.SlowResponsePlaceholder.RESPONSE_MS;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import org.easypeelsecurity.springdog.shared.configuration.NotificationGmailProperties;
+import org.easypeelsecurity.springdog.shared.settings.Placeholder;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettingManagerImpl;
+import org.easypeelsecurity.springdog.shared.settings.Template;
 
 /**
  * Slow response email notification.
@@ -29,118 +37,37 @@ import org.easypeelsecurity.springdog.shared.configuration.NotificationGmailProp
 @Service
 public class SlowResponseEmailNotification extends AbstractEmailNotification<String, Long> {
 
+  private final SpringdogSettingManagerImpl settingManager;
+
   /**
    * Constructor.
    */
   @Autowired
   public SlowResponseEmailNotification(@Qualifier("gmailNotificationSender") JavaMailSender mailSender,
-      NotificationGmailProperties gmailProperties) {
-    super(mailSender, gmailProperties);
-  }
-
-  SlowResponseEmailNotification() {
+      SpringdogSettingManagerImpl settingManager) {
+    super(mailSender, settingManager);
+    this.settingManager = settingManager;
   }
 
   @Override
-  @SuppressWarnings({"checkstyle:RegexpSingleline", "checkstyle:LineLength"})
   protected String generateBody() {
-    return """
-        <div style="border-radius: 8px; border: 1px solid #ccc; background-color: #f9f9f9; color: #333; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
-            <div style="padding: 16px;">
-                <h3 style="margin: 0; font-size: 24px; font-weight: 600; text-align: center;">
-                    Slow Response Alert
-                </h3>
-            </div>
-            <div style="padding: 16px; line-height: 1.5;">
-                <p>Hello,</p>
-                <p>We wanted to inform you that one of your API endpoints
-                 has been experiencing slower than your configured threshold.
-                 This issue has been detected by springdog monitoring system.</p>
-                <p><strong>Affected Endpoint:</strong><br>
-                  %s
-                </p>
-                <p><strong>Recent Response Times:</strong><br>
-                  %s ms
-                </p>
-            </div>
-        </div>
-        """.formatted(
-        this.cause.key(),
-        this.cause.value());
+    Map<Placeholder, String> replacement = new HashMap<>();
+    replacement.put(ENDPOINT_PATH, this.cause.key());
+    replacement.put(RESPONSE_MS, this.cause.value().toString());
+
+    return settingManager.getSettings()
+        .getNotificationGlobalSetting()
+        .generateMailTemplate(Template.SLOW_RESPONSE_BODY, replacement);
   }
 
   @Override
   public String getSubject() {
-    return "Slow API Response Alert : [%s] - %dms".formatted(
-        this.cause.key(), this.cause.value()
-    );
-  }
+    Map<Placeholder, String> replacement = new HashMap<>();
+    replacement.put(ENDPOINT_PATH, this.cause.key());
+    replacement.put(RESPONSE_MS, this.cause.value().toString());
 
-  @SuppressWarnings({"checkstyle:MissingJavadocMethod", "checkstyle:MissingJavadocType"})
-  public static class SlowResponse implements Comparable<SlowResponse> {
-    private final String endpointPath;
-    private final String endpointMethod;
-    private final long normalResponseTime;
-    private final long currentResponseTime;
-
-    SlowResponse(String endpointPath, String endpointMethod, long normalResponseTime,
-        long currentResponseTime) {
-      this.endpointPath = endpointPath;
-      this.endpointMethod = endpointMethod;
-      this.normalResponseTime = normalResponseTime;
-      this.currentResponseTime = currentResponseTime;
-    }
-
-    public String getEndpointPath() {
-      return endpointPath;
-    }
-
-    public String getEndpointMethod() {
-      return endpointMethod;
-    }
-
-    public long getNormalResponseTime() {
-      return normalResponseTime;
-    }
-
-    public long getCurrentResponseTime() {
-      return currentResponseTime;
-    }
-
-    @Override
-    public int compareTo(SlowResponse o) {
-      return Long.compare(this.currentResponseTime, o.currentResponseTime);
-    }
-
-    public static class Builder {
-      private String endpointPath;
-      private String endpointMethod;
-      private long normalResponseTime;
-      private long currentResponseTime;
-
-      public Builder endpointPath(String endpointPath) {
-        this.endpointPath = endpointPath;
-        return this;
-      }
-
-      public Builder endpointMethod(String endpointMethod) {
-        this.endpointMethod = endpointMethod;
-        return this;
-      }
-
-      public Builder normalResponseTime(long normalResponseTime) {
-        this.normalResponseTime = normalResponseTime;
-        return this;
-      }
-
-      public Builder currentResponseTime(long currentResponseTime) {
-        this.currentResponseTime = currentResponseTime;
-        return this;
-      }
-
-      public SlowResponse build() {
-        return new SlowResponse(endpointPath, endpointMethod, normalResponseTime, currentResponseTime);
-      }
-    }
+    return settingManager.getSettings()
+        .getNotificationGlobalSetting()
+        .generateMailTemplate(Template.SLOW_RESPONSE_SUBJECT, replacement);
   }
 }

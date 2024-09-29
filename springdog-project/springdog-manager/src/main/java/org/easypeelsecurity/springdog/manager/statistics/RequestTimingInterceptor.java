@@ -16,8 +16,6 @@
 
 package org.easypeelsecurity.springdog.manager.statistics;
 
-import java.util.logging.Logger;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -27,8 +25,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import org.easypeelsecurity.springdog.manager.util.RequestHandlerUtil;
 import org.easypeelsecurity.springdog.notification.SlowResponseEmailNotificationManager;
-import org.easypeelsecurity.springdog.notification.email.SlowResponseEmailNotification.SlowResponse;
-import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
+import org.easypeelsecurity.springdog.notification.SlowResponseEmailNotificationManager.SlowResponse;
 import org.easypeelsecurity.springdog.shared.util.MethodSignatureParser;
 
 /**
@@ -41,8 +38,6 @@ import org.easypeelsecurity.springdog.shared.util.MethodSignatureParser;
 @Component
 public class RequestTimingInterceptor implements HandlerInterceptor {
 
-  private final SpringdogProperties springdogProperties;
-  private final Logger logger = Logger.getLogger(RequestTimingInterceptor.class.getName());
   private static final String SKIP_REQUEST_TIMING_CALC = "SKIP_REQUEST_TIMING_CALC";
   private static final String START_TIME_REQUEST_TIMING = "START_TIME_REQUEST_TIMING";
   private final SlowResponseEmailNotificationManager notificationManager;
@@ -50,9 +45,7 @@ public class RequestTimingInterceptor implements HandlerInterceptor {
   /**
    * Constructor.
    */
-  public RequestTimingInterceptor(SpringdogProperties springdogProperties,
-      SlowResponseEmailNotificationManager notificationManager) {
-    this.springdogProperties = springdogProperties;
+  public RequestTimingInterceptor(SlowResponseEmailNotificationManager notificationManager) {
     this.notificationManager = notificationManager;
   }
 
@@ -94,10 +87,6 @@ public class RequestTimingInterceptor implements HandlerInterceptor {
     String methodSignature = MethodSignatureParser.parse(handlerMethod);
     EndpointMetricCacheManager.addResponseTime(methodSignature, responseTime);
     notificationManager.checkSlowResponse(
-        new SlowResponse.Builder()
-            .endpointPath(request.getRequestURI())
-            .endpointMethod(request.getMethod())
-            .currentResponseTime(responseTime).build()
-    );
+        new SlowResponse(request.getRequestURI(), request.getMethod(), responseTime));
   }
 }

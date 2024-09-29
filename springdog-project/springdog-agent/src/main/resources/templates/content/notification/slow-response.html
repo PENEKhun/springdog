@@ -1,0 +1,81 @@
+<!--
+  ~ Copyright 2024 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html lang="en"
+      layout:decorate="~{/templates/layout/default_layout.html}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <title>slow response</title>
+</head>
+
+<div class="content" layout:fragment="content">
+  <div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h4">Slow Response</h1>
+    </div>
+
+    <th:block th:if="${result != null}">
+      <div class="alert alert-success" th:if="${result == true}">
+        <strong th:text="${message}"></strong>
+      </div>
+
+      <div class="alert alert-danger" th:if="${result == false}">
+        <strong>Error!</strong> <strong th:text="${message}"></strong>
+      </div>
+    </th:block>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Configuration</h5>
+        </div>
+        <div class="card-body">
+          <!--/*@thymesVar id="slowResponseConfiguration" type="org.easypeelsecurity.springdog.shared.settings.SlowResponseSetting"*/-->
+          <form method="post" name="slowResponseConfiguration" th:object="${slowResponseConfiguration}">
+            <div class="mb-3">
+              <label class="form-label">Enable Slow Response Monitoring</label>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="enableSlowResponse" th:field="*{enabled}">
+                <label class="form-check-label" for="enableSlowResponse">Activate monitoring</label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="thresholdMs" class="form-label">Slow Response Threshold (ms)</label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="thresholdMs" step="1" th:field="*{responseTimeMs}">
+                <span class="input-group-text">ms</span>
+              </div>
+              <div class="form-text">
+                The slow response threshold. If the response time exceeds this value, a notification
+                will be sent. (0 < x ms)
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="saveConfigurationButton">
+              <i class="bi bi-save me-2"></i>Save Configuration
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</html>

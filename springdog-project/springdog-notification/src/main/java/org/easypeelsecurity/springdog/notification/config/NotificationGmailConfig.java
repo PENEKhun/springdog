@@ -23,7 +23,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import org.easypeelsecurity.springdog.shared.configuration.NotificationGmailProperties;
+import org.easypeelsecurity.springdog.shared.settings.NotificationGlobalSetting;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettingManagerImpl;
 
 /**
  * Configuration for Gmail notifications.
@@ -31,13 +32,13 @@ import org.easypeelsecurity.springdog.shared.configuration.NotificationGmailProp
  */
 @Configuration
 public class NotificationGmailConfig {
-  private final NotificationGmailProperties gmailProperties;
+  private final SpringdogSettingManagerImpl settingManager;
 
   /**
    * Constructor for GmailNotificationConfig.
    */
-  public NotificationGmailConfig(NotificationGmailProperties gmailProperties) {
-    this.gmailProperties = gmailProperties;
+  public NotificationGmailConfig(SpringdogSettingManagerImpl settingManager) {
+    this.settingManager = settingManager;
   }
 
   /**
@@ -51,8 +52,9 @@ public class NotificationGmailConfig {
     mailSender.setHost("smtp.gmail.com");
     mailSender.setPort(587);
 
-    mailSender.setUsername(gmailProperties.getUsername());
-    mailSender.setPassword(gmailProperties.getPassword());
+    NotificationGlobalSetting notificationSetting = settingManager.getSettings().getNotificationGlobalSetting();
+    mailSender.setUsername(notificationSetting.getUsername());
+    mailSender.setPassword(notificationSetting.getPassword());
 
     Properties props = mailSender.getJavaMailProperties();
     props.put("mail.transport.protocol", "smtp");

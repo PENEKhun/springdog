@@ -16,128 +16,136 @@
 
 package org.easypeelsecurity.springdog.notification;
 
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 
 import org.easypeelsecurity.springdog.notification.email.MetricContext;
 import org.easypeelsecurity.springdog.notification.email.SystemWatchEmailNotification;
-import org.easypeelsecurity.springdog.shared.configuration.SystemWatchProperties;
+import org.easypeelsecurity.springdog.shared.settings.NotificationGlobalSetting;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettingManager;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettings;
+import org.easypeelsecurity.springdog.shared.settings.SystemWatchSetting;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 class SystemWatchNotificationManagerTest {
 
   @Mock
-  private SystemWatchProperties properties;
+  private SpringdogSettingManager mockSettingManager;
 
   @Mock
-  private SystemWatchEmailNotification emailNotification;
+  private SystemWatchEmailNotification mockEmailNotification;
 
   @Mock
-  private MetricContext cpuContext;
+  private SpringdogSettings mockSpringdogSettings;
 
   @Mock
-  private MetricContext memoryContext;
+  private SystemWatchSetting mockSystemWatchSetting;
 
   @Mock
-  private MetricContext diskContext;
+  private NotificationGlobalSetting mockNotificationGlobalSetting;
 
-  @InjectMocks
+  @Mock
+  private Map<String, MetricContext<String, Double>> mockMetricContexts;
+
+  @Mock
+  private MetricContext<String, Double> mockCpuContext;
+
+  @Mock
+  private MetricContext<String, Double> mockMemoryContext;
+
+  @Mock
+  private MetricContext<String, Double> mockDiskContext;
+
   private SystemWatchNotificationManager manager;
 
   @BeforeEach
-  void setUp() throws NoSuchFieldException, IllegalAccessException {
+  void setUp() {
     MockitoAnnotations.openMocks(this);
-    when(properties.getCpuThreshold()).thenReturn(80.0);
-    when(properties.getMemoryThreshold()).thenReturn(90.0);
-    when(properties.getDiskThreshold()).thenReturn(85.0);
-
-    manager = new SystemWatchNotificationManager(properties, emailNotification) {
+    manager = new SystemWatchNotificationManager(mockSettingManager, mockEmailNotification) {
       @Override
       protected void initializeMetricContexts() {
-        // Do nothing, we'll set the contexts using reflection
+        // Do nothing
       }
     };
 
-    // Use reflection to set metricContexts
-    Field metricContextsField = SystemWatchNotificationManager.class.getDeclaredField("metricContexts");
-    metricContextsField.setAccessible(true);
-    Map<String, MetricContext> contexts = Map.of(
-        "CPU", cpuContext,
-        "Memory", memoryContext,
-        "Disk", diskContext
-    );
-    metricContextsField.set(manager, contexts);
+    when(mockMetricContexts.get("CPU")).thenReturn(mockCpuContext);
+    when(mockMetricContexts.get("Memory")).thenReturn(mockMemoryContext);
+    when(mockMetricContexts.get("Disk")).thenReturn(mockDiskContext);
+
+    try {
+      var field = SystemWatchNotificationManager.class.getDeclaredField("metricContexts");
+      field.setAccessible(true);
+      field.set(manager, mockMetricContexts);
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+
+    when(mockSettingManager.getSettings()).thenReturn(mockSpringdogSettings);
+    when(mockSpringdogSettings.getSystemWatchSetting()).thenReturn(mockSystemWatchSetting);
+    when(mockSpringdogSettings.getNotificationGlobalSetting()).thenReturn(mockNotificationGlobalSetting);
   }
 
   @Test
-  void checkMetrics_AllBelowThreshold() {
-    when(properties.isEnabled()).thenReturn(true);
+  @DisplayName("System metrics are not checked when global notifications are disabled")
+  void notificationDisabled() {
+    when(mockNotificationGlobalSetting.isEnabled()).thenReturn(false);
+    when(mockSystemWatchSetting.isEnabled()).thenReturn(true);
+
     manager.checkMetrics(70.0, 80.0, 75.0);
 
-    verify(cpuContext).checkMetric(70.0, 80.0);
-    verify(memoryContext).checkMetric(80.0, 90.0);
-    verify(diskContext).checkMetric(75.0, 85.0);
+    verify(mockNotificationGlobalSetting).isEnabled();
+    verifyNoInteractions(mockMetricContexts);
   }
 
   @Test
-  void checkMetrics_CpuAboveThreshold() {
-    when(properties.isEnabled()).thenReturn(true);
-    manager.checkMetrics(85.0, 80.0, 75.0);
+  @DisplayName("System metrics are not checked when system watch notifications are disabled")
+  void systemWatchDisabled() {
+    when(mockNotificationGlobalSetting.isEnabled()).thenReturn(true);
+    when(mockSystemWatchSetting.isEnabled()).thenReturn(false);
 
-    verify(cpuContext).checkMetric(85.0, 80.0);
-    verify(memoryContext).checkMetric(80.0, 90.0);
-    verify(diskContext).checkMetric(75.0, 85.0);
+    manager.checkMetrics(70.0, 80.0, 75.0);
+
+    verify(mockSystemWatchSetting).isEnabled();
+    verifyNoInteractions(mockMetricContexts);
   }
 
   @Test
-  void checkMetrics_MemoryAboveThreshold() {
-    when(properties.isEnabled()).thenReturn(true);
-    manager.checkMetrics(70.0, 95.0, 75.0);
+  @DisplayName("System metrics are checked and compared to thresholds when all settings are enabled")
+  void allEnabled() {
+    when(mockNotificationGlobalSetting.isEnabled()).thenReturn(true);
+    when(mockSystemWatchSetting.isEnabled()).thenReturn(true);
+    when(mockSystemWatchSetting.getCpuThreshold()).thenReturn(80.0);
+    when(mockSystemWatchSetting.getMemoryThreshold()).thenReturn(90.0);
+    when(mockSystemWatchSetting.getDiskThreshold()).thenReturn(85.0);
 
-    verify(cpuContext).checkMetric(70.0, 80.0);
-    verify(memoryContext).checkMetric(95.0, 90.0);
-    verify(diskContext).checkMetric(75.0, 85.0);
+    manager.checkMetrics(70.0, 80.0, 75.0);
+
+    verify(mockCpuContext).checkMetric(70.0, 80.0);
+    verify(mockMemoryContext).checkMetric(80.0, 90.0);
+    verify(mockDiskContext).checkMetric(75.0, 85.0);
   }
 
   @Test
-  void checkMetrics_DiskAboveThreshold() {
-    when(properties.isEnabled()).thenReturn(true);
-    manager.checkMetrics(70.0, 80.0, 90.0);
+  @DisplayName("System metrics exceeding thresholds are correctly processed when all settings are enabled")
+  void metricsExceedThresholds() {
+    when(mockNotificationGlobalSetting.isEnabled()).thenReturn(true);
+    when(mockSystemWatchSetting.isEnabled()).thenReturn(true);
+    when(mockSystemWatchSetting.getCpuThreshold()).thenReturn(80.0);
+    when(mockSystemWatchSetting.getMemoryThreshold()).thenReturn(90.0);
+    when(mockSystemWatchSetting.getDiskThreshold()).thenReturn(85.0);
 
-    verify(cpuContext).checkMetric(70.0, 80.0);
-    verify(memoryContext).checkMetric(80.0, 90.0);
-    verify(diskContext).checkMetric(90.0, 85.0);
-  }
-
-  @Test
-  void checkMetrics_AllAboveThreshold() {
-    when(properties.isEnabled()).thenReturn(true);
     manager.checkMetrics(90.0, 95.0, 95.0);
 
-    verify(cpuContext).checkMetric(90.0, 80.0);
-    verify(memoryContext).checkMetric(95.0, 90.0);
-    verify(diskContext).checkMetric(95.0, 85.0);
-  }
-
-  @Test
-  void testCheckMetrics_Disabled() {
-    when(properties.isEnabled()).thenReturn(false);
-
-    manager.checkMetrics(85.0, 70.0, 95.0);
-
-    // Verify that checkMetric was not called for any metric
-    verify(cpuContext, never()).checkMetric(anyDouble(), anyDouble());
-    verify(memoryContext, never()).checkMetric(anyDouble(), anyDouble());
-    verify(diskContext, never()).checkMetric(anyDouble(), anyDouble());
+    verify(mockCpuContext).checkMetric(90.0, 80.0);
+    verify(mockMemoryContext).checkMetric(95.0, 90.0);
+    verify(mockDiskContext).checkMetric(95.0, 85.0);
   }
 }

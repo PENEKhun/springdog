@@ -23,7 +23,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 import org.easypeelsecurity.springdog.notification.Notification;
-import org.easypeelsecurity.springdog.shared.configuration.NotificationGmailProperties;
+import org.easypeelsecurity.springdog.shared.settings.NotificationGlobalSetting;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettingManagerImpl;
 
 /**
  * Email content.
@@ -31,16 +32,16 @@ import org.easypeelsecurity.springdog.shared.configuration.NotificationGmailProp
 @SuppressWarnings("checkstyle:VisibilityModifier")
 abstract class AbstractEmailNotification<K, V> implements Notification {
   private JavaMailSender mailSender;
-  private NotificationGmailProperties gmailProperties;
+  private SpringdogSettingManagerImpl settingManager;
   protected Cause<K, V> cause;
   protected Cause<K, V> recovered;
 
   /**
    * Constructor.
    */
-  AbstractEmailNotification(JavaMailSender mailSender, NotificationGmailProperties gmailProperties) {
+  AbstractEmailNotification(JavaMailSender mailSender, SpringdogSettingManagerImpl settingManager) {
     this.mailSender = mailSender;
-    this.gmailProperties = gmailProperties;
+    this.settingManager = settingManager;
   }
 
   AbstractEmailNotification() {
@@ -50,13 +51,14 @@ abstract class AbstractEmailNotification<K, V> implements Notification {
   public final boolean send() {
     MimeMessage mimeMessage = mailSender.createMimeMessage();
 
-    if (!gmailProperties.isEnabled()) {
+    NotificationGlobalSetting notificationSetting = settingManager.getSettings().getNotificationGlobalSetting();
+    if (!notificationSetting.isEnabled()) {
       return false;
     }
 
     try {
       MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-      mimeMessageHelper.setTo(gmailProperties.getRecipient());
+      mimeMessageHelper.setTo(notificationSetting.getRecipient());
       mimeMessageHelper.setSubject("[springdog] %s".formatted(getSubject()));
       mimeMessageHelper.setText(getContent(), true);
       mailSender.send(mimeMessage);

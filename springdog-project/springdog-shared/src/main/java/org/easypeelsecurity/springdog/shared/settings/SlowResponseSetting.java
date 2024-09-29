@@ -14,34 +14,27 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.shared.configuration;
-
-import jakarta.annotation.PostConstruct;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
+package org.easypeelsecurity.springdog.shared.settings;
 
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * System watch properties.
+ * Slow response setting.
  */
-@Setter
 @Getter
-@ConfigurationProperties(prefix = "springdog.system-watch")
-@SuppressWarnings("checkstyle:MissingJavadocMethod")
-public class SystemWatchProperties {
-  private double cpuThreshold;
-  private double memoryThreshold;
-  private double diskThreshold;
+@Setter
+public class SlowResponseSetting {
   private boolean enabled;
+  private long responseTimeMs = 5_000;
 
-  @PostConstruct
-  public void init() {
+  /**
+   * Validate fields.
+   */
+  protected void validate() {
     if (enabled) {
-      String commonMessage = "To enable SystemWatch, you must enter at least one threshold.";
-      if (cpuThreshold == 0 && memoryThreshold == 0 && diskThreshold == 0) {
-        throw new IllegalArgumentException(commonMessage);
+      if (responseTimeMs < 0) {
+        throw new IllegalArgumentException("Response time must be greater than or equal to 0");
       }
     }
   }

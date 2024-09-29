@@ -23,7 +23,10 @@ import org.springframework.stereotype.Service;
 
 import org.easypeelsecurity.springdog.notification.email.MetricContext;
 import org.easypeelsecurity.springdog.notification.email.SystemWatchEmailNotification;
-import org.easypeelsecurity.springdog.shared.configuration.SystemWatchProperties;
+import org.easypeelsecurity.springdog.shared.settings.NotificationGlobalSetting;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettingManager;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettings;
+import org.easypeelsecurity.springdog.shared.settings.SystemWatchSetting;
 
 /**
  * Manages the overall system watch process.
@@ -32,18 +35,17 @@ import org.easypeelsecurity.springdog.shared.configuration.SystemWatchProperties
 @Service
 public class SystemWatchNotificationManager {
   private final Map<String, MetricContext<String, Double>> metricContexts;
-  private final SystemWatchProperties properties;
+  private final SpringdogSettingManager settingManager;
   private final SystemWatchEmailNotification emailNotification;
 
   /**
    * Constructs a new SystemWatchManager.
    *
-   * @param properties        The properties containing threshold values.
    * @param emailNotification The email notification service to use.
    */
-  public SystemWatchNotificationManager(SystemWatchProperties properties,
+  public SystemWatchNotificationManager(SpringdogSettingManager settingManager,
       SystemWatchEmailNotification emailNotification) {
-    this.properties = properties;
+    this.settingManager = settingManager;
     this.emailNotification = emailNotification;
     this.metricContexts = new HashMap<>();
     initializeMetricContexts();
@@ -66,12 +68,15 @@ public class SystemWatchNotificationManager {
    * @param diskUsage   The current disk usage.
    */
   public void checkMetrics(double cpuUsage, double memoryUsage, double diskUsage) {
-    if (!properties.isEnabled()) {
+    SpringdogSettings springdogSettings = settingManager.getSettings();
+    SystemWatchSetting systemWatchSetting = springdogSettings.getSystemWatchSetting();
+    NotificationGlobalSetting notificationGlobalSetting = springdogSettings.getNotificationGlobalSetting();
+    if (!systemWatchSetting.isEnabled() || !notificationGlobalSetting.isEnabled()) {
       return;
     }
 
-    metricContexts.get("CPU").checkMetric(cpuUsage, properties.getCpuThreshold());
-    metricContexts.get("Memory").checkMetric(memoryUsage, properties.getMemoryThreshold());
-    metricContexts.get("Disk").checkMetric(diskUsage, properties.getDiskThreshold());
+    metricContexts.get("CPU").checkMetric(cpuUsage, systemWatchSetting.getCpuThreshold());
+    metricContexts.get("Memory").checkMetric(memoryUsage, systemWatchSetting.getMemoryThreshold());
+    metricContexts.get("Disk").checkMetric(diskUsage, systemWatchSetting.getDiskThreshold());
   }
 }
