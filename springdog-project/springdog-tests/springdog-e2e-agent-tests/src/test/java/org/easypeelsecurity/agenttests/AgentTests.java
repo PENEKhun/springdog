@@ -70,7 +70,6 @@ class AgentTests extends SeleniumTestSupport {
   void ratelimit_detail() throws InterruptedException {
     withLogin();
 
-    accessPage("/rate-limit");
     WebElement analyzeBtn = accessPageUntilXPath("/rate-limit", "(//button[@title='Analyze'])[1]");
     analyzeBtn.click();
 
