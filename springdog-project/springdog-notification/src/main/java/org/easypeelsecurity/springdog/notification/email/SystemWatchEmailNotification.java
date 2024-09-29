@@ -16,74 +16,75 @@
 
 package org.easypeelsecurity.springdog.notification.email;
 
+import static org.easypeelsecurity.springdog.shared.settings.SystemWatchPlaceholder.TARGET_DEVICE;
+import static org.easypeelsecurity.springdog.shared.settings.SystemWatchPlaceholder.TARGET_STATUS;
+import static org.easypeelsecurity.springdog.shared.settings.SystemWatchPlaceholder.USAGE_PERCENT;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import org.easypeelsecurity.springdog.shared.configuration.NotificationGmailProperties;
+import org.easypeelsecurity.springdog.shared.settings.Placeholder;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettingManagerImpl;
+import org.easypeelsecurity.springdog.shared.settings.Template;
 
 /**
  * Email content for SystemWatch alerts.
  */
 @Service
 public class SystemWatchEmailNotification extends AbstractEmailNotification<String, Double> {
+  private SpringdogSettingManagerImpl settingManager;
 
   /**
    * Constructor.
    */
   @Autowired
   public SystemWatchEmailNotification(@Qualifier("gmailNotificationSender") JavaMailSender mailSender,
-      NotificationGmailProperties gmailProperties) {
-    super(mailSender, gmailProperties);
+      SpringdogSettingManagerImpl settingManager) {
+    super(mailSender, settingManager);
+    this.settingManager = settingManager;
   }
 
   SystemWatchEmailNotification() {
   }
 
   @Override
-  @SuppressWarnings("checkstyle:LineLength")
   protected String generateBody() {
-    StringBuilder sbBody = new StringBuilder();
-    sbBody.append("<div class='header'>");
-    sbBody.append("<h2 style='color: #333;'>System Usage Warning</h2>");
-    sbBody.append("</div>");
-    sbBody.append("<div class='content'>");
-    sbBody.append("<p>Hello,</p>");
-    sbBody.append(
-        "<p>This email is an alert from <strong>springdog</strong> about an increase(or recovery) in system usage.</p>");
-
+    Map<Placeholder, String> replacement = new HashMap<>();
+    replacement.put(TARGET_DEVICE, this.cause.key());
     if (this.cause != null) {
-      sbBody.append("<p>The current system usage of <strong>");
-      sbBody.append(cause.key());
-      sbBody.append("</strong> has exceeded <span class='alert'>");
-      sbBody.append(cause.value()).append("%</span>. ");
-      sbBody.append("This indicates a risk of system performance degradation and downtime.</p>");
-      sbBody.append(
-          "<p>If you believe this value is abnormal, it is advisable to promptly conduct a system inspection.</p>");
-      sbBody.append("</div>");
-    } else if (this.recovered != null) {
-      sbBody.append("<p>The system usage of <strong>");
-      sbBody.append(recovered.key());
-      sbBody.append("</strong> has returned to normal levels: <span class='alert'>");
-      sbBody.append(recovered.value()).append("%</span>. ");
-      sbBody.append("We will notify you when usage reaches the threshold again.</p>");
+      replacement.put(TARGET_STATUS, "overused");
+    } else {
+      replacement.put(TARGET_STATUS, "recovered");
     }
-    return sbBody.toString();
+
+    replacement.put(USAGE_PERCENT, this.cause.value().toString());
+
+    return settingManager
+        .getSettings()
+        .getNotificationGlobalSetting()
+        .generateMailTemplate(Template.SYSTEM_WATCH_BODY, replacement);
   }
 
   @Override
   public String getSubject() {
-    StringBuilder subject = new StringBuilder("SystemWatch Alert: ");
-
-    if (cause != null) {
-      subject.append(cause.key()).append(" is overused").append(" (").append(cause.value()).append("%)");
-    } else if (recovered != null) {
-      subject.append(recovered.key()).append(" usage is recovered").append(" (").append(recovered.value())
-          .append("%)");
+    Map<Placeholder, String> replacement = new HashMap<>();
+    replacement.put(TARGET_DEVICE, this.cause.key());
+    if (this.cause != null) {
+      replacement.put(TARGET_STATUS, "overused");
     } else {
-      throw new IllegalStateException("Cause or recovered must be set");
+      replacement.put(TARGET_STATUS, "recovered");
     }
-    return subject.toString();
+
+    replacement.put(USAGE_PERCENT, this.cause.value().toString());
+
+    return settingManager
+        .getSettings()
+        .getNotificationGlobalSetting()
+        .generateMailTemplate(Template.SYSTEM_WATCH_SUBJECT, replacement);
   }
 }

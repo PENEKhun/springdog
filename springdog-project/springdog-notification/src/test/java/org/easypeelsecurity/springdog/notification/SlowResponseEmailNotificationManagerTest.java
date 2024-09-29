@@ -16,94 +16,120 @@
 
 package org.easypeelsecurity.springdog.notification;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
 
+import org.easypeelsecurity.springdog.notification.SlowResponseEmailNotificationManager.SlowResponse;
 import org.easypeelsecurity.springdog.notification.email.MetricContext;
 import org.easypeelsecurity.springdog.notification.email.SlowResponseEmailNotification;
-import org.easypeelsecurity.springdog.notification.email.SlowResponseEmailNotification.SlowResponse;
-import org.easypeelsecurity.springdog.shared.configuration.SlowResponseProperties;
+import org.easypeelsecurity.springdog.shared.settings.NotificationGlobalSetting;
+import org.easypeelsecurity.springdog.shared.settings.SlowResponseSetting;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettingManager;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettings;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 class SlowResponseEmailNotificationManagerTest {
 
   @Mock
-  private SlowResponseProperties properties;
+  private SpringdogSettingManager mockSettingManager;
 
   @Mock
-  private SlowResponseEmailNotification emailNotification;
+  private SlowResponseEmailNotification mockEmailNotification;
 
   @Mock
-  private MetricContext<String, Long> metricContext;
+  private SpringdogSettings mockSpringdogSettings;
 
-  @InjectMocks
+  @Mock
+  private SlowResponseSetting mockSlowResponseSetting;
+
+  @Mock
+  private NotificationGlobalSetting mockNotificationGlobalSetting;
+
+  @Mock
+  private Map<String, MetricContext<String, Long>> mockMetricContexts;
+
+  @Mock
+  private MetricContext<String, Long> mockMetricContext;
   private SlowResponseEmailNotificationManager manager;
 
   @BeforeEach
-  void setUp() throws NoSuchFieldException, IllegalAccessException {
+  void setUp() {
     MockitoAnnotations.openMocks(this);
-    when(properties.getThresholdMs()).thenReturn(1000L);
+    manager =
+        new SlowResponseEmailNotificationManager(mockSettingManager, mockEmailNotification, mockMetricContexts);
 
-    manager = new SlowResponseEmailNotificationManager(properties, emailNotification);
-
-    // Use reflection to set metricContexts
-    Field metricContextsField = SlowResponseEmailNotificationManager.class.getDeclaredField("metricContexts");
-    metricContextsField.setAccessible(true);
-    Map<String, MetricContext<String, Long>> contexts = new HashMap<>();
-    contexts.put("[GET] /api/test", metricContext);
-    metricContextsField.set(manager, contexts);
+    when(mockSettingManager.getSettings()).thenReturn(mockSpringdogSettings);
+    when(mockSpringdogSettings.getSlowResponseSetting()).thenReturn(mockSlowResponseSetting);
+    when(mockSpringdogSettings.getNotificationGlobalSetting()).thenReturn(mockNotificationGlobalSetting);
   }
 
   @Test
-  void checkSlowResponse_BelowThreshold() {
-    when(properties.isEnabled()).thenReturn(true);
-    SlowResponse slowResponse = new SlowResponse.Builder()
-        .endpointMethod("GET")
-        .endpointPath("/api/test")
-        .currentResponseTime(500L)
-        .build();
+  @DisplayName("Given global notifications are disabled, when checking slow response, then no interactions should occur with metric contexts")
+  void notificationDisabled() {
+    when(mockNotificationGlobalSetting.isEnabled()).thenReturn(false);
+    when(mockSlowResponseSetting.isEnabled()).thenReturn(true);
 
+    SlowResponse slowResponse = new SlowResponse("/test", "GET", 1000L);
     manager.checkSlowResponse(slowResponse);
 
-    verify(metricContext).checkMetric(500L, 1000L);
+    verifyNoInteractions(mockMetricContexts);
   }
 
   @Test
-  void checkSlowResponse_AboveThreshold() {
-    when(properties.isEnabled()).thenReturn(true);
-    SlowResponse slowResponse = new SlowResponse.Builder()
-        .endpointMethod("GET")
-        .endpointPath("/api/test")
-        .currentResponseTime(1500L)
-        .build();
+  @DisplayName("Given slow response notifications are disabled, when checking slow response, then no interactions should occur with metric contexts")
+  void slowResponseDisabled() {
+    when(mockNotificationGlobalSetting.isEnabled()).thenReturn(true);
+    when(mockSlowResponseSetting.isEnabled()).thenReturn(false);
 
+    SlowResponse slowResponse = new SlowResponse("/test", "GET", 1000L);
     manager.checkSlowResponse(slowResponse);
 
-    verify(metricContext).checkMetric(1500L, 1000L);
+    verifyNoInteractions(mockMetricContexts);
   }
 
   @Test
-  void checkSlowResponse_Disabled() {
-    when(properties.isEnabled()).thenReturn(false);
-    SlowResponse slowResponse = new SlowResponse.Builder()
-        .endpointMethod("GET")
-        .endpointPath("/api/test")
-        .currentResponseTime(1500L)
-        .build();
+  @DisplayName("Given response time exceeds threshold, when checking slow response, then metric context should be updated accordingly")
+  void responseTimeExceedsThreshold() {
+    when(mockNotificationGlobalSetting.isEnabled()).thenReturn(true);
+    when(mockSlowResponseSetting.isEnabled()).thenReturn(true);
+    when(mockSlowResponseSetting.getResponseTimeMs()).thenReturn(500L);
 
+    String metricName = "[GET] /test";
+    when(mockMetricContexts.computeIfAbsent(eq(metricName), any()))
+        .thenReturn(mockMetricContext);
+
+    SlowResponse slowResponse = new SlowResponse("/test", "GET", 1000L);
     manager.checkSlowResponse(slowResponse);
 
-    verify(metricContext, never()).checkMetric(anyLong(), anyLong());
+    verify(mockMetricContext).checkMetric(1000L, 500L);
+    verify(mockMetricContexts).computeIfAbsent(eq(metricName), any());
+  }
+
+  @Test
+  @DisplayName("Given response time is within threshold, when checking slow response, then metric context should be updated accordingly")
+  void responseTimeWithinThreshold() {
+    when(mockNotificationGlobalSetting.isEnabled()).thenReturn(true);
+    when(mockSlowResponseSetting.isEnabled()).thenReturn(true);
+    when(mockSlowResponseSetting.getResponseTimeMs()).thenReturn(1500L);
+
+    String metricName = "[GET] /test";
+    when(mockMetricContexts.computeIfAbsent(eq(metricName), any()))
+        .thenReturn(mockMetricContext);
+
+    SlowResponse slowResponse = new SlowResponse("/test", "GET", 1000L);
+    manager.checkSlowResponse(slowResponse);
+
+    verify(mockMetricContext).checkMetric(1000L, 1500L);
+    verify(mockMetricContexts).computeIfAbsent(eq(metricName), any());
   }
 }

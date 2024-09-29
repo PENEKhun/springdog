@@ -14,25 +14,30 @@
  * limitations under the License.
  */
 
-package org.easypeelsecurity.springdog.notification.email.state;
+package org.easypeelsecurity.springdog.shared.settings;
 
 /**
- * Represents the state of a system metric in the SystemWatch.
- * This interface defines the contract for different states a metric can be in.
+ * Interface representing a placeholder in a template.
  */
-public interface MetricState<T extends Comparable<T>> {
-  /**
-   * Checks the current value against the threshold and potentially changes the state.
-   *
-   * @param currentValue The current value of the metric.
-   * @param threshold The threshold value for the metric.
-   */
-  void checkThreshold(T currentValue, T threshold);
+public interface Placeholder {
 
   /**
-   * Gets the name of the metric this state is associated with.
-   *
-   * @return The name of the metric.
+   * Returns the key of the placeholder.
    */
-  String getMetricName();
+  String getKey();
+
+  /**
+   * Returns the placeholder name as it appears in the template (e.g., "{{TARGET_DEVICE}}").
+   * @return the placeholder name
+   */
+  default String getPlaceholderName() {
+    return "{{%s}}".formatted(getKey());
+  }
+
+  /**
+   * Returns a description of the placeholder.
+   *
+   * @return the placeholder description
+   */
+  String getDescription();
 }

@@ -5,9 +5,11 @@ plugins {
 
 dependencies {
     compileOnly "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
-
     compileOnly 'org.projectlombok:lombok:1.18.34'
+
+    compileOnly "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    implementation "org.jsoup:jsoup:${jsoupVersion}"
     testImplementation "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
 }
@@ -17,7 +19,7 @@ mavenPublishing {
 
     pom {
         name = "SpringDog Shared Code"
-        description = "The code which shared across all SpringDog projects"
+        description = "The code which shared across all springdog projects"
         inceptionYear = "2024"
         url = ""
 

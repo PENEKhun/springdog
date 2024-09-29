@@ -39,6 +39,10 @@ import org.easypeelsecurity.springdog.domain.statistics.StatisticsService;
 import org.easypeelsecurity.springdog.shared.configuration.SpringdogProperties;
 import org.easypeelsecurity.springdog.shared.dto.EndpointDto;
 import org.easypeelsecurity.springdog.shared.dto.ErrorTracingDto;
+import org.easypeelsecurity.springdog.shared.settings.NotificationGlobalSetting;
+import org.easypeelsecurity.springdog.shared.settings.SlowResponseSetting;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettingManagerImpl;
+import org.easypeelsecurity.springdog.shared.settings.SystemWatchSetting;
 import org.easypeelsecurity.springdog.shared.util.Assert;
 
 /**
@@ -58,6 +62,8 @@ public class SpringdogAgentView {
   private ExceptionListingService exceptionListingService;
   @Autowired
   private SpringdogProperties properties;
+  @Autowired
+  private SpringdogSettingManagerImpl settingManager;
 
   @GetMapping("/login")
   public String login() {
@@ -133,6 +139,72 @@ public class SpringdogAgentView {
     model.addAttribute("result", true);
     model.addAttribute("message", "Successfully updated");
     return viewRateLimitSpecific(endpointId, model);
+  }
+
+  @GetMapping("/notification")
+  public String notificationSettingView(Model model) {
+    model.addAttribute("mailConfiguration", settingManager.getSettings().getNotificationGlobalSetting());
+    return "/templates/content/notification/configuration.html";
+  }
+
+  @PostMapping("/notification")
+  public String notificationSettingUpdate(Model model, @ModelAttribute("mailConfiguration")
+  NotificationGlobalSetting newSetting) {
+    try {
+      settingManager.updateNotificationGlobalSetting(newSetting);
+    } catch (Exception e) {
+      model.addAttribute("result", false);
+      model.addAttribute("message", e.getMessage());
+      return notificationSettingView(model);
+    }
+
+    model.addAttribute("result", true);
+    model.addAttribute("message", "Successfully updated");
+    return notificationSettingView(model);
+  }
+
+  @GetMapping("/notification/system-watch")
+  public String notificationSystemWatchView(Model model) {
+    model.addAttribute("systemWatchConfiguration", settingManager.getSettings().getSystemWatchSetting());
+    return "/templates/content/notification/system-watch.html";
+  }
+
+  @PostMapping("/notification/system-watch")
+  public String notificationSystemWatchSettingUpdate(Model model, @ModelAttribute("systemWatchConfiguration")
+  SystemWatchSetting newSetting) {
+    try {
+      settingManager.updateSystemWatchSetting(newSetting);
+    } catch (Exception e) {
+      model.addAttribute("result", false);
+      model.addAttribute("message", e.getMessage());
+      return notificationSystemWatchView(model);
+    }
+
+    model.addAttribute("result", true);
+    model.addAttribute("message", "Successfully updated");
+    return notificationSystemWatchView(model);
+  }
+
+  @GetMapping("/notification/slow-response")
+  public String notificationSlowResponseView(Model model) {
+    model.addAttribute("slowResponseConfiguration", settingManager.getSettings().getSlowResponseSetting());
+    return "/templates/content/notification/slow-response.html";
+  }
+
+  @PostMapping("/notification/slow-response")
+  public String notificationSlowResponseSettingUpdate(Model model, @ModelAttribute("slowResponseConfiguration")
+  SlowResponseSetting newSetting) {
+    try {
+      settingManager.updateSlowResponseSetting(newSetting);
+    } catch (Exception e) {
+      model.addAttribute("result", false);
+      model.addAttribute("message", e.getMessage());
+      return notificationSlowResponseView(model);
+    }
+
+    model.addAttribute("result", true);
+    model.addAttribute("message", "Successfully updated");
+    return notificationSlowResponseView(model);
   }
 
   @GetMapping("/error-tracing")

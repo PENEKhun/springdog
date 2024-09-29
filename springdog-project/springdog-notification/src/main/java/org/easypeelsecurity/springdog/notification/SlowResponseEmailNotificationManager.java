@@ -19,12 +19,15 @@ package org.easypeelsecurity.springdog.notification;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.easypeelsecurity.springdog.notification.email.MetricContext;
 import org.easypeelsecurity.springdog.notification.email.SlowResponseEmailNotification;
-import org.easypeelsecurity.springdog.notification.email.SlowResponseEmailNotification.SlowResponse;
-import org.easypeelsecurity.springdog.shared.configuration.SlowResponseProperties;
+import org.easypeelsecurity.springdog.shared.settings.NotificationGlobalSetting;
+import org.easypeelsecurity.springdog.shared.settings.SlowResponseSetting;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettingManager;
+import org.easypeelsecurity.springdog.shared.settings.SpringdogSettings;
 
 /**
  * Manages the slow response process.
@@ -32,20 +35,34 @@ import org.easypeelsecurity.springdog.shared.configuration.SlowResponsePropertie
 @Service
 public class SlowResponseEmailNotificationManager {
   private final Map<String, MetricContext<String, Long>> metricContexts;
-  private final SlowResponseProperties properties;
+  private final SpringdogSettingManager settings;
   private final SlowResponseEmailNotification emailNotification;
 
   /**
    * Constructs a new SlowResponseManager.
    *
-   * @param properties        The properties containing threshold values.
-   * @param emailNotification The email notification service to use.
+   * @param settings           The properties containing threshold values.
+   * @param emailNotification  The email notification service to use.
+   * @param metricContexts     The map of metric contexts to use.
    */
-  public SlowResponseEmailNotificationManager(SlowResponseProperties properties,
-      SlowResponseEmailNotification emailNotification) {
-    this.properties = properties;
+  public SlowResponseEmailNotificationManager(SpringdogSettingManager settings,
+      SlowResponseEmailNotification emailNotification,
+      Map<String, MetricContext<String, Long>> metricContexts) {
+    this.settings = settings;
     this.emailNotification = emailNotification;
-    this.metricContexts = new HashMap<>();
+    this.metricContexts = metricContexts != null ? metricContexts : new HashMap<>();
+  }
+
+  /**
+   * Constructs a new SlowResponseManager with a default metric contexts map.
+   *
+   * @param settings           The properties containing threshold values.
+   * @param emailNotification  The email notification service to use.
+   */
+  @Autowired
+  public SlowResponseEmailNotificationManager(SpringdogSettingManager settings,
+      SlowResponseEmailNotification emailNotification) {
+    this(settings, emailNotification, new HashMap<>());
   }
 
   /**
@@ -54,13 +71,28 @@ public class SlowResponseEmailNotificationManager {
    * @param value The current response time.
    */
   public void checkSlowResponse(SlowResponse value) {
-    if (!properties.isEnabled()) {
+    SpringdogSettings springdogSettings = settings.getSettings();
+    SlowResponseSetting slowResponseSetting = springdogSettings.getSlowResponseSetting();
+    NotificationGlobalSetting notificationGlobalSetting = springdogSettings.getNotificationGlobalSetting();
+    if (!notificationGlobalSetting.isEnabled() || !slowResponseSetting.isEnabled()) {
       return;
     }
 
-    String metricName = "[%s] %s".formatted(value.getEndpointMethod(), value.getEndpointPath());
+    String metricName = "[%s] %s".formatted(value.endpointMethod, value.endpointPath);
     MetricContext<String, Long> context =
         metricContexts.computeIfAbsent(metricName, n -> new MetricContext<>(n, emailNotification));
-    context.checkMetric(value.getCurrentResponseTime(), properties.getThresholdMs());
+    context.checkMetric(value.currentResponseTime, slowResponseSetting.getResponseTimeMs());
+  }
+
+  /**
+   * Represents a slow response.
+   */
+  public record SlowResponse(String endpointPath, String endpointMethod, long currentResponseTime)
+      implements Comparable<SlowResponse> {
+
+    @Override
+    public int compareTo(SlowResponse o) {
+      return Long.compare(this.currentResponseTime, o.currentResponseTime);
+    }
   }
 }

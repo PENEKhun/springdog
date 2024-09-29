@@ -88,6 +88,11 @@ public abstract class SeleniumTestSupport {
     return this.wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpathElement)));
   }
 
+  public WebElement accessPageUntilId(String path, String id) {
+    this.driver.get(getAgentPath(path));
+    return this.wait.until(ExpectedConditions.presenceOfElementLocated(By.id(id)));
+  }
+
   public void accessNotSpringdogPage(String path) {
     assertThat(path).startsWith("/");
     this.driver.get("http://localhost:" + port + path);

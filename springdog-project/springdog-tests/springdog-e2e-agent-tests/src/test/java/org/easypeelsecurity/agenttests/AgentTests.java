@@ -26,6 +26,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.RetryingTest;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -65,7 +66,6 @@ class AgentTests extends SeleniumTestSupport {
     assertThat(pageSource()).contains("Dashboard", "Total Endpoints");
   }
 
-  @Test
   @RetryingTest(5)
   void ratelimit_detail() throws InterruptedException {
     withLogin();
@@ -79,7 +79,6 @@ class AgentTests extends SeleniumTestSupport {
         "Endpoint Information\nPath: /api/hello\nEndpoint Method Signature: java.lang.String org.easypeelsecurity.agenttests.ExampleController.hello()\nHTTP Method: GET\nPattern Path: false\nRule Status: NOT_CONFIGURED\nIP Based Rule: false\nPermanent Ban Rule: false\nRequest Limit Count: 0\nTime Limit (seconds): 0\nBan Time (seconds): 0\n");
   }
 
-  @Test
   @RetryingTest(5)
   void ratelimit_read() throws InterruptedException {
     withLogin();
@@ -98,7 +97,6 @@ class AgentTests extends SeleniumTestSupport {
     assertThat(cells.get(4).findElement(xpath(".//button[@title='Analyze']"))).isNotNull();
   }
 
-  @Test
   @RetryingTest(5)
   void errorTraceConfigurationSearchTest() throws InterruptedException {
     withLogin();
@@ -131,7 +129,6 @@ class AgentTests extends SeleniumTestSupport {
     assertThat(visibleItems).doesNotContain(notExpectedResult);
   }
 
-  @Test
   @RetryingTest(5)
   void errorTraceConfigurationEnableTest() throws InterruptedException {
     withLogin();
@@ -143,9 +140,118 @@ class AgentTests extends SeleniumTestSupport {
     getWait().until(
         ExpectedConditions.visibilityOfElementLocated(cssSelector("li.list-group-item.exception-item")));
     WebElement exceptionClasses =
-        getDriver().findElements(cssSelector("li.list-group-item.exception-item")).getFirst();
+        getDriver().findElements(cssSelector("li.list-group-item.exception-item")).get(0);
     WebElement checkbox = exceptionClasses.findElement(xpath(".//input[@type='checkbox']"));
     checkbox.click();
     assertThat(checkbox.isSelected()).isFalse();
+  }
+
+  @RetryingTest(5)
+  void notificationConfigurationTest() throws InterruptedException {
+    withLogin();
+
+    accessPage("/notification");
+    WebElement submitButton =
+        getWait().until(ExpectedConditions.elementToBeClickable(By.id("saveConfigurationButton")));
+    WebElement mailConfiguration =
+        getDriver().findElement(By.xpath("//h5[normalize-space()='Gmail Configuration']"));
+    assertThat(mailConfiguration).isNotNull();
+    WebElement emailTemplate = getDriver().findElement(By.xpath("//h5[normalize-space()='Email Templates']"));
+    assertThat(emailTemplate).isNotNull();
+
+    WebElement recipient = getDriver().findElement(By.id("recipient"));
+    recipient.clear();
+    recipient.sendKeys("test@test.com");
+    WebElement username = getDriver().findElement(By.id("username"));
+    username.clear();
+    username.sendKeys("test@test.com");
+    WebElement password = getDriver().findElement(By.id("password"));
+    password.clear();
+    password.sendKeys("test-password");
+
+    ((JavascriptExecutor) getDriver()).executeScript(
+        "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", submitButton);
+    Thread.sleep(500);
+
+    WebElement slowResponseSubject = getDriver().findElement(By.id("slowResponseSubject"));
+    slowResponseSubject.clear();
+    slowResponseSubject.sendKeys("Test Slow Response Subject");
+    WebElement slowResponseBody = getDriver().findElement(By.id("slowResponseBody"));
+    slowResponseBody.clear();
+    slowResponseBody.sendKeys("Test Slow Response Body");
+
+    submitButton.click();
+
+    getWait().until(
+        ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='alert alert-success']")));
+    String successMessage = getDriver().findElement(By.xpath("//div[@class='alert alert-success']")).getText();
+    assertThat(successMessage).isEqualTo("Successfully updated");
+
+    // changed value should be saved
+    assertThat(getDriver().findElement(By.id("recipient")).getAttribute("value")).isEqualTo("test@test.com");
+    assertThat(getDriver().findElement(By.id("username")).getAttribute("value")).isEqualTo("test@test.com");
+    assertThat(getDriver().findElement(By.id("password")).getAttribute("value")).isEqualTo("test-password");
+    assertThat(getDriver().findElement(By.id("slowResponseSubject")).getAttribute("value"))
+        .isEqualTo("Test Slow Response Subject");
+    assertThat(getDriver().findElement(By.id("slowResponseBody")).getAttribute("value"))
+        .isEqualTo("Test Slow Response Body");
+  }
+
+  @RetryingTest(5)
+  void notificationSystemWatchConfigurationTest() throws InterruptedException {
+    withLogin();
+
+    accessPage("/notification/system-watch");
+    WebElement submitButton =
+        getWait().until(ExpectedConditions.elementToBeClickable(By.id("saveConfigurationButton")));
+
+    WebElement activateCheckbox = getDriver().findElement(By.id("enableSystemWatch"));
+    if (!activateCheckbox.isSelected()) {
+      activateCheckbox.click();
+    }
+    WebElement cpuThreshold = getDriver().findElement(By.id("cpuThreshold"));
+    cpuThreshold.clear();
+    cpuThreshold.sendKeys("10.5");
+    WebElement memoryThreshold = getDriver().findElement(By.id("memoryThreshold"));
+    memoryThreshold.clear();
+    memoryThreshold.sendKeys("10.5");
+    WebElement diskThreshold = getDriver().findElement(By.id("diskThreshold"));
+    diskThreshold.clear();
+    diskThreshold.sendKeys("10.5");
+
+    submitButton.click();
+
+    getWait().until(
+        ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='alert alert-success']")));
+    String successMessage = getDriver().findElement(By.xpath("//div[@class='alert alert-success']")).getText();
+    assertThat(successMessage).isEqualTo("Successfully updated");
+    assertThat(getDriver().findElement(By.id("enableSystemWatch")).isSelected()).isTrue();
+    assertThat(getDriver().findElement(By.id("cpuThreshold")).getAttribute("value")).isEqualTo("10.5");
+    assertThat(getDriver().findElement(By.id("memoryThreshold")).getAttribute("value")).isEqualTo("10.5");
+    assertThat(getDriver().findElement(By.id("diskThreshold")).getAttribute("value")).isEqualTo("10.5");
+  }
+
+  @RetryingTest(5)
+  void notificationSlowResponseConfigurationTest() throws InterruptedException {
+    withLogin();
+
+    accessPage("/notification/slow-response");
+    WebElement submitButton =
+        getWait().until(ExpectedConditions.elementToBeClickable(By.id("saveConfigurationButton")));
+
+    WebElement activateCheckbox = getDriver().findElement(By.id("enableSlowResponse"));
+    if (!activateCheckbox.isSelected()) {
+      activateCheckbox.click();
+    }
+    WebElement thresholdMs = getDriver().findElement(By.id("thresholdMs"));
+    thresholdMs.clear();
+    thresholdMs.sendKeys("5000");
+
+    submitButton.click();
+    getWait().until(
+        ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='alert alert-success']")));
+    String successMessage = getDriver().findElement(By.xpath("//div[@class='alert alert-success']")).getText();
+    assertThat(successMessage).isEqualTo("Successfully updated");
+    assertThat(getDriver().findElement(By.id("thresholdMs")).getAttribute("value")).isEqualTo("5000");
   }
 }
