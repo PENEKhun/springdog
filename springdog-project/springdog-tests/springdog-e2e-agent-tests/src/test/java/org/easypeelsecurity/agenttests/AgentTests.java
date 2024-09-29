@@ -107,7 +107,7 @@ class AgentTests extends SeleniumTestSupport {
 
     performSearch("java.io.ObjectStrea", "<mark>java.io.ObjectStrea</mark>mException",
         "java.lang.MatchException");
-    performSearch("MatchException", "java.lang.<mark>MatchException</mark>", "java.io.ObjectStreamException");
+    performSearch("lang.NullPo", "java.<mark>lang.NullPo</mark>interException", "java.lang.MatchException");
     performSearch("nullpointer", "java.lang.<mark>NullPointer</mark>Exception",
         "java.io.ObjectStreamException");
   }
