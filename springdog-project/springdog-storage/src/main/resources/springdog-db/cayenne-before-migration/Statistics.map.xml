@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap https://cayenne.apache.org/schema/10/modelMap.xsd"
+	 project-version="10">
+	<property name="defaultPackage" value="org.easypeelsecurity.springdog.domain.statistics.model"/>
+	<property name="defaultSchema" value="APP"/>
+	<db-entity name="ENDPOINT_METRIC" schema="APP">
+		<db-attribute name="AVERAGE_RESPONSE_MS" type="BIGINT" isMandatory="true"/>
+		<db-attribute name="ENDPOINT_ID" type="BIGINT" isMandatory="true"/>
+		<db-attribute name="FAILURE_WITH_RATELIMIT" type="BIGINT" isMandatory="true"/>
+		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isGenerated="true" isMandatory="true"/>
+		<db-attribute name="METRIC_DATE" type="DATE" isMandatory="true"/>
+		<db-attribute name="PAGE_VIEW" type="BIGINT" isMandatory="true"/>
+	</db-entity>
+	<db-entity name="SYSTEM_METRIC" schema="APP">
+		<db-attribute name="CPU_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
+		<db-attribute name="DISK_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
+		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="JVM_HEAP_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
+		<db-attribute name="JVM_NON_HEAP_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
+		<db-attribute name="JVM_TOTAL_MEMORY_USED" type="BIGINT" isMandatory="true"/>
+		<db-attribute name="MEMORY_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
+		<db-attribute name="NETWORK_IN_BYTES" type="BIGINT" isMandatory="true"/>
+		<db-attribute name="NETWORK_OUT_BYTES" type="BIGINT" isMandatory="true"/>
+		<db-attribute name="TIMESTAMP" type="TIMESTAMP" isMandatory="true"/>
+	</db-entity>
+	<obj-entity name="EndpointMetric" className="org.easypeelsecurity.springdog.domain.statistics.model.EndpointMetric" dbEntityName="ENDPOINT_METRIC">
+		<obj-attribute name="averageResponseMs" type="long" db-attribute-path="AVERAGE_RESPONSE_MS"/>
+		<obj-attribute name="failureWithRatelimit" type="long" db-attribute-path="FAILURE_WITH_RATELIMIT"/>
+		<obj-attribute name="metricDate" type="java.time.LocalDate" db-attribute-path="METRIC_DATE"/>
+		<obj-attribute name="pageView" type="long" db-attribute-path="PAGE_VIEW"/>
+	</obj-entity>
+	<obj-entity name="SystemMetric" className="org.easypeelsecurity.springdog.domain.statistics.model.SystemMetric" dbEntityName="SYSTEM_METRIC">
+		<obj-attribute name="cpuUsagePercent" type="double" db-attribute-path="CPU_USAGE_PERCENT"/>
+		<obj-attribute name="diskUsagePercent" type="double" db-attribute-path="DISK_USAGE_PERCENT"/>
+		<obj-attribute name="id" type="long" db-attribute-path="ID"/>
+		<obj-attribute name="jvmHeapUsagePercent" type="double" db-attribute-path="JVM_HEAP_USAGE_PERCENT"/>
+		<obj-attribute name="jvmNonHeapUsagePercent" type="double" db-attribute-path="JVM_NON_HEAP_USAGE_PERCENT"/>
+		<obj-attribute name="jvmTotalMemoryUsed" type="long" db-attribute-path="JVM_TOTAL_MEMORY_USED"/>
+		<obj-attribute name="memoryUsagePercent" type="double" db-attribute-path="MEMORY_USAGE_PERCENT"/>
+		<obj-attribute name="networkInBytes" type="long" db-attribute-path="NETWORK_IN_BYTES"/>
+		<obj-attribute name="networkOutBytes" type="long" db-attribute-path="NETWORK_OUT_BYTES"/>
+		<obj-attribute name="timestamp" type="java.time.LocalDateTime" db-attribute-path="TIMESTAMP"/>
+		<post-add method-name="onPostAdd"/>
+	</obj-entity>
+	<db-relationship name="endpoint" source="ENDPOINT_METRIC" target="ENDPOINT">
+		<db-attribute-pair source="ENDPOINT_ID" target="ID"/>
+	</db-relationship>
+	<obj-relationship name="endpoint" source="EndpointMetric" target="Endpoint" deleteRule="Nullify" db-relationship-path="endpoint"/>
+	<dbImport xmlns="http://cayenne.apache.org/schema/10/dbimport">
+		<tableTypes>
+			<tableType>TABLE</tableType>
+			<tableType>VIEW</tableType>
+		</tableTypes>
+		<forceDataMapCatalog>false</forceDataMapCatalog>
+		<forceDataMapSchema>false</forceDataMapSchema>
+		<namingStrategy>org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator</namingStrategy>
+		<skipPrimaryKeyLoading>false</skipPrimaryKeyLoading>
+		<skipRelationshipsLoading>false</skipRelationshipsLoading>
+		<useJava7Types>false</useJava7Types>
+		<usePrimitives>true</usePrimitives>
+	</dbImport>
+	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
+		<excludeEntities>EndpointMetric</excludeEntities>
+		<destDir>../../../../springdog-domain/src/main/java</destDir>
+		<mode>entity</mode>
+		<template>templates/v4_1/subclass.vm</template>
+		<superTemplate>templates/v4_1/superclass.vm</superTemplate>
+		<embeddableTemplate>templates/v4_1/embeddable-subclass.vm</embeddableTemplate>
+		<embeddableSuperTemplate>templates/v4_1/embeddable-superclass.vm</embeddableSuperTemplate>
+		<queryTemplate>templates/v4_1/datamap-subclass.vm</queryTemplate>
+		<querySuperTemplate>templates/v4_1/datamap-superclass.vm</querySuperTemplate>
+		<outputPattern>*.java</outputPattern>
+		<makePairs>true</makePairs>
+		<usePkgPath>true</usePkgPath>
+		<overwrite>false</overwrite>
+		<createPropertyNames>false</createPropertyNames>
+		<createPKProperties>false</createPKProperties>
+		<client>false</client>
+	</cgen>
+</data-map>
