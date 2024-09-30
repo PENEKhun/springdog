@@ -17,6 +17,7 @@
 package org.easypeelsecurity.springdog.domain.errortracing.model;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.easypeelsecurity.springdog.domain.errortracing.model.auto._ExceptionCause;
 
@@ -28,5 +29,32 @@ public class ExceptionCause extends _ExceptionCause {
   @Override
   protected void onPrePersist() {
     setTimestamp(LocalDateTime.now());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    ExceptionCause that = (ExceptionCause) o;
+    return line == that.line && className.equals(that.className) && fileName.equals(that.fileName)
+           && message.equals(that.message) && methodName.equals(that.methodName) && Objects.equals(
+        parentExceptionId, that.parentExceptionId) && Objects.equals(nextException, that.nextException);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = className.hashCode();
+    result = 31 * result + fileName.hashCode();
+    result = 31 * result + line;
+    result = 31 * result + message.hashCode();
+    result = 31 * result + methodName.hashCode();
+    result = 31 * result + Objects.hashCode(parentExceptionId);
+    result = 31 * result + Objects.hashCode(nextException);
+    return result;
   }
 }
