@@ -30,6 +30,7 @@ import lombok.Getter;
 @Getter
 public class SystemMetricDto {
 
+  private Long id;
   private Double cpuUsagePercent;
   private Double memoryUsagePercent;
   private Double diskUsagePercent;
@@ -38,12 +39,14 @@ public class SystemMetricDto {
   private Long jvmTotalMemoryUsed;
   private Long networkInBytes;
   private Long networkOutBytes;
+  private String memo;
   private LocalDateTime timestamp;
 
   @Builder
-  public SystemMetricDto(Double cpuUsagePercent, Double memoryUsagePercent, Double diskUsagePercent,
+  public SystemMetricDto(Long id, Double cpuUsagePercent, Double memoryUsagePercent, Double diskUsagePercent,
       Double jvmHeapUsagePercent, Double jvmNonHeapUsagePercent, Long jvmTotalMemoryUsed,
-      Long networkInBytes, Long networkOutBytes, LocalDateTime timestamp) {
+      Long networkInBytes, Long networkOutBytes, String memo, LocalDateTime timestamp) {
+    this.id = id;
     this.cpuUsagePercent = cpuUsagePercent;
     this.memoryUsagePercent = memoryUsagePercent;
     this.diskUsagePercent = diskUsagePercent;
@@ -52,6 +55,7 @@ public class SystemMetricDto {
     this.jvmTotalMemoryUsed = jvmTotalMemoryUsed;
     this.networkInBytes = networkInBytes;
     this.networkOutBytes = networkOutBytes;
+    this.memo = memo;
     if (timestamp == null) {
       this.timestamp = LocalDateTime.now();
     } else {
