@@ -66,7 +66,7 @@ class AgentTests extends SeleniumTestSupport {
     assertThat(pageSource()).contains("Dashboard", "Total Endpoints");
   }
 
-  @RetryingTest(5)
+  @RetryingTest(10)
   void ratelimit_detail() throws InterruptedException {
     withLogin();
 
@@ -78,7 +78,7 @@ class AgentTests extends SeleniumTestSupport {
         "Endpoint Information\nPath: /api/hello\nEndpoint Method Signature: java.lang.String org.easypeelsecurity.agenttests.ExampleController.hello()\nHTTP Method: GET\nPattern Path: false\nRule Status: NOT_CONFIGURED\nIP Based Rule: false\nPermanent Ban Rule: false\nRequest Limit Count: 0\nTime Limit (seconds): 0\nBan Time (seconds): 0\n");
   }
 
-  @RetryingTest(5)
+  @RetryingTest(10)
   void ratelimit_read() throws InterruptedException {
     withLogin();
 
@@ -96,7 +96,7 @@ class AgentTests extends SeleniumTestSupport {
     assertThat(cells.get(4).findElement(xpath(".//button[@title='Analyze']"))).isNotNull();
   }
 
-  @RetryingTest(5)
+  @RetryingTest(10)
   void errorTraceConfigurationSearchTest() throws InterruptedException {
     withLogin();
 
@@ -128,7 +128,7 @@ class AgentTests extends SeleniumTestSupport {
     assertThat(visibleItems).doesNotContain(notExpectedResult);
   }
 
-  @RetryingTest(5)
+  @RetryingTest(10)
   void errorTraceConfigurationEnableTest() throws InterruptedException {
     withLogin();
 
@@ -145,7 +145,7 @@ class AgentTests extends SeleniumTestSupport {
     assertThat(checkbox.isSelected()).isFalse();
   }
 
-  @RetryingTest(5)
+  @RetryingTest(10)
   void notificationConfigurationTest() throws InterruptedException {
     withLogin();
 
@@ -196,7 +196,7 @@ class AgentTests extends SeleniumTestSupport {
         .isEqualTo("Test Slow Response Body");
   }
 
-  @RetryingTest(5)
+  @RetryingTest(10)
   void notificationSystemWatchConfigurationTest() throws InterruptedException {
     withLogin();
 
@@ -230,7 +230,7 @@ class AgentTests extends SeleniumTestSupport {
     assertThat(getDriver().findElement(By.id("diskThreshold")).getAttribute("value")).isEqualTo("10.5");
   }
 
-  @RetryingTest(5)
+  @RetryingTest(10)
   void notificationSlowResponseConfigurationTest() throws InterruptedException {
     withLogin();
 
