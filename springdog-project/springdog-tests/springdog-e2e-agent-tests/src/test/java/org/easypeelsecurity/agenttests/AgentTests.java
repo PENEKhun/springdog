@@ -253,4 +253,15 @@ class AgentTests extends SeleniumTestSupport {
     assertThat(successMessage).isEqualTo("Successfully updated");
     assertThat(getDriver().findElement(By.id("thresholdMs")).getAttribute("value")).isEqualTo("5000");
   }
+
+  @RetryingTest(10)
+  void systemWatchView() throws InterruptedException {
+    withLogin();
+
+    WebElement systemUsageChart = accessPageUntilXPath("/system-watch", "//canvas[@id='resource-usage-chart']");
+    assertThat(systemUsageChart).isNotNull();
+    WebElement networkTrafficChart = getDriver().findElement(By.xpath( "//canvas[@id='network-traffic-chart']"));
+    assertThat(networkTrafficChart).isNotNull();
+    // TODO: chart visual validation and add memo test
+  }
 }

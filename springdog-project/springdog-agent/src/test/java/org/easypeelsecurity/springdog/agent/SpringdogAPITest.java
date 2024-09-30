@@ -21,6 +21,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
@@ -72,6 +73,14 @@ class SpringdogAPITest extends AgentTestSupport {
           assertThat(responseBody).contains("testMethod");
           assertThat(responseBody).contains("10");
         });
+  }
+
+  @Test
+  @WithMockUser(username = "admin", roles = {SpringdogSecurityConfig.SPRINGDOG_AGENT_ADMIN_ROLE})
+  void systemWatchMemo() throws Exception {
+    doNothing().when(statisticsService).changeMemo(1L, "test");
+    mockMvc.perform(post("/springdog/system-watch/1/memo?description=test"))
+        .andExpect(status().isNoContent());
   }
 
   @Test
