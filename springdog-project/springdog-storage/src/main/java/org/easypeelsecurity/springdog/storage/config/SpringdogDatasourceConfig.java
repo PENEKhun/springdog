@@ -46,7 +46,7 @@ public class SpringdogDatasourceConfig {
     return ServerRuntime.builder()
         .jdbcDriver("org.apache.derby.jdbc.EmbeddedDriver")
         .url("jdbc:derby:springdog-embedded-database;create=true")
-        .addConfig("cayenne-springdog.xml")
+        .addConfig("springdog-db/cayenne-before-migration/cayenne-springdog.xml")
         .build();
   }
 

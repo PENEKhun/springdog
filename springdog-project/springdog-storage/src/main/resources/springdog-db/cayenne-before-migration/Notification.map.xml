@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap https://cayenne.apache.org/schema/10/modelMap.xsd"
+	 project-version="10">
+	<property name="defaultPackage" value="org.easypeelsecurity.springdog.shared.notification.model"/>
+	<property name="defaultSchema" value="APP"/>
+	<db-entity name="NOTIFICATION_HISTORY" schema="APP">
+		<db-attribute name="CONTENT" type="DOUBLE" isMandatory="true"/>
+		<db-attribute name="CREATED_AT" type="TIMESTAMP" isMandatory="true"/>
+		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="SENT_SUCCESSFULLY" type="BOOLEAN" isMandatory="true"/>
+		<db-attribute name="TITLE" type="DOUBLE" isMandatory="true"/>
+	</db-entity>
+	<obj-entity name="NotificationHistory" className="org.easypeelsecurity.springdog.shared.notification.model.NotificationHistory" dbEntityName="NOTIFICATION_HISTORY">
+		<obj-attribute name="content" type="double" db-attribute-path="CONTENT"/>
+		<obj-attribute name="createdAt" type="java.time.LocalDateTime" db-attribute-path="CREATED_AT"/>
+		<obj-attribute name="sentSuccessfully" type="boolean" db-attribute-path="SENT_SUCCESSFULLY"/>
+		<obj-attribute name="title" type="double" db-attribute-path="TITLE"/>
+	</obj-entity>
+	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
+		<destDir>../java</destDir>
+		<mode>all</mode>
+		<template>templates/v4_1/subclass.vm</template>
+		<superTemplate>templates/v4_1/superclass.vm</superTemplate>
+		<embeddableTemplate>templates/v4_1/embeddable-subclass.vm</embeddableTemplate>
+		<embeddableSuperTemplate>templates/v4_1/embeddable-superclass.vm</embeddableSuperTemplate>
+		<queryTemplate>templates/v4_1/datamap-subclass.vm</queryTemplate>
+		<querySuperTemplate>templates/v4_1/datamap-superclass.vm</querySuperTemplate>
+		<outputPattern>*.java</outputPattern>
+		<makePairs>true</makePairs>
+		<usePkgPath>true</usePkgPath>
+		<overwrite>false</overwrite>
+		<createPropertyNames>false</createPropertyNames>
+		<createPKProperties>false</createPKProperties>
+		<client>false</client>
+	</cgen>
+</data-map>
