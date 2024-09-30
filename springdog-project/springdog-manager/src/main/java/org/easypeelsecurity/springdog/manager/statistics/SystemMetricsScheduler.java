@@ -47,7 +47,7 @@ public class SystemMetricsScheduler {
   /**
    * Store system metrics.
    */
-  @Scheduled(fixedRateString = "${springdog.systemMetricsScheduler.fixedRate:20000}") // TODO: 시간 변경
+  @Scheduled(fixedRateString = "${springdog.systemMetricsScheduler.fixedRate:60000}") // TODO: 시간 변경
   public void storeSystemsMetrics() {
     SystemUsageMonitor systemUsageMonitor = new SystemUsageMonitor();
 
