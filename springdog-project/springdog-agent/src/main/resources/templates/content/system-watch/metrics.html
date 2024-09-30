@@ -1,0 +1,121 @@
+<!--
+  ~ Copyright 2024 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html layout:decorate="~{/templates/layout/default_layout.html}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="en">
+
+<head>
+  <title>SystemWatch</title>
+  <script th:src="@{/js/chart.js}"></script>
+  <script th:src="@{/js/chartjs-plugin-annotation.min.js}"></script>
+  <script th:src="@{/js/chartjs-adapter-date-fns.js}"></script>
+  <script th:src="@{/js/system-watch.js}"></script>
+  <script th:src="@{/js/select2.min.js}"></script>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    let systemMetrics = [[${systemMetrics}]];
+    /*]]>*/
+
+    document.addEventListener('DOMContentLoaded', function () {
+      initializeCharts(systemMetrics);
+
+      $('#memoLabel').select2({
+        tags: true,
+        tokenSeparators: [',', ' '],
+        placeholder: "Select or add new labels"
+      });
+    });
+  </script>
+</head>
+
+<div class="content" layout:fragment="content">
+  <div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h4">SystemWatch</h1>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">System Metrics</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12 mb-4">
+                <div style="height: 400px;">
+                  <canvas id="resource-usage-chart"></canvas>
+                </div>
+              </div>
+              <div class="col-md-12 mb-4">
+                <div style="height: 400px;">
+                  <canvas id="network-traffic-chart"></canvas>
+                </div>
+              </div>
+
+              <div class="modal fade" id="memoModal" tabindex="-1" aria-labelledby="memoModalLabel"
+                   aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="memoModalLabel">Add Memo</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"
+                              aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form id="memoForm">
+                        <div class="mb-3">
+                          <label for="timestamp" class="form-label">Timestamp</label>
+                          <label id="timestamp" class="form-text">timestamp</label>
+                        </div>
+                        <div class="mb-3">
+                          <label for="memoDescription" class="form-label">Description</label>
+                          <textarea class="form-control" id="memoDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                          <label for="memoLabel" class="form-label">Label</label>
+                          <select id="memoLabel" class="form-select"></select>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                      </button>
+                      <button type="button" class="btn btn-primary" id="saveMemoBtn">Save Memo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <h5>Memos</h5>
+        <ul id="memoList" class="list-group">
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+</html>

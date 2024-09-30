@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import org.easypeelsecurity.springdog.domain.ratelimit.EndpointRepository;
 import org.easypeelsecurity.springdog.domain.ratelimit.model.Endpoint;
@@ -183,5 +184,38 @@ public class StatisticsService {
             metric.getFailureWithRatelimit(),
             metric.getMetricDate()))
         .toList();
+  }
+
+  /**
+   * Get the recent system metrics.
+   *
+   * @param limit The maximum number of system metrics to include in the results
+   * @return The list of {@link SystemMetricDto}
+   */
+  public List<SystemMetricDto> getRecentSystemMetrics(int limit) {
+    return systemMetricRepository.getRecentSystemMetrics(context, limit)
+        .stream()
+        .map(SystemMetricConverter::convert)
+        .toList();
+  }
+
+  /**
+   * Change the memo of a system metric.
+   * @param metricId The system metric id
+   * @param description The memo to set
+   */
+  public void changeMemo(Long metricId, String description) {
+    SystemMetric systemMetric = ObjectSelect.query(SystemMetric.class)
+        .where(SystemMetric.ID.eq(metricId))
+        .selectOne(context);
+    Assert.notNull(systemMetric, "System metric not found");
+
+    if (StringUtils.hasText(description)) {
+      systemMetric.setMemo(description);
+    } else {
+      systemMetric.setMemo(null);
+    }
+
+    context.commitChanges();
   }
 }
