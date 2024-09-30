@@ -2,7 +2,7 @@
 <graphs xmlns="http://cayenne.apache.org/schema/10/graph">
 	<graph type="ER" scale="1.0">
 		<entity name="EXCEPTION_TYPE" x="0.0" y="0.0" width="107.0" height="77.0"/>
-		<entity name="SYSTEM_METRIC" x="0.0" y="0.0" width="198.0" height="182.0"/>
+		<entity name="SYSTEM_METRIC" x="0.0" y="0.0" width="198.0" height="197.0"/>
 		<entity name="ENDPOINTPARAMETER" x="1035.72" y="0.0" width="140.0" height="107.0"/>
 		<entity name="ENDPOINTHEADER" x="0.0" y="0.0" width="116.0" height="92.0"/>
 		<entity name="ENDPOINT" x="1139.48" y="300.72" width="156.0" height="197.0"/>
@@ -17,7 +17,7 @@
 		<entity name="ExceptionClass" x="0.0" y="0.0" width="122.0" height="77.0"/>
 		<entity name="EndpointChangelog" x="0.0" y="0.0" width="132.0" height="137.0"/>
 		<entity name="Endpoint" x="1459.07" y="241.09" width="137.0" height="197.0"/>
-		<entity name="SystemMetric" x="0.0" y="0.0" width="155.0" height="167.0"/>
+		<entity name="SystemMetric" x="0.0" y="0.0" width="155.0" height="197.0"/>
 		<entity name="EndpointParameter" x="1349.56" y="0.0" width="120.0" height="77.0"/>
 		<entity name="EndpointMetric" x="0.0" y="0.0" width="120.0" height="92.0"/>
 		<entity name="EndpointHeader" x="0.0" y="0.0" width="101.0" height="62.0"/>

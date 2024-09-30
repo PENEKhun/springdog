@@ -16,10 +16,11 @@
 	<db-entity name="SYSTEM_METRIC" schema="APP">
 		<db-attribute name="CPU_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
 		<db-attribute name="DISK_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
-		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isGenerated="true" isMandatory="true"/>
+		<db-attribute name="ID" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
 		<db-attribute name="JVM_HEAP_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
 		<db-attribute name="JVM_NON_HEAP_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
 		<db-attribute name="JVM_TOTAL_MEMORY_USED" type="BIGINT" isMandatory="true"/>
+		<db-attribute name="MEMO" type="VARCHAR" length="500"/>
 		<db-attribute name="MEMORY_USAGE_PERCENT" type="DOUBLE" isMandatory="true"/>
 		<db-attribute name="NETWORK_IN_BYTES" type="BIGINT" isMandatory="true"/>
 		<db-attribute name="NETWORK_OUT_BYTES" type="BIGINT" isMandatory="true"/>
@@ -34,9 +35,11 @@
 	<obj-entity name="SystemMetric" className="org.easypeelsecurity.springdog.domain.statistics.model.SystemMetric" dbEntityName="SYSTEM_METRIC">
 		<obj-attribute name="cpuUsagePercent" type="double" db-attribute-path="CPU_USAGE_PERCENT"/>
 		<obj-attribute name="diskUsagePercent" type="double" db-attribute-path="DISK_USAGE_PERCENT"/>
+		<obj-attribute name="id" type="long" db-attribute-path="ID"/>
 		<obj-attribute name="jvmHeapUsagePercent" type="double" db-attribute-path="JVM_HEAP_USAGE_PERCENT"/>
 		<obj-attribute name="jvmNonHeapUsagePercent" type="double" db-attribute-path="JVM_NON_HEAP_USAGE_PERCENT"/>
 		<obj-attribute name="jvmTotalMemoryUsed" type="long" db-attribute-path="JVM_TOTAL_MEMORY_USED"/>
+		<obj-attribute name="memo" type="java.lang.String" db-attribute-path="MEMO"/>
 		<obj-attribute name="memoryUsagePercent" type="double" db-attribute-path="MEMORY_USAGE_PERCENT"/>
 		<obj-attribute name="networkInBytes" type="long" db-attribute-path="NETWORK_IN_BYTES"/>
 		<obj-attribute name="networkOutBytes" type="long" db-attribute-path="NETWORK_OUT_BYTES"/>

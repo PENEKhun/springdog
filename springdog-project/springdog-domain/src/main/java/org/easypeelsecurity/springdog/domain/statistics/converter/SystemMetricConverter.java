@@ -36,6 +36,7 @@ public abstract class SystemMetricConverter {
    */
   public static SystemMetricDto convert(SystemMetric systemMetric) {
     return SystemMetricDto.builder()
+        .id(systemMetric.getId())
         .cpuUsagePercent(systemMetric.getCpuUsagePercent())
         .memoryUsagePercent(systemMetric.getMemoryUsagePercent())
         .diskUsagePercent(systemMetric.getDiskUsagePercent())
@@ -44,6 +45,7 @@ public abstract class SystemMetricConverter {
         .jvmTotalMemoryUsed(systemMetric.getJvmTotalMemoryUsed())
         .networkInBytes(systemMetric.getNetworkInBytes())
         .networkOutBytes(systemMetric.getNetworkOutBytes())
+        .memo(systemMetric.getMemo())
         .timestamp(systemMetric.getTimestamp())
         .build();
   }
@@ -65,6 +67,7 @@ public abstract class SystemMetricConverter {
     systemMetric.setJvmTotalMemoryUsed(systemMetricDto.getJvmTotalMemoryUsed());
     systemMetric.setNetworkInBytes(systemMetricDto.getNetworkInBytes());
     systemMetric.setNetworkOutBytes(systemMetricDto.getNetworkOutBytes());
+    systemMetric.setMemo(systemMetricDto.getMemo());
     systemMetric.setTimestamp(systemMetricDto.getTimestamp());
     return systemMetric;
   }
