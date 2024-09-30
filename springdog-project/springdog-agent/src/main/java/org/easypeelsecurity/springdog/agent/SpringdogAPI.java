@@ -20,10 +20,12 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.easypeelsecurity.springdog.domain.errortracing.model.ExceptionListingService;
+import org.easypeelsecurity.springdog.domain.statistics.StatisticsService;
 import org.easypeelsecurity.springdog.shared.dto.ErrorTracingDto;
 
 /**
@@ -35,9 +37,11 @@ import org.easypeelsecurity.springdog.shared.dto.ErrorTracingDto;
 public class SpringdogAPI extends SpringdogAPIExceptionHandler {
 
   private final ExceptionListingService exceptionListingService;
+  private final StatisticsService statisticsService;
 
-  public SpringdogAPI(ExceptionListingService exceptionListingService) {
+  public SpringdogAPI(ExceptionListingService exceptionListingService, StatisticsService statisticsService) {
     this.exceptionListingService = exceptionListingService;
+    this.statisticsService = statisticsService;
   }
 
   @org.springframework.web.bind.annotation.ResponseStatus(NO_CONTENT)
@@ -52,5 +56,12 @@ public class SpringdogAPI extends SpringdogAPIExceptionHandler {
   public CommonResponse<ErrorTracingDto> getErrorTracing(
       @PathVariable(name = "errorTracingId") long errorTracingId) {
     return new CommonResponse<>(exceptionListingService.getErrorTrace(errorTracingId));
+  }
+
+  @org.springframework.web.bind.annotation.ResponseStatus(NO_CONTENT)
+  @PostMapping("/system-watch/{metricId}/memo")
+  public void addMemo(@PathVariable("metricId") Long metricId,
+      @RequestParam("description") String description) {
+    statisticsService.changeMemo(metricId, description);
   }
 }

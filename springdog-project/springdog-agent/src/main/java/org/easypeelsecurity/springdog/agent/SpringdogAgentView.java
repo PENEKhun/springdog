@@ -220,6 +220,12 @@ public class SpringdogAgentView {
     return "/templates/content/error-tracing/configuration.html";
   }
 
+  @GetMapping("/system-watch")
+  public String systemWatchView(Model model) {
+    model.addAttribute("systemMetrics", statisticsService.getRecentSystemMetrics(50));
+    return "/templates/content/system-watch/metrics.html";
+  }
+
   @GetMapping("/service/change-pw")
   public String changePW() {
     return "/templates/content/service/change-pw.html";
