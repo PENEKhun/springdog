@@ -17,6 +17,7 @@
 package org.easypeelsecurity.springdog.agent;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -145,6 +146,14 @@ class SpringdogAgentViewTest extends AgentTestSupport {
   void errorTraceConfiguration() throws Exception {
     when(exceptionListingService.getExceptionListing()).thenReturn(new ExceptionClassesDto(new ArrayList<>()));
     mockMvc.perform(get("/springdog/error-tracing/configuration"))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithMockUser(username = "admin", roles = {SpringdogSecurityConfig.SPRINGDOG_AGENT_ADMIN_ROLE})
+  void systemWatchView() throws Exception {
+    when(statisticsService.getRecentSystemMetrics(anyInt())).thenReturn(List.of());
+    mockMvc.perform(get("/springdog/system-watch"))
         .andExpect(status().isOk());
   }
 }
