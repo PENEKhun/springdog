@@ -18,8 +18,8 @@ mavenPublishing {
     coordinates(rootPackageName, "springdog-shared", springDogVersion)
 
     pom {
-        name = "SpringDog Shared Code"
-        description = "The code which shared across all springdog projects"
+        name = "Springdog Shared Code"
+        description = "Common components used throughout the entire project."
         inceptionYear = "2024"
         url = ""
 

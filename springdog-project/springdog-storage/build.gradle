@@ -29,8 +29,8 @@ mavenPublishing {
     coordinates(rootPackageName, "springdog-storage", springDogVersion)
 
     pom {
-        name = "SpringDog Storage"
-        description = "It contains the embedded database related code needed to run springdog."
+        name = "Springdog Storage"
+        description = "A module for database access."
         inceptionYear = "2024"
         url = ""
 

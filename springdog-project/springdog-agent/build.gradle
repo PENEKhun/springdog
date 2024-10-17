@@ -29,8 +29,8 @@ mavenPublishing {
     coordinates(rootPackageName, "springdog-agent", springDogVersion)
 
     pom {
-        name = "SpringDog Agent"
-        description = "Bark bark!"
+        name = "Springdog Agent"
+        description = "A module containing views related to user settings pages."
         inceptionYear = "2024"
         url = ""
 

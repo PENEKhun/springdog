@@ -30,8 +30,8 @@ mavenPublishing {
     coordinates(rootPackageName, "springdog-autoconfigure", springDogVersion)
 
     pom {
-        name = "SpringDog AutoConfigure"
-        description = "Bark bark!"
+        name = "Springdog AutoConfigure"
+        description = "An auto-configuration module for running the library. It analyzes the user's application through annotation processing and generates the necessary code for execution."
         inceptionYear = "2024"
         url = ""
 

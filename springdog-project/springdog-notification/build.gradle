@@ -19,8 +19,8 @@ mavenPublishing {
     coordinates(rootPackageName, "springdog-notification", springDogVersion)
 
     pom {
-        name = "SpringDog Notification"
-        description = "The notification service for SpringDog"
+        name = "Springdog Notification"
+        description = "The notification service for Springdog"
         inceptionYear = "2024"
         url = ""
 
