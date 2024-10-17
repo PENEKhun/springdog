@@ -101,8 +101,8 @@
           <nav class="sb-sidenav-menu-nested nav">
             <a class="nav-link"
                th:href="${@springdogProperties.computeAbsolutePath('/rate-limit')}">Manage</a>
-            <a class="nav-link"
-               th:href="${@springdogProperties.computeAbsolutePath('/rate-limit/monitor')}">Monitor</a>
+<!--            <a class="nav-link"-->
+<!--               th:href="${@springdogProperties.computeAbsolutePath('/rate-limit/monitor')}">Monitor</a>-->
           </nav>
         </div>
 
@@ -133,12 +133,6 @@
 
 
         <div class="sb-sidenav-menu-heading">Service Setting</div>
-
-        <a class="nav-link" th:href="${@springdogProperties.computeAbsolutePath('/change-pw')}">
-          <div class="sb-nav-link-icon">
-          </div>
-          Change Password
-        </a>
 
         <a class="nav-link" th:href="${@springdogProperties.computeAbsolutePath('/logout')}">
           <div class="sb-nav-link-icon">
