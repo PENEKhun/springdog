@@ -18,8 +18,8 @@ mavenPublishing {
     coordinates(rootPackageName, "springdog-domain", springDogVersion)
 
     pom {
-        name = "SpringDog domain"
-        description = ""
+        name = "Springdog domain"
+        description = "A module related to domain logic."
         inceptionYear = "2024"
         url = ""
 

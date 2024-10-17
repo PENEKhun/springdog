@@ -21,7 +21,7 @@ mavenPublishing {
 
     pom {
         name = "SpringDog Manager"
-        description = "Bark bark!"
+        description = "Core module containing business logic. All background tasks, except for code running on the agent, are executed through the Manager."
         inceptionYear = "2024"
         url = ""
 

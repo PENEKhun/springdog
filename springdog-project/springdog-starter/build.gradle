@@ -35,8 +35,8 @@ mavenPublishing {
     coordinates(rootPackageName, "springdog-starter", springDogVersion)
 
     pom {
-        name = "SpringDog Starter"
-        description = "All in one!"
+        name = "Springdog Starter"
+        description = "All in one! A module that includes all dependencies required to run the library."
         inceptionYear = "2024"
         url = ""
 
