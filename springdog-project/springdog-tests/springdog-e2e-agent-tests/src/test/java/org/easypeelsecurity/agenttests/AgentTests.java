@@ -264,4 +264,14 @@ class AgentTests extends SeleniumTestSupport {
     assertThat(networkTrafficChart).isNotNull();
     // TODO: chart visual validation and add memo test
   }
+
+  @RetryingTest(10)
+  void errorTraceMonitoring() throws InterruptedException {
+    accessEndpoint("/api/throw"); // given
+    withLogin();
+
+    WebElement target = accessPageUntilXPath("/error-tracing",
+        "//h2[@id='heading-0']//span[@class='text-primary'][contains(text(),'org.easypeelsecurity.agenttests.ExampleController.')]");
+    assertThat(target).isNotNull();
+  }
 }

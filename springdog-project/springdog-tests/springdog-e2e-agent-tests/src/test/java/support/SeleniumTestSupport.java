@@ -74,6 +74,10 @@ public abstract class SeleniumTestSupport {
     this.driver.get(getAgentPath(path));
   }
 
+  public void accessEndpoint(String path) {
+    this.driver.get("http://localhost:" + port + path);
+  }
+
   public WebElement accessPageUntil(String path, ExpectedCondition<WebElement> condition) {
     this.driver.get(getAgentPath(path));
     return this.wait.until(condition);

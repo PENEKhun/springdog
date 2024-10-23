@@ -28,4 +28,9 @@ public class ExampleController {
   public String hello() {
     return "Hello, World!";
   }
+
+  @GetMapping("/throw")
+  public String throwException() {
+    throw new IllegalArgumentException("This is a test exception");
+  }
 }
